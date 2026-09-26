@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>HK-ELE Teacher Database</title>
-  <link rel="stylesheet" href="styles.css?v=74">
+  <link rel="stylesheet" href="styles.css?v=88">
 </head>
 <body>
   <header class="site-header">
@@ -24,6 +24,35 @@
         <button class="scope" data-scope="broader"><strong>Candidate + reference</strong><span>The candidate plus 245 additional families: 3,430 in total</span></button>
         <button class="scope" data-scope="full"><strong>Full database</strong><span>Explore the complete database beyond the two wordlist sets</span></button>
       </div>
+      <section id="ai-filter-panel" class="ai-filter-panel" aria-labelledby="ai-filter-title">
+        <button id="ai-filter-toggle" class="ai-filter-toggle" type="button" aria-expanded="false" aria-controls="ai-filter-body">
+          <span><strong id="ai-filter-title">Find words with AI</strong><small>Optional request interpreter · teacher confirmation required</small></span>
+          <span class="ai-toggle-label" aria-hidden="true">Open +</span>
+        </button>
+        <div id="ai-filter-body" class="ai-filter-body" hidden>
+          <p>Describe the registered conditions you need. Only this short request is sent to the existing Worker; no word list, classroom text, notes or Teaching List is sent. Results always come from the principal HK-ELE data.</p>
+          <label for="ai-filter-query"><strong>Teaching request</strong></label>
+          <textarea id="ai-filter-query" maxlength="300" rows="3" placeholder="Example: Find words with the root act. Limit 20."></textarea>
+          <div class="ai-examples" aria-label="Verified examples">
+            <button type="button" data-ai-example="Find words with the root act. Limit 20.">Root: act</button>
+            <button type="button" data-ai-example="Find 10 Candidate words first observed by P2 or earlier, sorted by overall rank">Grade: by P2</button>
+            <button type="button" data-ai-example="Find 10 Candidate and Reference words in HK Top 1k, sorted by HK rank">HK Top 1k</button>
+          </div>
+          <div id="ai-turnstile" aria-label="Cloudflare Turnstile"></div>
+          <p id="ai-turnstile-message" class="hint">Open this panel to prepare the anti-abuse check.</p>
+          <div class="ai-actions">
+            <button id="ai-filter-preview-button" class="primary" type="button">Preview filters</button>
+            <button id="ai-filter-edit-button" type="button" hidden>Edit request</button>
+          </div>
+          <p id="ai-filter-message" class="ai-message hidden" role="status" aria-live="polite"></p>
+          <div id="ai-filter-preview" class="ai-filter-preview" hidden>
+            <h2>Confirm the AI interpretation</h2>
+            <p id="ai-filter-summary"></p>
+            <ul id="ai-filter-conditions"></ul>
+            <button id="ai-filter-confirm-button" class="primary" type="button" hidden>Show matching words</button>
+          </div>
+        </div>
+      </section>
       <form id="browse-search-form" class="search-toolbar" role="search">
         <label class="search-box"><span>Search for a word</span><input id="browse-search" type="search" placeholder="For example: happiness" autocomplete="off"></label>
         <button class="primary" type="submit">Search</button>
@@ -31,6 +60,10 @@
         <details class="columns-menu"><summary>Columns</summary><div id="column-choices"></div></details>
       </form>
       <div id="search-feedback" class="search-feedback hidden" role="status"></div>
+      <div id="ai-active-summary" class="ai-active-summary" role="status" aria-live="polite" hidden>
+        <div><strong id="ai-active-title"></strong><p id="ai-active-conditions"></p><small>Principal Candidate/Reference data · deterministic filtering</small></div>
+        <div class="ai-actions"><button id="ai-active-edit" type="button">Edit</button><button id="ai-active-clear" type="button">Clear / Undo</button></div>
+      </div>
       <div class="table-shell" tabindex="0" aria-label="Word family table; horizontally scrollable"><table id="family-table"><thead><tr id="family-head"></tr></thead><tbody id="family-body"></tbody></table></div>
       <div class="pagination"><button id="prev-page">Previous</button><span id="page-label">Page 1</span><button id="next-page">Next</button><label>Rows <select id="page-size"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></label></div>
       <details class="level-note"><summary>About the wordlist and its evidence</summary><p>Overall rank combines the study's General, textbook and Hong Kong corpus evidence. HK rank describes frequency in the registered Hong Kong corpus evidence. Use these measures alongside your lesson goals when selecting words.</p><p>Earliest observed level records where a word or family first appears in the sampled Hong Kong textbooks and provides a local progression reference for planning. External level references retain their source's level system. A dash indicates that the displayed field has no recorded value.</p><p>The study also examines proper-name treatment and transfer to K–12 disciplinary materials through fixed-set, post-selection evaluations. These evaluations keep the ranking and the 3,185 / 3,430 wordlist sets fixed. This website uses the 14 September 2026 ranking.</p></details>
@@ -73,6 +106,6 @@
     </section>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script src="tokenizer.js?v=74"></script><script src="contractions.js?v=74"></script><script src="static_api.js?v=74"></script><script src="xlsx_export.js?v=74"></script><script src="app.js?v=74"></script>
+  <script src="tokenizer.js?v=74"></script><script src="contractions.js?v=74"></script><script src="ai_runtime_config.js?v=87"></script><script src="ai_public_config.js?v=87"></script><script src="ai_filter_contract.js?v=87"></script><script src="static_api.js?v=87"></script><script src="xlsx_export.js?v=74"></script><script src="app.js?v=87"></script><script src="ai_filter.js?v=87"></script>
 </body>
 </html>

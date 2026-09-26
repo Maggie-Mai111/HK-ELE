@@ -22,6 +22,7 @@
   const MSVL_ORDER = ["English Grammar and Writing", "Health", "Mathematics", "Science", "Social Studies and History"];
   const state = {
     scope: "core", sort: "overall", page: 1, pageSize: 25, total: 0, rows: [],
+    aiFilters: null, aiRestore: null,
     selected: loadList(), columns: loadColumns(), detail: null, selectedForm: "", formFilter: "",
     formFilters: {hk:new Set(), first:new Set(), external:new Set(), academic:new Set()},
     textFilters: {hk:new Set(), first:new Set(), external:new Set(), academic:new Set()},
@@ -121,7 +122,7 @@
   function renderBrowseTable() {
     const visible = columnDefs.filter(([key]) => state.columns[key]);
     $("#family-head").innerHTML = visible.map(([key, label]) => `<th data-col="${key}" ${key === "family" ? 'class="family-cell"' : ""}>${esc(label)}</th>`).join("");
-    $("#family-body").innerHTML = state.rows.map(row => {
+    $("#family-body").innerHTML = state.rows.length ? state.rows.map(row => {
       const cells = {
         family: `<td class="family-cell"><button class="family-link" data-view-family="${esc(row.baseword_key)}">${esc(row.display_family)}</button></td>`,
         status: `<td class="status-cell"><span class="set-pill ${statusClass(row.set_membership)}">${statusLabel(row.set_membership)}</span></td>`,
@@ -140,20 +141,66 @@
         add: `<td class="action-cell"><button class="primary" data-add-family="${esc(row.baseword_key)}">Add</button></td>`,
       };
       return `<tr>${visible.map(([key]) => cells[key]).join("")}</tr>`;
-    }).join("");
+    }).join("") : `<tr><td class="browse-empty" colspan="${visible.length}">No word families match the current controlled conditions. Edit or clear the AI selection to continue.</td></tr>`;
     $$('[data-view-family]').forEach(button => button.addEventListener("click", () => openFamily(button.dataset.viewFamily)));
     $$('[data-add-family]').forEach(button => button.addEventListener("click", () => addFamilyByKey(button.dataset.addFamily)));
   }
 
   async function loadFamilies() {
     try {
-      const data = await json(`/families?scope=${state.scope}&sort=${state.sort}&page=${state.page}&page_size=${state.pageSize}`);
+      const params = new URLSearchParams({scope:state.scope, sort:state.sort, page:String(state.page), page_size:String(state.pageSize)});
+      if (state.aiFilters) params.set("ai_filters", JSON.stringify(state.aiFilters));
+      const data = await json(`/families?${params}`);
       state.rows = await enrichBrowseRows(data.families); state.total = data.available_items; renderBrowseTable();
       const pages = Math.max(1, Math.ceil(state.total / state.pageSize));
       $("#page-label").textContent = `Page ${state.page} of ${pages}`;
       $("#prev-page").disabled = state.page <= 1; $("#next-page").disabled = state.page >= pages;
-    } catch (error) { $("#family-body").innerHTML = `<tr><td>${esc(error.message)}</td></tr>`; }
+      return data;
+    } catch (error) { $("#family-body").innerHTML = `<tr><td>${esc(error.message)}</td></tr>`; return null; }
   }
+
+  function syncBrowseControls() {
+    $$(".scope").forEach(node => node.classList.toggle("active", node.dataset.scope === state.scope));
+    $("#sort-select").value = state.sort;
+    $("#page-size").value = String(state.pageSize);
+  }
+
+  function clearAiForManualBrowseChange() {
+    if (!state.aiFilters) return;
+    state.aiFilters = null;
+    state.aiRestore = null;
+    window.dispatchEvent(new CustomEvent("hkele:manual-browse-change"));
+  }
+
+  window.HKELE_BROWSE_ADAPTER = Object.freeze({
+    async apply(proposedFilters) {
+      const filters = window.HKELE_AI_FILTER_CONTRACT.validateConditions(proposedFilters);
+      const snapshot = {scope:state.scope, sort:state.sort, page:state.page, pageSize:state.pageSize, aiFilters:state.aiFilters, aiRestore:state.aiRestore};
+      if (!state.aiFilters) state.aiRestore = {scope:state.scope, sort:state.sort, page:state.page, pageSize:state.pageSize};
+      state.aiFilters = filters;
+      state.scope = filters.scope === "candidate" ? "core" : "broader";
+      state.sort = filters.sort;
+      state.page = 1;
+      syncBrowseControls();
+      const data = await loadFamilies();
+      if (!data) {
+        Object.assign(state, snapshot);
+        syncBrowseControls();
+        await loadFamilies();
+        throw new Error("The controlled filter could not be applied.");
+      }
+      return {matchedBeforeLimit:data.matched_before_limit, availableItems:data.available_items};
+    },
+    async clear() {
+      if (!state.aiFilters) return;
+      const restore = state.aiRestore || {scope:"core", sort:"overall", page:1, pageSize:25};
+      state.aiFilters = null;
+      state.aiRestore = null;
+      Object.assign(state, restore);
+      syncBrowseControls();
+      await loadFamilies();
+    },
+  });
 
   function exactForm(detail) {
     const target = normalized(state.selectedForm);
@@ -594,8 +641,8 @@
 
   function bind() {
     $$(".nav-button").forEach(button => button.addEventListener("click", () => showView(button.dataset.view)));
-    $$(".scope").forEach(button => button.addEventListener("click", () => { $$(".scope").forEach(node => node.classList.remove("active")); button.classList.add("active"); state.scope=button.dataset.scope; state.page=1; loadFamilies(); }));
-    $("#sort-select").addEventListener("change", event => { state.sort=event.target.value; state.page=1; loadFamilies(); });
+    $$(".scope").forEach(button => button.addEventListener("click", () => { clearAiForManualBrowseChange(); $$(".scope").forEach(node => node.classList.remove("active")); button.classList.add("active"); state.scope=button.dataset.scope; state.page=1; loadFamilies(); }));
+    $("#sort-select").addEventListener("change", event => { clearAiForManualBrowseChange(); state.sort=event.target.value; state.page=1; loadFamilies(); });
     $("#page-size").addEventListener("change", event => { state.pageSize=Number(event.target.value); state.page=1; loadFamilies(); });
     $("#prev-page").addEventListener("click", () => { if(state.page>1){state.page-=1;loadFamilies();} });
     $("#next-page").addEventListener("click", () => { state.page+=1;loadFamilies(); });

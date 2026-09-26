@@ -3,6 +3,7 @@
 
   const cache = new Map();
   let manifestPromise = null;
+  let aiFilterIndexPromise = null;
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
   const apostropheNorm = value => norm(value).replace(/[’‘ʼ＇]/g, "'");
@@ -27,6 +28,11 @@
     return manifestPromise;
   }
 
+  async function aiFilterIndex() {
+    if (!aiFilterIndexPromise) aiFilterIndexPromise = loadGzipJson("data/ai_filter_index.json.gz");
+    return aiFilterIndexPromise;
+  }
+
   function fnvBucket(value, count) {
     let hash = 2166136261;
     for (const byte of new TextEncoder().encode(value)) {
@@ -43,12 +49,45 @@
 
   async function browse(params) {
     const config = await manifest();
-    const scope = params.get("scope") || "core";
-    const sort = params.get("sort") || "overall";
+    const proposedFilters = params.get("ai_filters");
+    const filters = proposedFilters
+      ? window.HKELE_AI_FILTER_CONTRACT.validateConditions(JSON.parse(proposedFilters))
+      : null;
+    const scope = filters
+      ? (filters.scope === "candidate" ? "core" : "broader")
+      : (params.get("scope") || "core");
+    const sort = filters?.sort || params.get("sort") || "overall";
     const page = Math.max(1, Number(params.get("page")) || 1);
     const pageSize = [10, 25, 50, 100].includes(Number(params.get("page_size"))) ? Number(params.get("page_size")) : 25;
     const info = config.browse?.[scope]?.[sort];
     if (!info) throw new Error("Unsupported Browse selection");
+    if (filters) {
+      const allRows = [];
+      for (let index = 0; index < info.chunk_count; index += 1) {
+        const values = await loadGzipJson(`data/browse/${scope}/${sort}/${String(index).padStart(4, "0")}.json.gz`);
+        allRows.push(...values.map(row => inflate(config.browse_fields, row)));
+      }
+      const execution = window.HKELE_AI_FILTER_CONTRACT.applyToRows(
+        allRows,
+        filters,
+        await aiFilterIndex(),
+      );
+      const start = (page - 1) * pageSize;
+      const stop = Math.min(start + pageSize, execution.families.length);
+      return {
+        api_version: config.api_version,
+        scope,
+        sort,
+        page,
+        page_size: pageSize,
+        total_items: execution.matchedBeforeLimit,
+        available_items: execution.families.length,
+        matched_before_limit: execution.matchedBeforeLimit,
+        populations: info.populations,
+        families: execution.families.slice(start, stop),
+        ai_filters: execution.filters,
+      };
+    }
     const start = (page - 1) * pageSize;
     const stop = Math.min(start + pageSize, info.available_items);
     const rows = [];
