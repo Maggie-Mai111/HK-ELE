@@ -552,3 +552,5 @@ button,input,select,textarea{font-size:18px}
   .form-detail-table th,.form-detail-table td{font-size:20px;line-height:1.5;padding:15px 13px}
   .form-detail-table th{font-size:16px}
 }
+
+.ai-filter-panel[hidden]{display:none}

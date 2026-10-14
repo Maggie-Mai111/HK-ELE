@@ -1,0 +1,21 @@
+.privacy-dialog{box-sizing:border-box;width:calc(100% - 32px);max-width:600px;max-height:calc(100dvh - 32px);padding:32px;border:1px solid var(--line,#ccd6cf);border-radius:18px;background:var(--bg,#f4f7f2);color:var(--ink,#17231b);font:17px/1.55 Arial,sans-serif}
+.privacy-dialog::backdrop{background:#f4f7f2}
+.privacy-dialog h1{font-size:30px;line-height:1.25;margin:12px 0 20px}
+.privacy-dialog p{margin:16px 0}
+.privacy-brand{color:#176b45;font-size:15px;font-weight:700}
+.privacy-scope{padding:18px 20px 18px 38px;background:#dcefe5;border-radius:14px}
+.privacy-scope li+li{margin-top:10px}
+.privacy-note,.privacy-dialog details{font-size:15px;color:#52615a}
+.privacy-dialog summary{color:#176b45;font-size:16px;min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:600}
+.privacy-choice{display:flex;gap:12px;align-items:flex-start;margin:18px 0;font-size:16px;cursor:pointer}
+.privacy-choice input{width:24px;height:24px;margin:2px 0 0;accent-color:#176b45;flex-shrink:0}
+.privacy-dialog button{min-height:48px;width:100%;margin-top:12px;font-size:16px}
+.privacy-dialog button:disabled{opacity:.46;cursor:default}
+.privacy-dialog [hidden]{display:none}
+.privacy-error{color:#a22828}
+@media(max-width:480px){.privacy-overlay{padding:0}.privacy-dialog{width:100%;max-height:100dvh;margin:0;min-height:100dvh;padding:28px 22px;border:0;border-radius:0}}
+.privacy-overlay{position:fixed;inset:0;z-index:1000;background:#f4f7f2;display:grid;place-items:center;overflow:auto;padding:16px}
+.privacy-overlay[hidden]{display:none}
+.privacy-dialog{overflow:auto;outline:none}
+html[data-consent-pending],html[data-privacy-open]{overflow:hidden}
+@media(max-width:480px){.privacy-overlay{padding:0}}

@@ -4,7 +4,9 @@
   const config = window.HKELE_AI_PUBLIC_CONFIG;
   const contract = window.HKELE_AI_FILTER_CONTRACT;
   const panel = document.querySelector("#ai-filter-panel");
-  if (!config || !contract || !panel) return;
+  if (!panel) return;
+  if (!config || !contract || !config.configured) { panel.hidden = true; return; }
+  panel.hidden = false;
 
   const $ = selector => panel.querySelector(selector);
   const esc = value => String(value ?? "").replace(/[&<>'"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[character]));
@@ -47,7 +49,7 @@
     previewButton.disabled = value || !input.value.trim() || (!config.fixtureMode && !turnstileToken);
     editButton.disabled = value;
     confirmButton.disabled = value;
-    previewButton.textContent = value ? "Working…" : "Preview filters";
+    previewButton.textContent = value ? "Finding filters…" : "Review suggested filters";
   }
 
   function setMessage(text, kind = "") {
@@ -75,9 +77,9 @@
     confirmButton.hidden = result.status !== "ready";
     editButton.hidden = false;
     preview.hidden = false;
-    if (result.status === "unsupported") setMessage("Unsupported request. Nothing was applied; Browse and manual search remain available.", "error");
+    if (result.status === "unsupported") setMessage("We can't search for that information yet. Try an example or choose your own filters.", "error");
     else if (result.status === "needs_clarification") setMessage("Please edit the request before applying any filter.", "warning");
-    else setMessage("Review the controlled conditions below. Browse results have not changed yet.", "success");
+    else setMessage("Review these filters, then choose Show matching words.", "success");
   }
 
   function uuidV4() {
@@ -120,12 +122,12 @@
   async function prepareProtection() {
     if (config.fixtureMode) {
       turnstileToken = "local-fixture-token";
-      turnstileMessage.textContent = "Local fixture protection ready; no external AI call will be made.";
+      turnstileMessage.textContent = "";
       setBusy(false);
       return;
     }
     if (!config.configured || !config.endpoint || !config.turnstileSiteKey) {
-      turnstileMessage.textContent = "AI is not configured for this environment. Existing search and filters remain available.";
+      turnstileMessage.textContent = "";
       setBusy(false);
       return;
     }
@@ -135,14 +137,14 @@
       widgetId = api.render(turnstileHost, {
         sitekey: config.turnstileSiteKey,
         action: "ai_filter",
-        callback: token => { turnstileToken = token; turnstileMessage.textContent = "Anti-abuse check ready for one AI request."; setBusy(false); },
-        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Anti-abuse check failed. Existing search and filters remain available."; setBusy(false); },
-        "expired-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Anti-abuse check expired. Complete it again before previewing."; setBusy(false); },
-        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Anti-abuse check timed out. Existing search and filters remain available."; setBusy(false); },
+        callback: token => { turnstileToken = token; turnstileMessage.textContent = ""; setBusy(false); },
+        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word filters."; setBusy(false); },
+        "expired-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please complete the verification again."; setBusy(false); },
+        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word filters."; setBusy(false); },
         theme: "auto",
       });
     } catch {
-      turnstileMessage.textContent = "Anti-abuse check is unavailable. Existing search and filters remain available.";
+      turnstileMessage.textContent = "Search couldn't get ready. Please try again or use the word filters.";
     }
   }
 
@@ -187,7 +189,7 @@
     const query = input.value.trim();
     if (!query || query.length > 300 || busy) return;
     if (!config.fixtureMode && (!config.configured || !turnstileToken)) {
-      setMessage("AI protection is not ready. Nothing changed; existing search and filters remain available.", "error");
+      setMessage("Please complete the verification and try again.", "error");
       return;
     }
     setBusy(true);
@@ -197,7 +199,9 @@
       const raw = config.fixtureMode ? await fixtureResult(query) : await workerResult(query);
       renderInterpretation(contract.validateResult(raw));
     } catch (error) {
-      setMessage(`${error instanceof Error ? error.message : "AI search failed."} Nothing was applied; existing search and filters remain available.`, "error");
+      setMessage(error instanceof Error && error.message === "AI search is busy. Try again later."
+        ? "Search is busy. Try again shortly or use the word filters."
+        : "We couldn't complete the search. Try again or use the word filters.", "error");
     } finally {
       setBusy(false);
     }
@@ -215,7 +219,7 @@
       setMessage("");
       document.querySelector("#family-table")?.scrollIntoView({block: "start", behavior: "smooth"});
     } catch {
-      setMessage("The controlled filter could not be applied. Nothing changed; existing search and filters remain available.", "error");
+      setMessage("We couldn't show these results. Try again or adjust the word filters.", "error");
     } finally {
       setBusy(false);
     }
