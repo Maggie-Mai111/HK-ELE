@@ -1,15 +1,19 @@
 {
   "schemaVersion": 1,
-  "productVersion": "teacher-feedback-forms-local-20261014-v5",
+  "productVersion": "teacher-lesson-planning-20261019-v9",
   "dataVersion": "Package67-20260914",
   "report": {
     "url": "https://docs.google.com/forms/d/e/1FAIpQLSeGzu5OWBnaDo8aiA43ouEFotgVchDTafVro-1RIL_qTQn_AA/viewform",
     "requiredContext": "reference",
-    "fields": { "reference": "entry.734180665" }
+    "fields": {
+      "reference": "entry.734180665"
+    }
   },
   "rating": {
     "url": "https://docs.google.com/forms/d/e/1FAIpQLSf6pC-Csxo2EfT8t5JASF1R6Rtcyn9j5UMZKezSiGiA_tPjCQ/viewform",
     "requiredContext": "reference",
-    "fields": { "reference": "entry.495852996" }
+    "fields": {
+      "reference": "entry.495852996"
+    }
   }
 }

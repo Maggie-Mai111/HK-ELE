@@ -2,10 +2,12 @@
   "use strict";
 
   const LIST_KEY = "hkele-phase1v-teaching-list-v1";
+  const LESSON_TITLE_KEY = "hkele-lesson-title-v1";
+  const lesson = globalThis.HKELE_LESSON;
   const COLUMN_KEY = "hkele-phase1v-columns-v1";
   const columnDefs = [
     ["family", "Word family", true],
-    ["status", "Candidate/reference status", true], ["overall", "Overall frequency rank", true],
+    ["status", "Word list", true], ["overall", "Overall frequency rank", true],
     ["hk", "HK frequency rank / band", true], ["first_seen", "Earliest observed in HK textbooks", true],
     ["external", "External level reference", true], ["academic", "Academic Word List (AWL)", true],
     ["subjects", "Middle School Vocabulary Lists (MSVL)", true], ["earlier", "Earlier HK list", true],
@@ -21,9 +23,9 @@
   };
   const MSVL_ORDER = ["English Grammar and Writing", "Health", "Mathematics", "Science", "Social Studies and History"];
   const state = {
-    scope: "core", sort: "overall", page: 1, pageSize: 25, total: 0, rows: [],
+    scope: "full", sort: "overall", page: 1, pageSize: 25, total: 0, rows: [],
     aiFilters: null, aiRestore: null,
-    selected: loadList(), columns: loadColumns(), detail: null, selectedForm: "", formFilter: "",
+    selected: loadList(), lessonTitle: loadLessonTitle(), lessonSelection:new Set(), lessonLimit:6, lessonOpen:new Set(), undoList:null, columns: loadColumns(), detail: null, selectedForm: "", formFilter: "",
     formFilters: {hk:new Set(), first:new Set(), external:new Set(), academic:new Set()},
     textFilters: {hk:new Set(), first:new Set(), external:new Set(), academic:new Set()},
     textFilterOptions: {hk:[], first:[], external:[], academic:[]},
@@ -43,8 +45,8 @@
   const browseYes = value => value === true || value === 1 ? "Yes" : "—";
   const normalized = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
   const yes = value => value === true || value === 1 ? "Yes" : "—";
-  const statusLabel = value => value === "Candidate" ? "Candidate" : value === "Reference only" ? "Reference only" : "Full database";
-  const statusClass = value => value === "Candidate" ? "core" : value === "Reference only" ? "reference" : "other";
+  const statusLabel = value => value === "Candidate" || value === "Core list" ? "Core list" : "Full database";
+  const statusClass = value => value === "Candidate" || value === "Core list" ? "core" : "other";
 
   function msvlSubjects(...values) {
     const found = new Set();
@@ -93,12 +95,21 @@
     try { const value = JSON.parse(localStorage.getItem(LIST_KEY) || "[]"); return Array.isArray(value) ? value : []; }
     catch { return []; }
   }
+  function loadLessonTitle() { try { return localStorage.getItem(LESSON_TITLE_KEY) || ""; } catch { return ""; } }
   function loadColumns() {
     const defaults = Object.fromEntries(columnDefs.map(([key, , initial]) => [key, initial]));
     try { return {...defaults, ...(JSON.parse(localStorage.getItem(COLUMN_KEY) || "null") || {})}; }
     catch { return defaults; }
   }
-  function saveList() { localStorage.setItem(LIST_KEY, JSON.stringify(state.selected)); updateListCount(); }
+  function saveList() {
+    try { localStorage.setItem(LIST_KEY, JSON.stringify(state.selected)); } catch { toast("We couldn’t save your latest changes. Export a copy before leaving."); }
+    updateListCount();
+    if (!$("#lesson-picker").classList.contains("hidden")) workspace.renderPicker();
+    $$('[data-add-family]').forEach(button => {
+      const added = state.selected.some(item => item.baseword_key === button.dataset.addFamily);
+      button.disabled = added; button.textContent = added ? "Added ✓" : "Add";
+    });
+  }
   function saveColumns() { localStorage.setItem(COLUMN_KEY, JSON.stringify(state.columns)); }
   function toast(message) { const node = $("#toast"); node.textContent = message; node.classList.add("show"); setTimeout(() => node.classList.remove("show"), 1800); }
   async function json(path, options = {}) { return window.HKELE_STATIC_API.request(path, options); }
@@ -119,18 +130,25 @@
     }));
   }
 
+  function evidenceBadge(label, value, tone = "neutral") {
+    if (blank(value)) return "";
+    return `<span class="evidence-badge tone-${tone}"><span>${esc(label)}</span><strong>${esc(value)}</strong></span>`;
+  }
   function renderBrowseTable() {
+    $("#browse-result-count").innerHTML = `<strong>${state.total.toLocaleString()}</strong> word families`;
     const visible = columnDefs.filter(([key]) => state.columns[key]);
-    $("#family-head").innerHTML = visible.map(([key, label]) => `<th data-col="${key}" ${key === "family" ? 'class="family-cell"' : ""}>${esc(label)}</th>`).join("");
+    const groups = [["Word family", ["family", "status"]], ["Frequency", ["overall", "hk"]], ["Textbook & list evidence", ["first_seen", "external", "academic", "subjects", "earlier"]], ["Word parts", ["root", "root_meaning", "prefix", "suffix"]], ["Actions", ["view", "add"]]];
+    $("#family-column-groups").innerHTML = groups.map(([label, keys]) => { const count = keys.filter(key => state.columns[key]).length; return count ? `<th colspan="${count}" scope="colgroup">${label}</th>` : ""; }).join("");
+    $("#family-head").innerHTML = visible.map(([key, label]) => `<th scope="col" data-col="${key}" ${key === "family" ? 'class="family-cell"' : ""}>${esc(label)}</th>`).join("");
     $("#family-body").innerHTML = state.rows.length ? state.rows.map(row => {
       const cells = {
         family: `<td class="family-cell"><button class="family-link" data-view-family="${esc(row.baseword_key)}">${esc(row.display_family)}</button></td>`,
         status: `<td class="status-cell"><span class="set-pill ${statusClass(row.set_membership)}">${statusLabel(row.set_membership)}</span></td>`,
         overall: `<td class="overall-cell">${browseInteger(row.overall_frequency_order)}</td>`,
         hk: `<td class="hk-cell"><strong>${browseInteger(row.current_hk_frequency_rank)}</strong><span class="hint">${browseShown(row.current_hk_frequency_band)}</span></td>`,
-        first_seen: `<td class="evidence-cell first-seen-cell">${browseShown(row.textbook_first_seen_level)}</td>`,
-        external: `<td class="evidence-cell external-cell">${browseShown(row.browse_external_level_reference)}</td>`,
-        academic: `<td class="evidence-cell academic-cell">${browseYes(row.awl)}</td>`,
+        first_seen: `<td class="evidence-cell first-seen-cell">${evidenceBadge("", row.textbook_first_seen_level, "textbook") || "—"}</td>`,
+        external: `<td class="evidence-cell external-cell">${evidenceBadge("", row.browse_external_level_reference, "external") || "—"}</td>`,
+        academic: `<td class="evidence-cell academic-cell">${row.awl ? evidenceBadge("", "AWL", "subject") : "—"}</td>`,
         subjects: `<td class="evidence-cell subjects-cell">${browseShown(msvlDisplay(row.msvl))}</td>`,
         earlier: `<td class="earlier-cell">${browseYes(row.earlier_hk)}</td>`,
         root: `<td class="morph-cell root-cell">${browseShown(row.browse_root)}</td>`,
@@ -138,7 +156,7 @@
         prefix: `<td class="morph-cell affix-cell">${browseShown(row.browse_prefix)}</td>`,
         suffix: `<td class="morph-cell affix-cell">${browseShown(row.browse_suffix)}</td>`,
         view: `<td class="action-cell"><button data-view-family="${esc(row.baseword_key)}">View</button></td>`,
-        add: `<td class="action-cell"><button class="primary" data-add-family="${esc(row.baseword_key)}">Add</button></td>`,
+        add: `<td class="action-cell"><button class="primary" data-add-family="${esc(row.baseword_key)}" ${state.selected.some(item => item.baseword_key === row.baseword_key) ? "disabled" : ""}>${state.selected.some(item => item.baseword_key === row.baseword_key) ? "Added ✓" : "Add"}</button></td>`,
       };
       return `<tr>${visible.map(([key]) => cells[key]).join("")}</tr>`;
     }).join("") : `<tr><td class="browse-empty" colspan="${visible.length}">No word families match the current controlled conditions. Edit or clear the AI selection to continue.</td></tr>`;
@@ -178,7 +196,7 @@
       const snapshot = {scope:state.scope, sort:state.sort, page:state.page, pageSize:state.pageSize, aiFilters:state.aiFilters, aiRestore:state.aiRestore};
       if (!state.aiFilters) state.aiRestore = {scope:state.scope, sort:state.sort, page:state.page, pageSize:state.pageSize};
       state.aiFilters = filters;
-      state.scope = filters.scope === "candidate" ? "core" : "broader";
+      state.scope = filters.scope === "full" ? "full" : "core";
       state.sort = filters.sort;
       state.page = 1;
       syncBrowseControls();
@@ -193,7 +211,7 @@
     },
     async clear() {
       if (!state.aiFilters) return;
-      const restore = state.aiRestore || {scope:"core", sort:"overall", page:1, pageSize:25};
+      const restore = state.aiRestore || {scope:"full", sort:"overall", page:1, pageSize:25};
       state.aiFilters = null;
       state.aiRestore = null;
       Object.assign(state, restore);
@@ -210,11 +228,11 @@
     return [hasAwl(form, family) ? "AWL" : "", msvlDisplay(form?.msvl, family?.msvl, form?.academic_subject_evidence)].filter(Boolean).join(" · ");
   }
   function evidenceItem(label, value) { return `<div class="evidence-item"><span>${esc(label)}</span><strong>${shown(value)}</strong></div>`; }
-  function resultEvidenceLabel(label, value) { return blank(value) ? "" : `<span class="result-evidence-label">${esc(label)}: ${esc(value)}</span>`; }
+  function resultEvidenceLabel(label, value) { return evidenceBadge(label, value, label.includes("textbook") ? "textbook" : label.includes("External") ? "external" : label.includes("subject") ? "subject" : "neutral"); }
   function resultEvidence(owner, evidence, item) {
     const hk = blank(owner?.current_hk_frequency_rank) && blank(owner?.current_hk_frequency_band) ? "" : [blank(owner.current_hk_frequency_rank) ? "" : integer(owner.current_hk_frequency_rank), owner.current_hk_frequency_band || ""].filter(Boolean).join(" · ");
     const subject = item ? subjectText(item) : [hasAwl(evidence, owner) ? "AWL" : "", msvlDisplay(evidence?.msvl, owner?.msvl, evidence?.academic_subject_evidence)].filter(Boolean).join(" · ");
-    return [`<span class="set-pill ${statusClass(owner.set_membership)}">${statusLabel(owner.set_membership)}</span>`, resultEvidenceLabel("Overall rank", blank(owner.overall_frequency_order) ? "" : integer(owner.overall_frequency_order)), resultEvidenceLabel("HK rank / band", hk), resultEvidenceLabel("Earliest HK textbook observation", evidence?.first_seen_hk_textbooks), resultEvidenceLabel("External level", evidence?.external_level_reference), resultEvidenceLabel("AWL / MSVL / subject", subject)].filter(Boolean).join("");
+    return [`<span class="set-pill ${statusClass(owner.set_membership)}">${statusLabel(owner.set_membership)}</span>`, resultEvidenceLabel("Overall rank", blank(owner.overall_frequency_order) ? "" : integer(owner.overall_frequency_order)), resultEvidenceLabel("HK rank / band", hk), resultEvidenceLabel("HK textbooks · earliest", evidence?.first_seen_hk_textbooks), resultEvidenceLabel("External level", evidence?.external_level_reference), resultEvidenceLabel("AWL / MSVL / subject", subject)].filter(Boolean).join("");
   }
 
   function distinct(values) {
@@ -310,8 +328,10 @@
       <article class="selected-word-card">
         <p class="eyebrow">Selected word</p><h1 id="word-view-title">${shown(selected?.form || state.selectedForm)}</h1>
         <p class="identity-line">Word family: <strong>${esc(family.display_family)}</strong></p>
-        <div class="evidence-grid">
-          ${evidenceItem("Candidate / reference status", statusLabel(family.set_membership))}
+        <div class="word-overview"><span class="set-pill ${statusClass(family.set_membership)}">${statusLabel(family.set_membership)}</span><div class="evidence-badges">${evidenceBadge("This word · earliest HK textbook", selected?.first_seen_hk_textbooks, "textbook")}${evidenceBadge("External level", selected?.external_level_reference, "external")}${hasAwl(selected, family) ? evidenceBadge("List", "AWL", "subject") : ""}</div><div class="card-frequency"><span>Family overall rank <strong>${overallRank(family.overall_frequency_order)}</strong></span><span>HK rank <strong>${browseInteger(family.current_hk_frequency_rank)}</strong></span></div></div>
+        <button class="primary selected-add" data-add-selected>+ Teaching list</button><div class="feedback-word-actions"><button type="button" data-feedback-kind="rating" data-feedback-word="true">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true">Report a problem</button></div>
+        <details class="workspace-disclosure" open><summary>More word information <span>Levels, subject links and word parts</span></summary><div class="evidence-grid">
+          ${evidenceItem("Word list", statusLabel(family.set_membership))}
           ${evidenceItem("Overall frequency rank", overallRank(family.overall_frequency_order))}
           ${evidenceItem("HK frequency rank / band", rankBand(family.current_hk_frequency_rank, family.current_hk_frequency_band))}
           ${evidenceItem("This word: earliest observed in HK textbooks", selected?.first_seen_hk_textbooks)}
@@ -323,9 +343,9 @@
           ${evidenceItem("Prefix", selected?.prefix)}
           ${evidenceItem("Suffix", selected?.suffix)}
         </div>
-        <button class="primary selected-add" data-add-selected>Add selected word</button><div class="feedback-word-actions"><button type="button" data-feedback-kind="rating" data-feedback-word="true">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true">Report a problem</button></div>
+        </details>
       </article>
-      <section class="family-summary">
+      <details class="family-summary workspace-disclosure"><summary>Family evidence <span>Frequency, textbook and source records</span></summary>
         <div class="family-summary-head"><div><p class="eyebrow">Family summary</p><h2>${esc(family.display_family)}</h2></div><span class="set-pill ${statusClass(family.set_membership)}">${statusLabel(family.set_membership)}</span></div>
         <div class="evidence-grid summary-grid">
           ${evidenceItem("Overall frequency rank", overallRank(family.overall_frequency_order))}
@@ -350,18 +370,18 @@
             ${evidenceItem("Earlier General frequency (Zipf scale)", family.historical_general_zipf_provenance_only)}
           </details>
         </details>
-      </section>
+      </details>
       <section class="family-forms">
-        <div class="form-table-heading"><div><p class="eyebrow">Word family</p><h2>Word-level evidence by layer</h2><span class="shown-count">Showing ${forms.length.toLocaleString()} of ${detail.forms.length.toLocaleString()} forms</span></div>
+        <div class="form-table-heading"><div><p class="eyebrow">Word family</p><h2>Explore word forms</h2><span class="shown-count">Showing ${forms.length.toLocaleString()} of ${detail.forms.length.toLocaleString()} forms</span></div>
         <div class="form-table-controls"><label>Filter forms<input id="form-filter" value="${esc(state.formFilter)}" placeholder="Type part of a word"></label><button id="clear-form-filter">Reset all</button></div></div>
-        <div class="form-evidence-filters" aria-label="Word-level evidence filters">
+        <details class="workspace-disclosure" ${Object.values(state.formFilters).some(values => values.size) ? "open" : ""}><summary>Filter word forms</summary><div class="form-evidence-filters" aria-label="Word-level evidence filters">
           <div id="form-filter-hk">${multiFilterMarkup("hk", "HK frequency band", formFilterOptions.hk, state.formFilters.hk)}</div>
           <div id="form-filter-first">${multiFilterMarkup("first", "Earliest observed in HK textbooks", formFilterOptions.first, state.formFilters.first)}</div>
           <div id="form-filter-external">${multiFilterMarkup("external", "External level reference", formFilterOptions.external, state.formFilters.external)}</div>
           <div id="form-filter-academic">${multiFilterMarkup("academic", "AWL / MSVL / subject", formFilterOptions.academic, state.formFilters.academic)}</div>
         </div>
-        <div class="form-tiers">${tierTables}</div>
-        <p class="level-note">Textbook levels show where each form first appears in the sampled Hong Kong materials and provide a local progression reference for planning. The family level is the earliest observation among its registered members. External references retain their source level systems. AWL and MSVL connections include available family-level links. A dash indicates no recorded value for the displayed field.</p>
+        </details><div class="form-tiers">${tierTables}</div>
+        <details class="level-note"><summary>How to read this evidence</summary><p>Textbook levels show where each form first appears in the sampled Hong Kong materials and provide a local progression reference for planning. The family level is the earliest observation among its registered members. External references retain their source level systems. AWL and MSVL connections include available family-level links. A dash indicates no recorded value for the displayed field.</p></details>
       </section>`;
     window.dispatchEvent(new CustomEvent("hkele-word-feedback-context", { detail: { word: selected?.form || state.selectedForm, family: family.display_family, familyKey: family.baseword_key } }));
     $("[data-add-selected]").addEventListener("click", () => addToList(family, selected?.form || state.selectedForm));
@@ -377,22 +397,20 @@
     });
   }
 
-  function addToList(family, word) {
-    const key = family.baseword_key, chosen = word || family.display_family;
-    let item = state.selected.find(row => row.baseword_key === key);
-    if (!item) {
-      item = {baseword_key:key, display_family:family.display_family, set_membership:family.set_membership,
-        overall_frequency_order:family.overall_frequency_order, overall_frequency_value:family.overall_frequency_value,
-        general_evidence_status:family.general_evidence_status, general_zipf:family.bawf_family_zipf,
-        educational_tokens:family.educational_tokens, ice_hk_tokens:family.ice_hk_tokens,
-        glowbe_hk_tokens:family.glowbe_hk_tokens, now_hk_tokens:family.now_hk_tokens,
-        hk_corpus_frequency_rank:family.current_hk_frequency_rank,
-        hk_corpus_frequency_band:family.current_hk_frequency_band, selected_forms:[], order:state.selected.length + 1,
-        depth:"Notice", notes:"", connections:""};
-      state.selected.push(item);
-    }
-    if (!item.selected_forms.includes(chosen)) item.selected_forms.push(chosen);
-    saveList(); toast(`${chosen} added`);
+  function createLessonItem(family, index) {
+    return {baseword_key:family.baseword_key, display_family:family.display_family, set_membership:family.set_membership,
+      overall_frequency_order:family.overall_frequency_order, overall_frequency_value:family.overall_frequency_value,
+      general_evidence_status:family.general_evidence_status, general_zipf:family.bawf_family_zipf,
+      educational_tokens:family.educational_tokens, ice_hk_tokens:family.ice_hk_tokens,
+      glowbe_hk_tokens:family.glowbe_hk_tokens, now_hk_tokens:family.now_hk_tokens,
+      hk_corpus_frequency_rank:family.current_hk_frequency_rank, hk_corpus_frequency_band:family.current_hk_frequency_band,
+      selected_forms:[], order:index + 1, depth:"Notice", teaching_focus:"", notes:"", connections:""};
+  }
+  function addToList(family, word, sourceLabel = "Find words") {
+    workspace.rememberUndo();
+    const merged = lesson.mergeSelections(state.selected, [{family, selectedForms:[word || family.display_family], sourceLabel}], createLessonItem);
+    state.selected = merged.items;
+    saveList(); toast(`${word || family.display_family} added · Open Teaching List to plan your lesson.`);
   }
   async function addFamilyByKey(key) {
     const row = state.rows.find(item => item.baseword_key === key);
@@ -455,11 +473,10 @@
     if (!owner || item.status !== "RESOLVED") return "review";
     if (state.commonTokens.has(item.normalized_token)) return "common";
     if (owner.candidate_member) return "core";
-    if (owner.reference_member) return "broader";
     return "other";
   }
   function summarizeTextItems(items) {
-    const summary = Object.fromEntries(["core","broader","other","contractions","review","common","unmatched"].map(key => [key,{words:0,occurrences:0}]));
+    const summary = Object.fromEntries(["core","other","contractions","review","common","unmatched"].map(key => [key,{words:0,occurrences:0}]));
     items.forEach(item => {
       const key = itemGroup(item);
       summary[key].words += 1;
@@ -482,7 +499,6 @@
     if (!owner || item.status !== "RESOLVED") return true;
     const wordSet = $("#filter-word-set").value;
     if (wordSet === "core" && !owner.candidate_member) return false;
-    if (wordSet === "broader" && !owner.reference_member) return false;
     if (!selectedMatches(owner.current_hk_frequency_band, state.textFilters.hk)) return false;
     if (!selectedMatches(firstSeen(item), state.textFilters.first, firstSeenMatches)) return false;
     if (!selectedMatches(evidence?.external_level_reference, state.textFilters.external)) return false;
@@ -517,7 +533,7 @@
     }
     const owner = itemOwner(item), evidence = exactEvidence(item);
     if (!owner || item.status !== "RESOLVED") {
-      const note = item.identity_exception?.teacher_display || (item.status === "UNMATCHED" ? "No recorded family match in this data release. This can include common words or compounds; it does not mean your students do not know the word." : "Check the reading in this sentence before choosing a family.");
+      const note = item.identity_exception?.teacher_display || (item.status === "UNMATCHED" ? "" : "Check the reading in this sentence before choosing a family.");
       return `<article class="text-result"><div><span class="observed-word">${esc(item.display_word)}</span><span class="occurrence-count">${item.count} occurrence${item.count === 1 ? "" : "s"}</span>${context}</div><div class="review-note">${esc(note)}</div><div></div></article>`;
     }
     return `<article class="text-result"><div class="result-token"><span class="observed-word">${esc(item.display_word)}</span><span class="occurrence-count">${item.count} occurrence${item.count === 1 ? "" : "s"}</span>${context}</div><div><div class="result-family-line"><span>Word family</span><strong>${esc(owner.display_family)}</strong></div><div class="result-evidence">${resultEvidence(owner, evidence, item)}</div></div><div class="result-actions"><button data-result-view="${esc(owner.baseword_key)}" data-result-form="${esc(evidence?.form || item.display_word)}">View</button><button class="primary" data-result-add="${esc(owner.baseword_key)}" data-result-form="${esc(evidence?.form || item.display_word)}">Add</button></div></article>`;
@@ -525,20 +541,23 @@
   function renderTextResults() {
     if (!state.textItems.length) return;
     const definitions = [
-      ["core", "Candidate words", true], ["broader", "Reference-only words", true], ["other", "Other database words", false],
-      ["contractions", "Contractions and expressions", true], ["unmatched", "Words without a data match", true], ["review", "Words that need a context check", false], ["common", "Common words", $("#filter-common").checked],
+      ["core", "Core list words", true], ["other", "Other database words", true],
+      ["contractions", "Contractions and expressions", false], ["unmatched", "Words without a data match", false], ["review", "Words that need a context check", false], ["common", "Common words", $("#filter-common").checked],
     ];
+    const activeFilters = Object.values(state.textFilters).reduce((count, values) => count + values.size, 0) + ($("#filter-word-set").value !== "all" ? 1 : 0) + ($("#filter-common").checked ? 1 : 0);
+    $("#active-filter-count").textContent = activeFilters ? `${activeFilters} active` : "All words";
     const summary = summarizeTextItems(state.textItems);
     const languageNotes = {words:summary.contractions.words + summary.review.words, occurrences:summary.contractions.occurrences + summary.review.occurrences};
     $("#text-summary").classList.remove("hidden");
-    $("#text-summary").innerHTML = `<div class="text-summary-heading"><div><p class="eyebrow">Text overview</p><h3>Vocabulary profile</h3></div><p>${summary.common.words.toLocaleString()} common word${summary.common.words === 1 ? " is" : "s are"} grouped separately below.</p></div><div class="text-summary-grid">${textSummaryCard("Candidate", summary.core, "summary-candidate")}${textSummaryCard("Reference only", summary.broader, "summary-reference")}${textSummaryCard("Other database words", summary.other, "summary-other")}${textSummaryCard("Language notes", languageNotes, "summary-notes")}</div>`;
+    $("#text-summary").innerHTML = `<div class="text-summary-heading"><div><p class="eyebrow">Text overview</p><h3>Vocabulary profile</h3></div><p>${summary.common.words.toLocaleString()} common word${summary.common.words === 1 ? " is" : "s are"} grouped separately below.</p></div><div class="text-summary-grid">${textSummaryCard("Core list", summary.core, "summary-candidate")}${textSummaryCard("Other database words", summary.other, "summary-other")}${textSummaryCard("Language notes", languageNotes, "summary-notes")}</div>`;
     let shownUnique = 0;
     const html = definitions.map(([key, label, normallyOpen]) => {
       const all = state.textItems.filter(item => itemGroup(item) === key);
       const filtered = sortItems(all.filter(passesFilters)); shownUnique += filtered.length;
+      if (!all.length) return "";
       const occurrences = all.reduce((sum, item) => sum + item.count, 0);
       const open = key === "common" ? $("#filter-common").checked : normallyOpen;
-      return `<details class="result-group group-${key}" ${open ? "open" : ""}><summary>${label} <span>${filtered.length} of ${all.length} grouped words · ${occurrences} occurrences</span></summary><div class="result-group-content">${filtered.length ? filtered.map(resultCard).join("") : '<p class="hint">No words in this group match the current filters.</p>'}</div></details>`;
+      return `<details class="result-group group-${key}" ${open ? "open" : ""}><summary>${label} <span>${filtered.length} of ${all.length} grouped words · ${occurrences} occurrences</span></summary><div class="result-group-content">${key === "unmatched" ? '<p class="hint">These words have no recorded family match in this release. Common words and compounds can be missing; this does not show whether students know them.</p>' : ""}${filtered.length ? filtered.map(resultCard).join("") : '<p class="hint">No words in this group match the current filters.</p>'}</div></details>`;
     }).join("");
     $("#text-results").className = "result-groups"; $("#text-results").innerHTML = html;
     if (summary.unmatched.occurrences) $("#text-summary").insertAdjacentHTML("beforeend", `<p class="hint">Not matched: ${summary.unmatched.occurrences} word occurrences · Context check: ${summary.review.occurrences}. Common words and compounds can be missing from the wordlist. A missing match does not mean the word is unfamiliar to your students.</p>`);
@@ -548,7 +567,7 @@
     $$('[data-result-add]').forEach(button => button.addEventListener("click", () => {
       for (const item of state.textItems) {
         const owner = item.owners?.find(value => value.baseword_key === button.dataset.resultAdd && !value.blocked);
-        if (owner && normalized(owner.matched_form_evidence?.form || item.display_word) === normalized(button.dataset.resultForm)) { addToList(owner, button.dataset.resultForm); break; }
+        if (owner && normalized(owner.matched_form_evidence?.form || item.display_word) === normalized(button.dataset.resultForm)) { addToList(owner, button.dataset.resultForm, "Check a text"); break; }
       }
     }));
   }
@@ -577,7 +596,8 @@
           if (!group.context_examples.includes(excerpt)) group.context_examples.push(excerpt);
         }
       });
-      state.textItems = [...grouped.values()];
+      state.textItems = [...grouped.values()]; state.lessonSelection.clear(); state.lessonLimit=6; state.lessonQuery="";
+      workspace.renderPicker();
       const currentOwners = state.textItems.flatMap(item => (item.owners || []).filter(owner => !owner.blocked));
       const currentEvidence = currentOwners.map(owner => owner.matched_form_evidence).filter(Boolean);
       const bands = distinct(currentOwners.map(owner => owner.current_hk_frequency_band));
@@ -588,14 +608,14 @@
       state.textFilterOptions.academic = [...MSVL_ORDER.filter(value => currentAcademic.has(value)), ...["AWL", "MSVL"].filter(value => currentAcademic.has(value)), ...(currentOwners.some(owner => academicTags(owner.matched_form_evidence, owner).size === 0) ? ["No record"] : [])];
       renderTextFilterControls();
       renderTextResults();
-    } catch (error) { $("#text-summary").classList.add("hidden"); $("#text-results").className = "search-feedback"; $("#text-results").textContent = error instanceof Error && error.message.startsWith("The technical limit is") ? "Please check up to 500 words at a time. Split a longer passage into sections." : "We couldn't check this text. Check the pasted text and your connection, then try again."; $("#result-count").textContent = "Text not checked"; }
+    } catch (error) { workspace.hidePicker(); $("#text-summary").classList.add("hidden"); $("#text-results").className = "search-feedback"; $("#text-results").textContent = error instanceof Error && error.message.startsWith("The technical limit is") ? "Please check up to 500 words at a time. Split a longer passage into sections." : "We couldn't check this text. Check the pasted text and your connection, then try again."; $("#result-count").textContent = "Text not checked"; }
   }
 
   function clearTextWorkspace() {
     $("#text-input").value = "";
     $("#text-count").textContent = "0 characters";
     state.textAudit = [];
-    state.textItems = [];
+    state.textItems = []; workspace.hidePicker();
     $("#text-summary").classList.add("hidden");
     $("#text-summary").innerHTML = "";
     $("#text-results").className = "empty-state";
@@ -604,43 +624,34 @@
   }
 
   function resetFilters() {
-    $("#filter-word-set").value = "broader";
+    $("#filter-word-set").value = "all";
     Object.values(state.textFilters).forEach(values => values.clear());
     $("#filter-common").checked = false; $("#text-sort").value = "hk";
     renderTextFilterControls(); renderTextResults();
   }
 
-  function renderList() {
-    updateListCount(); const empty = state.selected.length === 0;
-    $("#list-empty").classList.toggle("hidden", !empty); $("#list-workspace").classList.toggle("hidden", empty);
-    if (empty) return;
-    $("#list-body").innerHTML = [...state.selected].sort((a,b) => a.order - b.order).map(item => `<tr data-list-key="${esc(item.baseword_key)}"><td><input class="list-order" type="number" min="1" value="${item.order}"></td><td><div class="selected-forms-list">${item.selected_forms.map(form => `<span class="selected-form-chip">${esc(form)} <button data-remove-form="${esc(form)}" aria-label="Remove ${esc(form)}">×</button></span>`).join("")}</div></td><td>${esc(item.display_family)}</td><td><span class="set-pill ${statusClass(item.set_membership)}">${statusLabel(item.set_membership)}</span></td><td class="list-rank">${integer(item.overall_frequency_order)}</td><td class="list-hk">${rankBand(item.hk_corpus_frequency_rank, item.hk_corpus_frequency_band)}</td><td><select class="list-depth"><option ${item.depth === "Notice" ? "selected" : ""}>Notice</option><option ${item.depth === "Practise" ? "selected" : ""}>Practise</option><option ${item.depth === "Master" ? "selected" : ""}>Master</option></select></td><td><input class="notes" value="${esc(item.notes)}" placeholder="Lesson notes"></td><td><input class="connections" value="${esc(item.connections)}" placeholder="Connections"></td><td><button data-remove-family>Remove</button></td></tr>`).join("");
-    $$('#list-body tr').forEach(row => {
-      const item = state.selected.find(value => value.baseword_key === row.dataset.listKey);
-      row.querySelector(".list-order").addEventListener("change", event => { item.order = Math.max(1, Number(event.target.value) || 1); saveList(); renderList(); });
-      row.querySelector(".list-depth").addEventListener("change", event => { item.depth = event.target.value; saveList(); });
-      row.querySelector(".notes").addEventListener("input", event => { item.notes = event.target.value; saveList(); });
-      row.querySelector(".connections").addEventListener("input", event => { item.connections = event.target.value; saveList(); });
-      row.querySelector("[data-remove-family]").addEventListener("click", () => { state.selected = state.selected.filter(value => value !== item); saveList(); renderList(); });
-      row.querySelectorAll("[data-remove-form]").forEach(button => button.addEventListener("click", () => {
-        item.selected_forms = item.selected_forms.filter(form => form !== button.dataset.removeForm);
-        if (!item.selected_forms.length) state.selected = state.selected.filter(value => value !== item);
-        saveList(); renderList();
-      }));
-    });
-  }
-  function exportItems() { return [...state.selected].sort((a,b) => a.order-b.order).map(item => ({teacher_order:item.order, word_family:item.display_family, selected_forms:[...item.selected_forms], status:statusLabel(item.set_membership), overall_frequency_rank:item.overall_frequency_order, overall_score:item.overall_frequency_value, general_availability:item.general_evidence_status === "UNAVAILABLE_NOT_ZERO" ? "Unavailable — not zero" : blank(item.general_zipf) ? "Unavailable" : "Available", general_zipf:item.general_zipf, educational_tokens:item.educational_tokens, ice_hk_tokens:item.ice_hk_tokens, glowbe_hk_tokens:item.glowbe_hk_tokens, now_hk_tokens:item.now_hk_tokens, hk_corpus_frequency_rank:item.hk_corpus_frequency_rank, hk_corpus_frequency_band:item.hk_corpus_frequency_band, teaching_depth:item.depth, teacher_notes:item.notes, semantic_notes:item.connections})); }
+  function renderList() { workspace.renderList(); }
+  function exportItems() { return [...state.selected].sort((a,b) => a.order-b.order).map(item => ({teacher_order:item.order, word_family:item.display_family, selected_forms:[...item.selected_forms], status:statusLabel(item.set_membership), overall_frequency_rank:item.overall_frequency_order, overall_score:item.overall_frequency_value, general_availability:item.general_evidence_status === "UNAVAILABLE_NOT_ZERO" ? "Unavailable — not zero" : blank(item.general_zipf) ? "Unavailable" : "Available", general_zipf:item.general_zipf, educational_tokens:item.educational_tokens, ice_hk_tokens:item.ice_hk_tokens, glowbe_hk_tokens:item.glowbe_hk_tokens, now_hk_tokens:item.now_hk_tokens, hk_corpus_frequency_rank:item.hk_corpus_frequency_rank, hk_corpus_frequency_band:item.hk_corpus_frequency_band, teaching_depth:item.depth, teacher_notes:item.notes, semantic_notes:item.connections, lesson_title:state.lessonTitle, teaching_plan:lesson.focusLabel(item.teaching_focus), source_labels:(item.source_labels || []).join(" | ")})); }
   function download(name, type, content) { const blob = content instanceof Blob ? content : new Blob([content], {type}); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href=url; link.download=name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 500); }
   const csvCell = value => `"${String(value ?? "").replaceAll('"','""')}"`;
-  function exportCsv() { const headers=["Teacher order","Selected word","Word family","Candidate/reference status","Overall rank","Overall score","General availability","General Zipf","Educational tokens","ICE-HK tokens","GloWbE-HK tokens","NOW-HK tokens (evaluation only)","HK rank","HK band","Depth","Teacher notes","Connections"]; const rows=exportItems().flatMap(item => item.selected_forms.map(form => [item.teacher_order,form,item.word_family,item.status,item.overall_frequency_rank,item.overall_score,item.general_availability,item.general_zipf,item.educational_tokens,item.ice_hk_tokens,item.glowbe_hk_tokens,item.now_hk_tokens,item.hk_corpus_frequency_rank,item.hk_corpus_frequency_band,item.teaching_depth,item.teacher_notes,item.semantic_notes])); download("HK-ELE_Teaching_List.csv","text/csv;charset=utf-8",[headers,...rows].map(row => row.map(csvCell).join(",")).join("\r\n")); }
-  function exportMarkdown() { const rows=exportItems(); download("HK-ELE_Teaching_List.md","text/markdown;charset=utf-8",`# Teaching List\n\n${rows.length ? rows.map(item => `${item.teacher_order}. ${item.selected_forms.join(", ")} — ${item.word_family}\n   - Status: ${item.status}\n   - Overall rank: ${item.overall_frequency_rank ?? "Unranked"}\n   - General: ${item.general_availability}${item.general_zipf == null ? "" : ` · Zipf ${item.general_zipf}`}\n   - HK rank / band: ${item.hk_corpus_frequency_rank ?? "—"} · ${item.hk_corpus_frequency_band || "—"}\n   - Depth: ${item.teaching_depth}\n   - Notes: ${item.teacher_notes || "—"}\n   - Connections: ${item.semantic_notes || "—"}`).join("\n") : "No words selected."}\n`); }
+  function lessonExportRows() {
+    const headers=["Lesson","Order","Selected word","Teaching plan","Teaching notes","Related words or example","Word family","Added from","Word list","Overall rank","HK rank","HK band","Earlier teaching depth","Family key","Overall score","General availability","General Zipf","Educational tokens","ICE-HK tokens","GloWbE-HK tokens","NOW-HK tokens (evaluation only)"];
+    const items=[...state.selected].sort((a,b)=>a.order-b.order);
+    const rows=exportItems().flatMap((item,index)=>item.selected_forms.map(form=>[item.lesson_title,index+1,form,item.teaching_plan,item.teacher_notes,item.semantic_notes,item.word_family,item.source_labels,item.status,item.overall_frequency_rank,item.hk_corpus_frequency_rank,item.hk_corpus_frequency_band,item.teaching_depth,items[index].baseword_key,item.overall_score,item.general_availability,item.general_zipf,item.educational_tokens,item.ice_hk_tokens,item.glowbe_hk_tokens,item.now_hk_tokens]));
+    return [headers,...rows];
+  }
+  function exportCsv() { download("HK-ELE_Teaching_List.csv","text/csv;charset=utf-8",lessonExportRows().map(row=>row.map(csvCell).join(",")).join("\r\n")); }
+  function exportMarkdown() {
+    const clean=value=>String(value || "").replace(/\r?\n/g," ");
+    const rows=exportItems();
+    const body=rows.map((item,index)=>`${index+1}. ${clean(item.selected_forms.join(", "))} — ${clean(item.word_family)}\n   - Teaching plan: ${item.teaching_plan}\n   - Notes: ${clean(item.teacher_notes) || "—"}\n   - Related words or example: ${clean(item.semantic_notes) || "—"}\n   - Added from: ${clean(item.source_labels) || "—"}\n   - Earlier teaching depth: ${clean(item.teaching_depth) || "—"}`).join("\n\n");
+    download("HK-ELE_Teaching_List.md","text/markdown;charset=utf-8",`# Teaching List\n\nLesson: ${clean(state.lessonTitle)}\n\nTeaching plans are intentions, not student attainment results.\n\n${body}\n`);
+  }
   async function exportExcel() {
     try {
-      if (!window.HKELE_XLSX) throw new Error("The Excel export component did not load. Please reload the page and try again.");
-      const headers = ["Teacher order","Selected word","Word family","Candidate/reference status","Overall rank","Overall score","General availability","General Zipf","Educational tokens","ICE-HK tokens","GloWbE-HK tokens","NOW-HK tokens (evaluation only)","HK rank","HK band","Depth","Teacher notes","Connections"];
-      const rows = exportItems().flatMap(item => item.selected_forms.map(form => [item.teacher_order,form,item.word_family,item.status,item.overall_frequency_rank,item.overall_score,item.general_availability,item.general_zipf,item.educational_tokens,item.ice_hk_tokens,item.glowbe_hk_tokens,item.now_hk_tokens,item.hk_corpus_frequency_rank,item.hk_corpus_frequency_band,item.teaching_depth,item.teacher_notes,item.semantic_notes]));
-      window.HKELE_XLSX.download([headers, ...rows], "HK-ELE_Teaching_List.xlsx");
-    } catch (error) { toast("We couldn't complete that action. Please try again."); }
+      if (!window.HKELE_XLSX) throw new Error("Excel export is not available.");
+      window.HKELE_XLSX.download(lessonExportRows(), "HK-ELE_Teaching_List.xlsx");
+    } catch { toast("We couldn't export your list. Please try again."); }
   }
 
   function bind() {
@@ -650,13 +661,39 @@
     $("#page-size").addEventListener("change", event => { state.pageSize=Number(event.target.value); state.page=1; loadFamilies(); });
     $("#prev-page").addEventListener("click", () => { if(state.page>1){state.page-=1;loadFamilies();} });
     $("#next-page").addEventListener("click", () => { state.page+=1;loadFamilies(); });
-    $("#browse-search-form").addEventListener("submit", async event => { event.preventDefault(); const query=$("#browse-search").value.trim(); if(!query)return; try{const result=await json(`/search?q=${encodeURIComponent(query)}`); const node=$("#search-feedback"); if(result.status==="RESOLVED"){const owner=result.owners.find(item=>!item.blocked); await openFamily(owner.baseword_key, owner.matched_form_evidence?.form || query); node.classList.add("hidden");}else if(result.status==="AMBIGUOUS"){const owners=result.owners.filter(item=>!item.blocked); node.classList.remove("hidden"); node.innerHTML=`<strong>${owners.length} possible word families.</strong> Choose one explicitly: ${owners.map(owner=>`<button data-search-owner="${esc(owner.baseword_key)}" data-search-form="${esc(owner.matched_form_evidence?.form || query)}">${esc(owner.display_family)}</button>`).join(" ")}`; node.querySelectorAll("[data-search-owner]").forEach(button=>button.addEventListener("click",()=>openFamily(button.dataset.searchOwner,button.dataset.searchForm)));}else{node.classList.remove("hidden"); node.textContent=result.identity_exception?.teacher_display || "No match in the current wordlist. Check the spelling or try another word form.";}}catch(error){toast("We couldn't complete that action. Please try again.");} });
+    $("#browse-search-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const query = $("#browse-search").value.trim(); if (!query) return;
+      try {
+        const result = await json(`/search?q=${encodeURIComponent(query)}`);
+        const node = $("#search-feedback");
+        const allOwners = (result.owners || []).filter(owner => !owner.blocked);
+        const owners = allOwners.filter(owner => state.scope !== "core" || owner.candidate_member === true || owner.candidate_member === 1);
+        if (allOwners.length && !owners.length && state.scope === "core") {
+          node.classList.remove("hidden");
+          node.innerHTML = 'This word is in the full database, outside the Core list. <button type="button" data-search-full>View in Full database</button>';
+          node.querySelector('[data-search-full]').addEventListener("click", async () => {
+            clearAiForManualBrowseChange(); state.scope = "full"; state.page = 1; syncBrowseControls();
+            await loadFamilies(); $("#browse-search-form").requestSubmit();
+          });
+        } else if (result.status === "RESOLVED" && owners.length) {
+          await openFamily(owners[0].baseword_key, owners[0].matched_form_evidence?.form || query);
+          node.classList.add("hidden");
+        } else if (result.status === "AMBIGUOUS" && owners.length) {
+          node.classList.remove("hidden");
+          node.innerHTML = `<strong>${owners.length} matching word ${owners.length === 1 ? "family" : "families"} in this list.</strong> Choose the reading that fits: ${owners.map(owner => `<button data-search-owner="${esc(owner.baseword_key)}" data-search-form="${esc(owner.matched_form_evidence?.form || query)}">${esc(owner.display_family)}</button>`).join(" ")}`;
+          node.querySelectorAll("[data-search-owner]").forEach(button => button.addEventListener("click", () => openFamily(button.dataset.searchOwner, button.dataset.searchForm)));
+        } else {
+          node.classList.remove("hidden"); node.textContent = result.identity_exception?.teacher_display || "No match in the current wordlist. Check the spelling or try another word form.";
+        }
+      } catch { toast("We couldn't complete that action. Please try again."); }
+    });
     $("#back-to-browse").addEventListener("click", () => showView("browse"));
     $("#text-input").addEventListener("input", event => {
       $("#text-count").textContent=`${event.target.value.length.toLocaleString()} characters`;
       if (state.textItems.length) {
         state.textItems=[]; state.textAudit=[];
-        $("#text-summary").classList.add("hidden");
+        $("#text-summary").classList.add("hidden"); workspace.hidePicker();
         $("#text-results").textContent="Text changed. Check again to update the results.";
         $("#result-count").textContent="Results need updating";
       }
@@ -665,15 +702,16 @@
     $("#clear-text").addEventListener("click", clearTextWorkspace);
     ["#filter-word-set","#filter-common","#text-sort"].forEach(selector => $(selector).addEventListener("change", renderTextResults));
     $("#reset-filters").addEventListener("click", resetFilters);
-    $("#clear-list").addEventListener("click", () => { if(state.selected.length && !confirm("Clear the whole Teaching List?")) return; state.selected=[]; saveList(); renderList(); });
+    $("#clear-list").addEventListener("click", () => { if(state.selected.length && !confirm("Clear the whole Teaching List?")) return; workspace.rememberUndo(); state.selected=[]; saveList(); renderList(); });
     $("#export-csv").addEventListener("click", exportCsv); $("#export-md").addEventListener("click", exportMarkdown); $("#export-xlsx").addEventListener("click", exportExcel);
     window.addEventListener("hashchange", () => { const view=location.hash.slice(1); if(["home","browse","check","list"].includes(view))showView(view); });
   }
 
   async function init() {
-    buildColumnMenu(); bind(); updateListCount(); clearTextWorkspace();
+    buildColumnMenu(); bind(); workspace.bind(); updateListCount(); clearTextWorkspace();
     await Promise.all([loadFamilies(), loadFilterConfig(), refreshSelectedFromDatabase()]);
     const view=location.hash.slice(1); showView(["home","browse","check","list"].includes(view) ? view : "home");
   }
+  const workspace = globalThis.HKELE_LESSON_WORKSPACE.create({state, $, $$, esc, saveList, updateListCount, showView, openFamily, createLessonItem, contractionDescription, titleKey:LESSON_TITLE_KEY, toast});
   init().catch(error => toast("We couldn't complete that action. Please try again."));
 })();

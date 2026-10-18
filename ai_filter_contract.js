@@ -77,7 +77,7 @@
     const record = objectValue(value, "filters");
     rejectUnknown(record, FILTER_KEY_SET, "filters");
     const result = {
-      scope: enumValue(record.scope, ["candidate", "inclusive_reference"], "scope"),
+      scope: enumValue(record.scope, ["full", "candidate", "inclusive_reference"], "scope"),
       limit: integer(record.limit, "limit", 1, 100),
       sort: enumValue(record.sort, ["overall", "hk", "az"], "sort"),
     };
@@ -132,7 +132,7 @@
     const to = filters.earliestObservedTo ? GRADES.indexOf(filters.earliestObservedTo) : -1;
     const matches = rows.filter(family => {
       if (hasFlag(family.display_blocked)) return false;
-      if (filters.scope === "candidate" ? !hasFlag(family.candidate_member) : !hasFlag(family.reference_member)) return false;
+      if (filters.scope === "candidate" ? !hasFlag(family.candidate_member) : filters.scope === "inclusive_reference" && !hasFlag(family.reference_member)) return false;
       const grade = GRADES.indexOf(family.textbook_first_seen_level);
       if ((from >= 0 || to >= 0) && grade < 0) return false;
       if (from >= 0 && grade < from) return false;
@@ -170,7 +170,7 @@
   }
 
   function describeConditions(filters) {
-    const items = [filters.scope === "candidate" ? "Scope: Candidate" : "Scope: Candidate + Reference"];
+    const items = [filters.scope === "full" ? "Scope: Full database" : filters.scope === "candidate" ? "Scope: Core list" : "Scope: saved word data (partial)"];
     if (filters.earliestObservedFrom || filters.earliestObservedTo) items.push(filters.earliestObservedFrom && filters.earliestObservedTo ? `Grade: ${filters.earliestObservedFrom}–${filters.earliestObservedTo}` : filters.earliestObservedFrom ? `Grade: ${filters.earliestObservedFrom} or later` : `Grade: ${filters.earliestObservedTo} or earlier`);
     const range = (label, minimum, maximum) => { if (minimum !== undefined || maximum !== undefined) items.push(minimum !== undefined && maximum !== undefined ? `${label}: ${minimum.toLocaleString("en")}–${maximum.toLocaleString("en")}` : minimum !== undefined ? `${label}: ${minimum.toLocaleString("en")} or lower priority` : `${label}: up to ${maximum.toLocaleString("en")}`); };
     range("Overall rank", filters.overallRankMin, filters.overallRankMax);
@@ -186,5 +186,18 @@
     return items;
   }
 
-  return Object.freeze({GRADES, HK_BANDS, MSVL_SUBJECTS, FILTER_KEYS, ValidationError, validateConditions, validateResult, applyToRows, describeConditions});
+  function teacherScope(query, selected = "full") {
+    if (/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/i.test(query)) return "full";
+    if (/core\s+list|核心词[表库]/i.test(query)) return "core";
+    return selected === "core" ? "core" : "full";
+  }
+  function interpreterQuery(query) {
+    return query.replace(/core\s+list|核心词[表库]/gi,"Candidate").replace(/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/gi,"database").trim();
+  }
+  function teacherResult(raw, scope = "full") {
+    const result = validateResult(raw);
+    const teacherText = text => text.replace(/Candidate\s*(?:and|\+)\s*Reference/gi, "Core list").replace(/Reference[ -]only/gi, "other database").replace(/\bCandidate\b/g, "Core list");
+    return {...result, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core" ? "Core list" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
+  }
+  return Object.freeze({GRADES, HK_BANDS, MSVL_SUBJECTS, FILTER_KEYS, ValidationError, validateConditions, validateResult, applyToRows, describeConditions, teacherScope, interpreterQuery, teacherResult});
 });

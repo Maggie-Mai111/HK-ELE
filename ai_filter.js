@@ -67,6 +67,7 @@
   }
 
   function renderInterpretation(result) {
+    result = contract.teacherResult(result, contract.teacherScope(input.value, document.querySelector(".scope.active")?.dataset.scope || "full"));
     interpretation = result;
     summary.textContent = result.summary;
     conditions.innerHTML = result.filters
@@ -154,8 +155,9 @@
       return response.json();
     });
     const document = await fixturePromise;
-    const target = query.normalize("NFKC").trim().toLocaleLowerCase();
-    const item = document.cases.find(candidate => candidate.query.normalize("NFKC").trim().toLocaleLowerCase() === target);
+    const queryKey = value => value.normalize("NFKC").trim().toLocaleLowerCase().replace(/candidate\s*(?:and|\+)\s*reference|candidate|core list/gi, "").replace(/\s+/g," ");
+    const target = queryKey(query);
+    const item = document.cases.find(candidate => queryKey(candidate.query) === target);
     if (!item) return document.cases.find(candidate => candidate.id === "unsupported").response;
     return item.response;
   }
@@ -168,7 +170,7 @@
         method: "POST",
         headers: {"content-type": "application/json"},
         body: JSON.stringify({
-          query,
+          query: contract.interpreterQuery(query),
           locale: /[\u3400-\u9fff]/u.test(query) ? "zh-HK" : "en-HK",
           surface: "browse",
           turnstileToken,

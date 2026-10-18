@@ -2,12 +2,27 @@
   "use strict";
 
   const cache = new Map();
-  let manifestPromise = null;
-  let aiFilterIndexPromise = null;
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
   const apostropheNorm = value => norm(value).replace(/[’‘ʼ＇]/g, "'");
-  const inflate = (fields, row) => Object.fromEntries(fields.map((field, index) => [field, row?.[index] ?? null]));
+  // Use the source's registered grade labels; a raw VXGL score is not a label.
+  function teacherLevelLabel(value) {
+    if (typeof value !== "string") return null;
+    const label = value.trim();
+    return !label || /^[\d.\s,;|+\-–—eE]+$/.test(label) ? null : label;
+  }
+  function teacherRecord(record) {
+    const label = teacherLevelLabel(record.external_level_reference_teacher_display);
+    for (const field of ["external_level_reference_display", "external_level_reference"]) {
+      if (Object.hasOwn(record, field)) record[field] = label ?? teacherLevelLabel(record[field]);
+    }
+    if (Object.hasOwn(record, "browse_external_level_reference")) {
+      record.browse_external_level_reference = teacherLevelLabel(record.browse_external_level_reference)
+        ?? record.external_level_reference_display ?? null;
+    }
+    return record;
+  }
+  const inflate = (fields, row) => teacherRecord(Object.fromEntries(fields.map((field, index) => [field, row?.[index] ?? null])));
 
   async function loadGzipJson(path) {
     if (cache.has(path)) return cache.get(path);
@@ -18,19 +33,20 @@
       if (typeof DecompressionStream !== "function") throw new Error("This browser cannot open the compressed database. Please use a current version of Chrome, Edge, Firefox, or Safari.");
       const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
       return JSON.parse(await new Response(stream).text());
-    })();
+    })().catch(error => {
+      cache.delete(path);
+      throw error;
+    });
     cache.set(path, promise);
     return promise;
   }
 
   async function manifest() {
-    if (!manifestPromise) manifestPromise = loadGzipJson("data/manifest.json.gz");
-    return manifestPromise;
+    return loadGzipJson("data/manifest.json.gz");
   }
 
   async function aiFilterIndex() {
-    if (!aiFilterIndexPromise) aiFilterIndexPromise = loadGzipJson("data/ai_filter_index.json.gz");
-    return aiFilterIndexPromise;
+    return loadGzipJson("data/ai_filter_index.json.gz");
   }
 
   function fnvBucket(value, count) {
@@ -54,8 +70,8 @@
       ? window.HKELE_AI_FILTER_CONTRACT.validateConditions(JSON.parse(proposedFilters))
       : null;
     const scope = filters
-      ? (filters.scope === "candidate" ? "core" : "broader")
-      : (params.get("scope") || "core");
+      ? (filters.scope === "full" ? "full" : filters.scope === "candidate" ? "core" : "broader")
+      : (params.get("scope") || "full");
     const sort = filters?.sort || params.get("sort") || "overall";
     const page = Math.max(1, Number(params.get("page")) || 1);
     const pageSize = [10, 25, 50, 100].includes(Number(params.get("page_size"))) ? Number(params.get("page_size")) : 25;
@@ -63,14 +79,26 @@
     if (!info) throw new Error("Unsupported Browse selection");
     if (filters) {
       const allRows = [];
-      for (let index = 0; index < info.chunk_count; index += 1) {
-        const values = await loadGzipJson(`data/browse/${scope}/${sort}/${String(index).padStart(4, "0")}.json.gz`);
-        allRows.push(...values.map(row => inflate(config.browse_fields, row)));
+      let filterIndex;
+      if (scope === "full") {
+        const projection = await loadGzipJson("data/ai_full_projection.json.gz");
+        if (projection.schemaVersion !== "HK_ELE_AI_FULL_PROJECTION_V1" || projection.apiVersion !== config.api_version || projection.sourceResultEntrySha256 !== config.metadata.final_candidate_result_entry_sha256 || projection.familyCount !== info.available_items || projection.rows.length !== projection.familyCount) {
+          cache.delete("data/ai_full_projection.json.gz");
+          throw new Error("The full AI projection does not match this database release.");
+        }
+        for (const row of projection.rows) allRows.push(inflate(projection.fields, row));
+        filterIndex = {cpb100_family_keys:projection.cpb100FamilyKeys};
+      } else {
+        for (let index = 0; index < info.chunk_count; index += 1) {
+          const values = await loadGzipJson(`data/browse/${scope}/${sort}/${String(index).padStart(4, "0")}.json.gz`);
+          allRows.push(...values.map(row => inflate(config.browse_fields, row)));
+        }
+        filterIndex = await aiFilterIndex();
       }
       const execution = window.HKELE_AI_FILTER_CONTRACT.applyToRows(
         allRows,
         filters,
-        await aiFilterIndex(),
+        filterIndex,
       );
       const start = (page - 1) * pageSize;
       const stop = Math.min(start + pageSize, execution.families.length);
@@ -212,5 +240,5 @@
     throw new Error(`Unsupported static request: ${path}`);
   }
 
-  window.HKELE_STATIC_API = {request, manifest};
+  window.HKELE_STATIC_API = {request, manifest, teacherRecord};
 })();
