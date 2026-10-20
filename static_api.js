@@ -38,8 +38,11 @@
     integrityPromise ??= fetch(DATA_ROOT + "integrity.json", {cache:"force-cache"}).then(async response => {
       if (!response.ok) throw new Error("Please reload to open the word data.");
       const bytes = await response.arrayBuffer();
-      if (await hash(bytes) !== "8280bf2e15865eaa641b83ab56830cf0f6f597115984863557e627820d6cc92a") throw new Error("Please reload to open the word data.");
-      return JSON.parse(new TextDecoder().decode(bytes));
+      const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
+      // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
+      const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
+      if (await hash(normalized) !== "0c3c53c1523bbc6118ad84115497b7035987745007f5fcc2ceacb4b356e4678d") throw new Error("Please reload to open the word data.");
+      return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
   }
