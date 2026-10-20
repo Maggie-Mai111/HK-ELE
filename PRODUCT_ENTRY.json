@@ -1,0 +1,22 @@
+{
+  "status": "LOCAL_A_DATA_UPDATE_READY_MANUAL_PUBLICATION_PENDING",
+  "dataVersion": "2026-10-20-a-main-v1",
+  "uiBaseline": "Web UI v21 / Package88 UI and Package87 AI",
+  "uiRedesigned": false,
+  "dataCounts": {
+    "candidate": 2871,
+    "forms": 319961,
+    "inclusiveReference": 2871,
+    "ranked": 163371,
+    "referenceOnly": 0,
+    "totalFamilies": 163906,
+    "unranked": 535
+  },
+  "registeredWorkerEnvironment": "production",
+  "workerEnvironmentChanged": false,
+  "feedbackFormsConnected": true,
+  "researchTelemetryEnabled": false,
+  "authenticationConnected": false,
+  "deployedByThisTask": false,
+  "provenance": "README.md"
+}

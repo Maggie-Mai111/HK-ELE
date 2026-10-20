@@ -1,6 +1,7 @@
 (function (root) {
   "use strict";
   const focusOptions = [["", "Not decided"], ["focus", "Teach in depth"], ["mention", "Briefly introduce"]];
+  function wordCount(items) { return items.reduce((sum,item)=>sum+(item.selected_forms || []).length,0); }
   function focusLabel(value) { return focusOptions.find(([key]) => key === value)?.[1] || "Not decided"; }
   function choicesFromResults(items) {
     const choices = new Map();
@@ -32,5 +33,5 @@
     }
     return {items:next, added, formsAdded};
   }
-  root.HKELE_LESSON = Object.freeze({focusOptions, focusLabel, choicesFromResults, mergeSelections});
+  root.HKELE_LESSON = Object.freeze({focusOptions, focusLabel, choicesFromResults, mergeSelections, wordCount});
 })(globalThis);

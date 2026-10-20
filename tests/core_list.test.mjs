@@ -9,8 +9,8 @@ const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const require=createRequire(import.meta.url);
 const contract=require(join(root,'ai_filter_contract.js'));
 function api(failFullIndexOnce = false) {
-  const context=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},location:{href:'https://fixture.invalid/'},URL,TextEncoder,Blob,Response,DecompressionStream,fetch:async path=>{
-    if (failFullIndexOnce && path === 'data/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
+  const context=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},location:{href:'https://fixture.invalid/'},URL,crypto:globalThis.crypto,TextDecoder,TextEncoder,Blob,Response,DecompressionStream,fetch:async path=>{
+    if (failFullIndexOnce && path === 'data/releases/2026-10-20-a-main-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
     return new Response(new Uint8Array(readFileSync(join(root,path))));
   }});
   vm.runInContext(readFileSync(join(root,'static_api.js'),'utf8'),context);
@@ -18,12 +18,12 @@ function api(failFullIndexOnce = false) {
 }
 test('default Full and Core scopes retain exact populations and the former Reference-only word fabric',async()=>{
   const repository=api();
-  assert.equal((await repository.request('/families')).available_items,163784);
-  assert.equal((await repository.request('/families?scope=core')).available_items,3185);
+  assert.equal((await repository.request('/families')).available_items,163906);
+  assert.equal((await repository.request('/families?scope=core')).available_items,2871);
   const result=await repository.request('/search?q=fabric');
   assert.equal(result.status,'RESOLVED');
   assert.equal(Number(result.owners[0].candidate_member),0);
-  assert.equal(Number(result.owners[0].reference_member),1);
+  assert.equal(Number(result.owners[0].reference_member),0);
 });
 test('full AI failure is explicit, with retry rather than a smaller-list fallback',async()=>{
   const repository=api(true);
@@ -58,7 +58,7 @@ test('actual full AI filtering reaches non-Core and non-reference families with 
   assert.equal(full.matched_before_limit,69);
   assert.equal(core.matched_before_limit,7);
   assert.ok(full.families.some(f=>!f.candidate_member&&!f.reference_member));
-  for(const [field,value,count] of [['earliestObservedTo','P2',1679],['hkBands',['HK Top 1k'],1000]]){
+  for(const [field,value,count] of [['earliestObservedTo','P2',1697],['hkBands',['HK Top 1k'],1000]]){
     const result=await repository.request('/families?ai_filters='+encodeURIComponent(JSON.stringify({scope:'full',[field]:value,limit:10,sort:'overall'})));
     assert.equal(result.matched_before_limit,count);
   }

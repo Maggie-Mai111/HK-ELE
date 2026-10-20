@@ -4,7 +4,7 @@
   const dialog = document.createElement("dialog");
   dialog.className = "feedback-dialog";
   dialog.setAttribute("aria-labelledby", "feedback-dialog-title");
-  dialog.innerHTML = '<button type="button" class="feedback-close" aria-label="Close feedback">Close</button><h2 id="feedback-dialog-title"></h2><p class="feedback-description"></p><p class="feedback-context"></p><a class="feedback-open" target="_blank" rel="noopener noreferrer">Continue to Google Form ↗</a><p class="feedback-status" role="status"></p>';
+  dialog.innerHTML = '<button type="button" class="feedback-close" aria-label="Close feedback">Close</button><h2 id="feedback-dialog-title"></h2><p class="feedback-description"></p><p class="feedback-context"></p><a class="feedback-open" target="_blank" rel="noopener noreferrer">Open Google Form ↗</a><p class="feedback-status" role="status"></p>';
   document.body.appendChild(dialog);
   dialog.querySelector(".feedback-close").addEventListener("click", () => dialog.close());
   window.addEventListener("hkele-word-feedback-context", (event) => { wordContext = event.detail; });
@@ -20,14 +20,14 @@
     const link = dialog.querySelector(".feedback-open");
     link.removeAttribute("href"); link.hidden = true;
     const status = dialog.querySelector(".feedback-status");
-    status.textContent = "Loading form information…";
+    status.textContent = "Opening form…";
     dialog.showModal();
     try {
       if (!config) { const response = await fetch("./feedback_forms.json"); if (!response.ok) throw new Error(); config = await response.json(); }
       const url = window.HkeleFeedbackContract.buildFeedbackUrl(kind, context, config);
-      if (url) { link.href = url; link.hidden = false; status.textContent = "HK-ELE fills in the reference for you. Complete and submit your response in the form."; }
-      else status.textContent = "Feedback will be available soon. Nothing has been sent.";
-    } catch { status.textContent = "Form information is unavailable. Your feedback has not been sent."; }
+      if (url) { link.href = url; link.hidden = false; status.textContent = ""; }
+      else status.textContent = "Please try this form again later.";
+    } catch { status.textContent = "Couldn’t open the form. Close this window and try again."; }
   };
   document.addEventListener("click", (event) => {
     const button = event.target.closest?.("[data-feedback-kind]");

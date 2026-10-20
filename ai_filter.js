@@ -49,7 +49,7 @@
     previewButton.disabled = value || !input.value.trim() || (!config.fixtureMode && !turnstileToken);
     editButton.disabled = value;
     confirmButton.disabled = value;
-    previewButton.textContent = value ? "Finding filters…" : "Review suggested filters";
+    previewButton.textContent = value ? "Preparing search…" : "Review search";
   }
 
   function setMessage(text, kind = "") {
@@ -66,21 +66,31 @@
     editButton.hidden = true;
   }
 
+  function displayConditions(filters) {
+    return contract.describeConditions(filters).map(text => text
+      .replace(/^Sort: overall$/, "Sort: Overall frequency")
+      .replace(/^Sort: hk$/, "Sort: HK frequency")
+      .replace(/^Sort: az$/, "Sort: A–Z")
+      .replace(/^Result limit: /, "Show up to: "));
+  }
+
   function renderInterpretation(result) {
     result = contract.teacherResult(result, contract.teacherScope(input.value, document.querySelector(".scope.active")?.dataset.scope || "full"));
     interpretation = result;
-    summary.textContent = result.summary;
+    summary.textContent = result.status === "ready" ? result.summary : result.status === "needs_clarification" ? "Which words would you like to find?" : "Try a different search.";
     conditions.innerHTML = result.filters
-      ? contract.describeConditions(result.filters).map(item => `<li>${esc(item)}</li>`).join("")
+      ? displayConditions(result.filters).map(item => `<li>${esc(item)}</li>`).join("")
       : "";
-    const notes = [result.clarifyingQuestion, ...result.warnings].filter(Boolean);
+    const notes = [result.clarifyingQuestion, ...result.warnings].filter(Boolean)
+      .filter(text => !/^No filters? (?:was|were) applied\.?$/i.test(text))
+      .map(text => text.replace(/\bregistered\b/gi, "available"));
     if (notes.length) conditions.insertAdjacentHTML("beforeend", notes.map(item => `<li class="ai-warning">${esc(item)}</li>`).join(""));
     confirmButton.hidden = result.status !== "ready";
     editButton.hidden = false;
     preview.hidden = false;
-    if (result.status === "unsupported") setMessage("We can't search for that information yet. Try an example or choose your own filters.", "error");
-    else if (result.status === "needs_clarification") setMessage("Please edit the request before applying any filter.", "warning");
-    else setMessage("Review these filters, then choose Show matching words.", "success");
+    if (result.status === "unsupported") setMessage("Try a simpler request or one of the examples.", "error");
+    else if (result.status === "needs_clarification") setMessage("Add a little more detail to your request.", "warning");
+    else setMessage("");
   }
 
   function uuidV4() {
@@ -139,13 +149,13 @@
         sitekey: config.turnstileSiteKey,
         action: "ai_filter",
         callback: token => { turnstileToken = token; turnstileMessage.textContent = ""; setBusy(false); },
-        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word filters."; setBusy(false); },
+        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word search."; setBusy(false); },
         "expired-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please complete the verification again."; setBusy(false); },
-        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word filters."; setBusy(false); },
+        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word search."; setBusy(false); },
         theme: "auto",
       });
     } catch {
-      turnstileMessage.textContent = "Search couldn't get ready. Please try again or use the word filters.";
+      turnstileMessage.textContent = "Search couldn't get ready. Please try again or use the word search.";
     }
   }
 
@@ -202,8 +212,8 @@
       renderInterpretation(contract.validateResult(raw));
     } catch (error) {
       setMessage(error instanceof Error && error.message === "AI search is busy. Try again later."
-        ? "Search is busy. Try again shortly or use the word filters."
-        : "We couldn't complete the search. Try again or use the word filters.", "error");
+        ? "Search is busy. Try again shortly or use the word search."
+        : "We couldn't complete the search. Try again or use the word search.", "error");
     } finally {
       setBusy(false);
     }
@@ -215,13 +225,13 @@
     try {
       const result = await window.HKELE_BROWSE_ADAPTER.apply(interpretation.filters);
       activeTitle.textContent = `${result.matchedBeforeLimit.toLocaleString("en")} matches · showing first ${result.availableItems.toLocaleString("en")}`;
-      activeConditions.textContent = contract.describeConditions(interpretation.filters).join(" · ");
+      activeConditions.textContent = displayConditions(interpretation.filters).join(" · ");
       active.hidden = false;
       setExpanded(false);
       setMessage("");
       document.querySelector("#family-table")?.scrollIntoView({block: "start", behavior: "smooth"});
     } catch {
-      setMessage("We couldn't show these results. Try again or adjust the word filters.", "error");
+      setMessage("We couldn't show these results. Try again or adjust the word search.", "error");
     } finally {
       setBusy(false);
     }

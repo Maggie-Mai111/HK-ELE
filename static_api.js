@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  const DATA_ROOT = "data/releases/2026-10-20-a-main-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -22,14 +23,35 @@
     }
     return record;
   }
+  function displayedWordEvidence(family, forms, currentWord = family.display_family) {
+    const word = apostropheNorm(currentWord);
+    const form = forms.find(item => apostropheNorm(item.form) === word || apostropheNorm(item.normalized_form) === word);
+    return {...family, browse_display_word: currentWord, browse_external_level_reference: form
+      ? teacherLevelLabel(form.external_level_reference_teacher_display) ?? teacherLevelLabel(form.external_level_reference)
+      : null};
+  }
   const inflate = (fields, row) => teacherRecord(Object.fromEntries(fields.map((field, index) => [field, row?.[index] ?? null])));
 
+  let integrityPromise;
+  const hash = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2,"0")).join("");
+  async function integrity() {
+    integrityPromise ??= fetch(DATA_ROOT + "integrity.json", {cache:"force-cache"}).then(async response => {
+      if (!response.ok) throw new Error("Please reload to open the word data.");
+      const bytes = await response.arrayBuffer();
+      if (await hash(bytes) !== "8280bf2e15865eaa641b83ab56830cf0f6f597115984863557e627820d6cc92a") throw new Error("Please reload to open the word data.");
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }).catch(error => {integrityPromise = null; throw error;});
+    return integrityPromise;
+  }
   async function loadGzipJson(path) {
+    path = path.replace(/^data\//, DATA_ROOT);
     if (cache.has(path)) return cache.get(path);
     const promise = (async () => {
       const response = await fetch(path, {cache: "force-cache"});
       if (!response.ok) throw new Error(`Data file unavailable (${response.status}): ${path}`);
       const bytes = await response.arrayBuffer();
+      const expected = (await integrity()).files[path.slice(DATA_ROOT.length)];
+      if (!expected || await hash(bytes) !== expected) throw new Error("The word data changed. Please reload this page.");
       if (typeof DecompressionStream !== "function") throw new Error("This browser cannot open the compressed database. Please use a current version of Chrome, Edge, Firefox, or Safari.");
       const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
       return JSON.parse(await new Response(stream).text());
@@ -240,5 +262,5 @@
     throw new Error(`Unsupported static request: ${path}`);
   }
 
-  window.HKELE_STATIC_API = {request, manifest, teacherRecord};
+  window.HKELE_STATIC_API = {request, manifest, teacherRecord, displayedWordEvidence};
 })();

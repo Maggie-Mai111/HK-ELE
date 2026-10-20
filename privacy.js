@@ -13,17 +13,17 @@
   dialog.tabIndex = -1;
   dialog.innerHTML = `<p class="privacy-brand">HK-ELE · For teachers</p>
     <h1 id="privacy-title">Welcome to HK-ELE</h1>
-    <p>Help us improve vocabulary teaching. With your agreement, we can use:</p>
-    <ul class="privacy-scope"><li>Feedback about problems you report</li><li>Your ratings of words for teaching and your class</li><li>Basic records of clicks and features used</li></ul>
+    <p>Help us improve vocabulary teaching by sharing:</p>
+    <ul class="privacy-scope"><li>Feedback about problems you report</li><li>Your ratings of words for teaching and your class</li></ul>
     <p>Your classroom texts, photos and teaching notes are not included in these records.</p>
-    <p class="privacy-note">In this trial, your choice is saved on this device. Usage records are not sent.</p>
+    <p class="privacy-note">Feedback is shared only when you submit a Google Form. Click and feature-use records are not currently collected. We will ask again before enabling them.</p>
     <details><summary>Read data information</summary>
-      <p>Feedback and ratings are shared only when you submit a linked Google Form. Please leave out student names and other identifying information.</p>
-      <p>Your checked text, teaching list and notes stay in this browser. Export your list to keep a backup. When you use AI word search, only your search request is sent to the AI service.</p>
-      <p>You can review or withdraw this choice using Your data choices. This trial does not enrol you in a research study. Study information will be provided before research usage collection begins, and you will be asked again.</p>
+      <p>Your choice is saved on this device. Please leave student names and other identifying information out of your feedback.</p>
+      <p>Teaching lists and notes are saved in this browser. Checked texts stay in the current session. Export a list to keep a copy. AI word search sends your request to the AI service.</p>
+      <p>Review or withdraw your agreement using Your data choices. Any research study will have separate information and consent.</p>
     </details>
     <div class="privacy-first"><label class="privacy-choice"><input id="privacy-agree" type="checkbox"><span>I have read the data information and agree to the uses described above.</span></label>
-      <button type="button" class="primary privacy-continue" disabled>Agree and continue</button><p class="privacy-note">Please confirm your choice to enter HK-ELE.</p></div>
+      <button type="button" class="primary privacy-continue" disabled>Agree and continue</button></div>
     <div class="privacy-saved" hidden><p class="privacy-note">Your agreement is saved on this device.</p><button type="button" class="primary privacy-back">Back to your work</button><button type="button" class="privacy-withdraw">Withdraw agreement</button><p class="privacy-note">Withdrawing returns you to the welcome screen.</p></div>
     <p class="privacy-error" role="alert" hidden></p>`;
   overlay.appendChild(dialog);
@@ -32,7 +32,7 @@
   const checkbox = dialog.querySelector("#privacy-agree");
   const continueButton = dialog.querySelector(".privacy-continue");
   const error = dialog.querySelector(".privacy-error");
-  const workspace = [...document.querySelectorAll(".site-header, main")];
+  const workspace = [...document.querySelectorAll(".site-header, .lesson-context, #new-lesson-dialog, main")];
   function gate(blocked) {
     document.documentElement.toggleAttribute("data-consent-pending", blocked);
     workspace.forEach(element => { element.inert = blocked || !overlay.hidden; });

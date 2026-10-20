@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "HK_ELE_AI_FILTER_SHARED_FIXTURES_V1",
+  "sourceContract": "Package85 src/domain/aiFilterSchema.ts and worker/src/prompt.ts",
+  "cases": [
+    {
+      "id": "root_act",
+      "query": "Find words with the root act. Limit 20.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families with the registered root act.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "root": "act",
+          "limit": 20,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 7,
+      "expectedKeys": [
+        "act",
+        "age",
+        "actual",
+        "exact",
+        "agent",
+        "react",
+        "agenda"
+      ]
+    },
+    {
+      "id": "grade",
+      "query": "Find 10 Candidate words first observed by P2 or earlier, sorted by overall rank",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate families first observed by P2 or earlier.",
+        "filters": {
+          "scope": "candidate",
+          "earliestObservedTo": "P2",
+          "limit": 10,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 1118
+    },
+    {
+      "id": "hk_top_1k",
+      "query": "Find 10 Candidate and Reference words in HK Top 1k, sorted by HK rank",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families in the registered HK Top 1k band.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "hkBands": [
+            "HK Top 1k"
+          ],
+          "limit": 10,
+          "sort": "hk"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 997
+    },
+    {
+      "id": "prefix",
+      "query": "Find Candidate and Reference words with the registered prefix re. Limit 25.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families with the registered prefix re.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "prefix": "re",
+          "limit": 25,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 804
+    },
+    {
+      "id": "suffix",
+      "query": "Find Candidate and Reference words with the registered suffix ion. Limit 25.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families with the registered suffix ion.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "suffix": "ion",
+          "limit": 25,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 711
+    },
+    {
+      "id": "awl",
+      "query": "Find 25 Candidate AWL words.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate families registered in AWL.",
+        "filters": {
+          "scope": "candidate",
+          "awl": true,
+          "limit": 25,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 517
+    },
+    {
+      "id": "msvl",
+      "query": "Find 25 Candidate and Reference MSVL words.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families registered in MSVL.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "msvl": true,
+          "limit": 25,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 598
+    },
+    {
+      "id": "cpb100",
+      "query": "Find 25 Candidate and Reference CPB 100 words.",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate and Reference families matched by the registered CPB 100 fixture.",
+        "filters": {
+          "scope": "inclusive_reference",
+          "cpb100": true,
+          "limit": 25,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 91
+    },
+    {
+      "id": "zero_result",
+      "query": "Find Candidate words with the registered root not-registered",
+      "response": {
+        "status": "ready",
+        "summary": "Candidate families with the registered root not-registered.",
+        "filters": {
+          "scope": "candidate",
+          "root": "not-registered",
+          "limit": 20,
+          "sort": "overall"
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      },
+      "expectedMatchCount": 0
+    },
+    {
+      "id": "unsupported",
+      "query": "Find animal compounds and rerank them with SQL.",
+      "response": {
+        "status": "unsupported",
+        "summary": "This request uses a field or operation that is not registered for filtering.",
+        "filters": null,
+        "clarifyingQuestion": null,
+        "warnings": [
+          "No filter was applied."
+        ]
+      }
+    }
+  ],
+  "dataVersion": "2026-10-20-a-main-v1"
+}
