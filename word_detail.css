@@ -1,0 +1,57 @@
+/* Word detail only. The approved Browse, Home and App layouts keep their own scale. */
+main:has(#view-word.active) { width:100%; max-width:none; }
+#view-word { --work-copy:clamp(20px,1.1vw,24px); --work-note:clamp(18px,.95vw,21px); --work-word:clamp(22px,1.15vw,27px); padding-inline:clamp(16px,1.1vw,32px); max-width:none; }
+#view-word .word-workspace { width:100%; max-width:none; min-width:0; }
+#view-word .selected-word-card { padding:clamp(20px,1.3vw,32px); }
+#view-word .word-card-head { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:20px 32px; padding-bottom:22px; border-bottom:1px solid #dce6df; }
+#view-word .word-title-line { display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; }
+#view-word .word-title-line h1 { margin:0; font-size:clamp(40px,2.2vw,52px); line-height:1.15; overflow-wrap:anywhere; }
+#view-word .word-title-line .set-pill { width:auto; align-self:center; font-size:clamp(18px,1vw,21px); padding:5px 10px; }
+#view-word .word-card-identity { min-width:0; }
+#view-word .word-card-identity .identity-line { margin:10px 0 0; font-size:20px; color:#455f50; }
+#view-word .word-card-actions { display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-width:100%; }
+#view-word .word-card-actions .hint { margin:0; font-size:18px; }
+#view-word .word-action-buttons { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+#view-word .word-card-actions :is(button,.selected-add) { margin:0; min-height:48px; font-size:18px; padding:9px 13px; }
+#view-word .word-card-actions .feedback-word-actions { margin:0; gap:8px; }
+#view-word .word-card-evidence { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:18px; margin-top:22px; }
+#view-word .word-evidence-group { border:1px solid #dce6df; border-radius:12px; padding:18px 20px; min-width:0; background:#fafcfb; }
+#view-word .word-evidence-group h2 { margin:0 0 8px; font-size:clamp(26px,1.35vw,31px); line-height:1.35; }
+#view-word .word-evidence-group .evidence-grid { margin:0; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 20px; }
+#view-word .word-evidence-group .evidence-item { min-width:0; border:0; border-radius:0; border-bottom:1px solid #e4ebe6; padding:12px 0; background:transparent; }
+#view-word .word-evidence-group .evidence-item > span { font-size:clamp(22px,1.2vw,27px); color:#435c4d; font-weight:500; line-height:1.45; }
+#view-word .word-evidence-group .evidence-item > strong { margin-top:7px; font-size:clamp(26px,1.4vw,32px); color:#203b2e; line-height:1.45; }
+#view-word .word-evidence-group .evidence-tokens { font-size:inherit; }
+#view-word .word-evidence-group .evidence-token { font-size:clamp(22px,1.2vw,27px); padding:5px 8px; line-height:1.45; }
+#view-word [aria-labelledby="word-teaching-title"] .evidence-item:last-child { grid-column:1/-1; }
+#view-word .word-family-frequency { grid-column:1/-1; background:#f3f8f5; }
+#view-word .family-summary :is(.evidence-item > span,.level-note) { font-size:17px; }
+#view-word .family-summary .evidence-item > strong { font-size:19px; }
+
+/* Same compact scale as the default Find words table, with all form columns visible. */
+#view-word .form-detail-table { width:100%; min-width:1180px; table-layout:fixed; }
+#view-word .form-detail-table :is(th,td,.sticky-word) {
+  box-sizing:border-box; min-width:0; max-width:none; padding:9px 6px;
+  font-size:clamp(16px,.85vw,18px); line-height:1.4; white-space:normal;
+  overflow-wrap:anywhere; vertical-align:middle;
+}
+#view-word .form-detail-table th { top:0; font-size:clamp(14px,.75vw,16px); text-transform:none; letter-spacing:0; }
+#view-word .form-detail-table .family-link { font-size:clamp(18px,.95vw,20px); min-height:0; line-height:1.35; white-space:normal; overflow-wrap:anywhere; }
+#view-word .form-detail-table .selected-marker { margin-top:4px; font-size:13px; font-weight:600; text-transform:none; line-height:1.4; }
+#view-word .form-detail-table .evidence-token { font-size:clamp(16px,.85vw,18px); padding:3px 5px; }
+#view-word .form-detail-table td:last-child button { width:100%; min-height:44px; min-width:0; padding:5px 3px; font-size:14px; white-space:normal; }
+#view-word .form-tier > summary { padding:13px 16px; }
+#view-word .form-tier > summary strong { font-size:clamp(19px,1vw,22px); }
+#view-word .form-tier .tier-count { font-size:15px; }
+#view-word .form-table-controls :is(label,input,button),#view-word .shown-count { font-size:16px; }
+#view-word .form-table-controls :is(input,button) { min-height:44px; }
+@media(max-width:900px) {
+  #view-word .word-card-evidence { grid-template-columns:1fr; }
+  #view-word .word-card-actions { align-items:flex-start; }
+  #view-word .word-evidence-group .evidence-item > span,#view-word .word-evidence-group .evidence-token { font-size:20px; }
+  #view-word .word-evidence-group .evidence-item > strong { font-size:24px; }
+}
+@media(max-width:520px) {
+  #view-word .word-evidence-group .evidence-grid { grid-template-columns:1fr; }
+  #view-word .word-evidence-group { padding:16px; }
+}

@@ -1,0 +1,28 @@
+/* Search results only; the approved full-database table stays unchanged. */
+#view-browse [hidden] { display:none !important; }
+#view-browse.word-search-mode #ai-active-summary { display:none !important; }
+#view-browse .family-search-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:20px 0 14px; flex-wrap:wrap; }
+#view-browse .family-search-toolbar h2 { margin:0 0 5px; font-size:24px; }
+#view-browse .family-search-toolbar p { margin:0; font-size:17px; }
+#view-browse .family-search-group { background:white; border:1px solid #cbdcd5; border-radius:12px; margin:16px 0; overflow:hidden; }
+#view-browse .family-search-heading { padding:16px; background:#f0f7f3; display:flex; flex-wrap:wrap; gap:10px 20px; align-items:baseline; }
+#view-browse .family-search-heading h3 { font-size:22px; margin:0; }
+#view-browse .family-search-heading p { margin:0; font-size:16px; }
+#view-browse .family-search-heading .family-summary { width:100%; display:flex; flex-wrap:wrap; gap:10px 20px; padding:0; border:0; border-radius:0; background:transparent; }
+#view-browse .family-search-heading .family-summary span { font-size:15px; }
+#view-browse .family-search-scroll { overflow:auto; max-height:70vh; }
+#view-browse .family-search-table { width:100%; min-width:1120px; table-layout:fixed; border-collapse:collapse; font-size:16px; }
+#view-browse .family-search-table :is(th, td) { padding:10px 7px; line-height:1.4; overflow-wrap:anywhere; min-width:0; white-space:normal; vertical-align:middle; font-size:16px; }
+#view-browse .family-search-table thead th { position:sticky; top:0; background:#e3eee7; z-index:1; font-size:14px; text-transform:none; letter-spacing:0; }
+#view-browse .family-search-table tbody th { position:static; font-weight:600; text-align:left; background:transparent; text-transform:none; letter-spacing:0; }
+#view-browse .family-search-table tr.search-hit > :is(td, th) { background:#e1f3e8; border-block:1px solid #7eb59a; }
+#view-browse .family-search-table tr.search-hit > th { border-left:4px solid #126a4a; }
+#view-browse .family-search-table .form-search-link { color:#105d43; font-size:18px; font-weight:750; padding:0; border:0; background:none; text-align:left; text-decoration:underline; text-underline-offset:3px; white-space:normal; overflow-wrap:anywhere; min-height:36px; }
+#view-browse .your-search { display:block; width:fit-content; font-size:13px; font-weight:700; padding:2px 6px; border:1px solid #8dbaa2; border-radius:5px; margin-top:4px; color:#155236; background:#fff; }
+#view-browse .family-search-table button:not(.form-search-link) { font-size:14px; padding:6px 4px; min-height:44px; width:100%; min-width:0; white-space:normal; }
+#view-browse .family-search-note { font-size:15px; margin:12px 0; color:#466353; }
+#view-browse .family-search-retry { margin-left:10px; }
+@media (max-width:700px) {
+  #view-browse .family-search-toolbar h2 { font-size:21px; }
+  #view-browse .family-search-heading { padding:12px; }
+}

@@ -195,7 +195,7 @@
     });
   }
 
-  async function search(submitted) {
+  async function searchFamily(submitted) {
     const config = await manifest();
     const normalized = norm(submitted);
     const empty = {submitted_query: submitted, normalized_query: normalized, best_priority: null, best_owner_count: 0, owners: [], alternatives: []};
@@ -227,6 +227,16 @@
     };
   }
 
+  async function search(submitted) {
+    const result = await searchFamily(submitted);
+    try {
+      if (!window.HKELE_COMPOUNDS) throw new Error("Compound data need updating.");
+      const expression = await window.HKELE_COMPOUNDS.lookup(submitted);
+      return {...result, expression, expression_layer_status:"READY",
+        status:expression && result.status === "UNMATCHED" ? "REGISTERED_EXPRESSION" : result.status};
+    } catch { return {...result, expression:null, expression_layer_status:"UNAVAILABLE"}; }
+  }
+
   async function resolveOccurrences(payload) {
     const config = await manifest();
     const occurrences = payload?.occurrences;
@@ -246,7 +256,7 @@
         output.push({...base, status: "UNSUPPORTED", best_owner_count: 0, owners: [], alternatives: [], identity_exception: null});
       } else {
         const result = await unique.get(String(item.surface || item.normalized_token));
-        output.push({...base, ...Object.fromEntries(["status", "best_priority", "best_owner_count", "owners", "alternatives", "identity_exception"].map(key => [key, result[key]]))});
+        output.push({...base, ...Object.fromEntries(["status", "best_priority", "best_owner_count", "owners", "alternatives", "identity_exception", "expression", "expression_layer_status"].map(key => [key, result[key]]))});
       }
     }
     return {api_version: config.api_version, occurrences: output, occurrence_count: output.length};

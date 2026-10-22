@@ -12,8 +12,12 @@
   <link rel="stylesheet" href="teacher_view.css?v=20261020-v16">
   <link rel="stylesheet" href="text_workspace.css?v=20261020-v16">
   <link rel="stylesheet" href="workspace_readability.css?v=20261020-v20">
+  <link rel="stylesheet" href="browse_compact.css?v=20261021-fit1">
+  <link rel="stylesheet" href="word_family_results.css?v=20261022-ai-entry1">
+  <link rel="stylesheet" href="evidence_tokens.css?v=20261022-tags1">
+  <link rel="stylesheet" href="word_detail.css?v=20261022-wide2">
   <style>html[data-consent-pending] .site-header,html[data-consent-pending] main,html[data-consent-pending] .lesson-context{visibility:hidden}</style>
-</head>
+<link rel="stylesheet" href="compound.css?v=20261022-c1"></head>
 <body>
   <header class="site-header">
     <a class="brand" href="#home" aria-label="HK-ELE Home"><span class="brand-mark">HK</span><span><strong>HK-ELE</strong><small>Teacher Database</small></span></a>
@@ -63,6 +67,7 @@
           <span class="ai-toggle-label" aria-hidden="true">Open +</span>
         </button>
         <div id="ai-filter-body" class="ai-filter-body" hidden>
+          <p id="ai-network-note" class="hint" role="status" hidden>AI search needs an internet connection. Reconnect and try again.</p>
           <p>Describe the words you need, then review the search. Only your request is sent to the AI service.</p>
           <label for="ai-filter-query"><strong>Teaching request</strong></label>
           <textarea id="ai-filter-query" maxlength="300" rows="3" placeholder="Example: Find words with the root act. Limit 20."></textarea>
@@ -91,11 +96,12 @@
         <div><strong id="ai-active-title"></strong><p id="ai-active-conditions"></p></div>
         <div class="ai-actions"><button id="ai-active-edit" type="button">Edit</button><button id="ai-active-clear" type="button">Clear / Undo</button></div>
       </div>
+      <section id="family-search-results" aria-labelledby="family-search-title" hidden></section>
       <div class="browse-results-bar"><p id="browse-result-count" role="status"></p><details class="columns-menu"><summary>Choose columns</summary><div id="column-choices"></div></details></div>
-      <div id="browse-table-shell" class="table-shell" tabindex="0" aria-label="Complete word family table; scroll horizontally for all evidence"><table id="family-table"><thead><tr id="family-column-groups"></tr><tr id="family-head"></tr></thead><tbody id="family-body"></tbody></table></div>
+      <div id="browse-table-shell" class="table-shell" tabindex="0" aria-label="Complete word family table; scroll horizontally for all evidence"><table id="family-table"><colgroup id="family-column-widths"></colgroup><thead><tr id="family-column-groups"></tr><tr id="family-head"></tr></thead><tbody id="family-body"></tbody></table></div>
       <p class="table-scroll-hint">Scroll sideways to see more columns.</p>
       <div class="pagination"><button id="prev-page">Previous</button><span id="page-label">Page 1</span><button id="next-page">Next</button><label>Rows <select id="page-size"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></label></div>
-      <details class="level-note"><summary>About the wordlist and its evidence</summary><p>Overall rank combines general English, textbook and Hong Kong corpus frequencies. HK rank uses the Hong Kong corpus frequencies.</p><p>Textbook levels show the earliest appearance in the sampled Hong Kong textbooks. External levels use the source resource’s grading system. A dash means no recorded value.</p><p>Wordlist updated: 14 September 2026.</p></details>
+      <details class="level-note"><summary>About the wordlist and its evidence</summary><p>Overall rank combines general English, textbook and Hong Kong corpus frequencies. HK rank uses the Hong Kong corpus frequencies.</p><p>Textbook levels show the earliest appearance in the sampled Hong Kong textbooks. US grade references use the US school grading system. A dash means no recorded value.</p><p>Wordlist updated: 20 October 2026. Closed-compound entries added: 22 October 2026.</p></details>
     </section>
 
     <section id="view-word" class="view word-view" aria-labelledby="word-view-title">
@@ -159,7 +165,7 @@
     </section>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script src="tokenizer.js?v=74"></script><script src="contractions.js?v=74"></script><script src="ai_runtime_config.js?v=87"></script><script src="ai_public_config.js?v=87"></script><script src="ai_filter_contract.js?v=20261016-v8"></script><script src="static_api.js?v=20261021-integrity-lf2"></script><script src="xlsx_export.js?v=74"></script><script src="lesson_contract.js?v=20261019-v13"></script><script src="lesson_library.js?v=20261020-a1"></script><script src="lesson_library_ui.js?v=20261020-v16"></script><script src="lesson_workspace.js?v=20261020-a1"></script><script src="text_workspace.js?v=20261020-v16"></script><script src="lesson_data_refresh.js?v=20261020-a1"></script><script src="app.js?v=20261021-word-grade1"></script><script src="ai_filter.js?v=20261020-v19"></script>
+  <script src="tokenizer.js?v=74"></script><script src="contractions.js?v=74"></script><script src="ai_runtime_config.js?v=20261022-connected1"></script><script src="ai_public_config.js?v=87"></script><script src="ai_filter_contract.js?v=20261016-v8"></script><script src="compound_release.js?v=20261022-compounds1"></script><script src="compound_data.js?v=20261022-compounds1"></script><script src="static_api.js?v=20261022-compounds1"></script><script src="xlsx_export.js?v=74"></script><script src="lesson_contract.js?v=20261019-v13"></script><script src="lesson_library.js?v=20261020-a1"></script><script src="lesson_library_ui.js?v=20261020-v16"></script><script src="lesson_workspace.js?v=20261020-a1"></script><script src="text_workspace.js?v=20261020-v16"></script><script src="lesson_data_refresh.js?v=20261020-a1"></script><script src="word_family_results.js?v=20261022-v1"></script><script src="evidence_tokens.js?v=20261022-tags1"></script><script src="compound_teaching.js?v=20261022-c1"></script><script src="compound_ui.js?v=20261022-c1"></script><script src="app.js?v=20261022-review32"></script><script src="ai_filter.js?v=20261022-network1"></script>
   <script src="feedback_contract.js?v=20261012"></script><script src="feedback.js?v=20261020-v19"></script>
   <script src="home.js?v=20261012"></script>
   <script src="privacy_contract.js?v=20261012-v2"></script><script src="privacy.js?v=20261020-v19"></script>

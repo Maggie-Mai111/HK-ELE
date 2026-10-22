@@ -1,0 +1,4 @@
+.compound-card{border:1px solid #cbdcd5;border-radius:12px;background:#fff;padding:18px;margin:14px 0;font-size:18px;line-height:1.5}
+.compound-title,.compound-parts,.compound-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.compound-title h3{margin:0;font-size:1.2em}.compound-parts{margin:12px 0}.compound-parts>span:first-child{color:#58716a;width:100%;font-size:.95em}.compound-actions{margin-top:12px}
+.compound-parts button{background:#e9f4ed}.compound-card button{font-size:inherit}

@@ -9,6 +9,21 @@ const api = globalThis.HKELE_LESSON_LIBRARY;
 const legacyKey = "hkele-phase1v-teaching-list-v1";
 const item = {baseword_key:"use", display_family:"use", selected_forms:["use","reusable"], order:2,
   notes:"Keep target meaning", connections:"reuse", depth:"Master", teaching_focus:"focus"};
+test("mixed compound and family lessons keep saved notes, exact forms and separate export identities",()=>{
+  const {hooks,context,disk}=harness();
+  const expression={expressionId:"hc_test",displayExpression:"classroom",normalizedExpression:"classroom",sourceVersion:"compound-test"};
+  const compound=context.HKELE_COMPOUND_TEACHING.createItem(expression,3,"2026-10-20-a-main-v1");
+  compound.notes="Explain routines";
+  hooks.state.selected=[structuredClone(item),compound];hooks.saveList();
+  const reopened=api.create(disk).library.lessons[0].items;
+  assert.equal(reopened[1].notes,"Explain routines");assert.equal(reopened[0].selected_forms[1],"reusable");
+  const rows=hooks.lessonExportRows(),header=rows[0],row=rows.find(r=>r.includes("hc_test"));
+  assert.ok(row);assert.equal(row[header.indexOf("Expression ID")],"hc_test");
+  assert.equal(row[header.indexOf("Record type")],"Compound");
+  assert.equal(row[header.indexOf("Word family")],"");
+  assert.equal(row[header.indexOf("Family key")],"");
+  assert.ok(row.includes("Explain routines"));
+});
 function storage(initial={}) {
   const values = new Map(Object.entries(initial));
   return {values, fail:false, getItem(key){return values.get(key) ?? null;},
@@ -81,7 +96,7 @@ function harness() {
     addEventListener:(name,fn)=>events[name]=fn,confirm:()=>false,location:{hash:"",reload(){}},
     setTimeout:()=>{}, CustomEvent:class{},scrollY:0});
   context.window=context;
-  for(const file of ["lesson_contract.js","lesson_library.js","lesson_library_ui.js"])
+  for(const file of ["lesson_contract.js","lesson_library.js","lesson_library_ui.js","word_family_results.js","evidence_tokens.js","compound_teaching.js","compound_ui.js"])
     vm.runInContext(fs.readFileSync(new URL(`../${file}`,import.meta.url),"utf8"),context);
   context.HKELE_LESSON_WORKSPACE={create:()=>({renderList(){},renderPicker(){},rememberUndo(){}})};
   context.HKELE_TEXT_WORKSPACE={create:()=>({refreshSuggestions(){},resetLessonContext(){}})};

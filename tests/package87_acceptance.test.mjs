@@ -97,7 +97,12 @@ test("UI is one thin adapter over the existing Browse table", async () => {
   assert.match(ai, /action:\s*"ai_filter"/);
   assert.match(config, /https:\/\/maggie-mai111\.github\.io/);
   assert.match(config, /\/api\/ai\/interpret-filter/);
-  assert.match(runtimeConfig, /endpoint:\s*""/);
-  assert.match(runtimeConfig, /turnstileSiteKey:\s*""/);
+  const runtimeWindow = {};
+  const { runInNewContext } = await import("node:vm");
+  runInNewContext(runtimeConfig, {window: runtimeWindow});
+  assert.equal(runtimeWindow.__HKELE_AI_PUBLIC_CONFIG__.endpoint,
+    "https://hkele-ai-filter.hkele-teacher-webapp.workers.dev/api/ai/interpret-filter");
+  assert.equal(runtimeWindow.__HKELE_AI_PUBLIC_CONFIG__.turnstileSiteKey,
+    "0x4AAAAAAFEeVTrwV_ny6k5q");
   assert.doesNotMatch(`${html}\n${app}\n${ai}\n${config}\n${runtimeConfig}`, /sk-[A-Za-z0-9_-]{12,}/);
 });

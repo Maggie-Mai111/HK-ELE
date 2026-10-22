@@ -5,8 +5,21 @@
   const contract = window.HKELE_AI_FILTER_CONTRACT;
   const panel = document.querySelector("#ai-filter-panel");
   if (!panel) return;
-  if (!config || !contract || !config.configured) { panel.hidden = true; return; }
   panel.hidden = false;
+
+  // Keep the entry discoverable even when this build cannot send AI requests.
+  if (!config?.configured || !contract) {
+    const toggle = panel.querySelector("#ai-filter-toggle");
+    const body = panel.querySelector("#ai-filter-body");
+    body.innerHTML = '<p role="status">AI search is temporarily unavailable here. You can still search for a word above.</p>';
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") !== "true";
+      toggle.setAttribute("aria-expanded", String(expanded));
+      toggle.querySelector(".ai-toggle-label").textContent = expanded ? "Close −" : "Open +";
+      body.hidden = !expanded;
+    });
+    return;
+  }
 
   const $ = selector => panel.querySelector(selector);
   const esc = value => String(value ?? "").replace(/[&<>'"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[character]));
@@ -22,6 +35,8 @@
   const message = $("#ai-filter-message");
   const turnstileMessage = $("#ai-turnstile-message");
   const turnstileHost = $("#ai-turnstile");
+  const networkNote = $("#ai-network-note");
+  const isOnline = () => typeof navigator === "undefined" || navigator.onLine !== false;
   const active = document.querySelector("#ai-active-summary");
   const activeTitle = document.querySelector("#ai-active-title");
   const activeConditions = document.querySelector("#ai-active-conditions");
@@ -32,6 +47,7 @@
   let widgetId = null;
   let busy = false;
   let fixturePromise = null;
+  let pendingRequest = null;
 
   function setExpanded(expanded) {
     toggle.setAttribute("aria-expanded", String(expanded));
@@ -46,7 +62,7 @@
   function setBusy(value) {
     busy = value;
     input.disabled = value;
-    previewButton.disabled = value || !input.value.trim() || (!config.fixtureMode && !turnstileToken);
+    previewButton.disabled = !isOnline() || value || !input.value.trim() || (!config.fixtureMode && !turnstileToken);
     editButton.disabled = value;
     confirmButton.disabled = value;
     previewButton.textContent = value ? "Preparing search…" : "Review search";
@@ -119,7 +135,7 @@
       const script = existing || document.createElement("script");
       const finish = () => window.turnstile ? resolve(window.turnstile) : reject(new Error("Turnstile unavailable"));
       script.addEventListener("load", finish, {once: true});
-      script.addEventListener("error", () => reject(new Error("Turnstile unavailable")), {once: true});
+      script.addEventListener("error", () => { script.remove(); reject(new Error("Turnstile unavailable")); }, {once: true});
       if (!existing) {
         script.id = id;
         script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -131,6 +147,7 @@
   }
 
   async function prepareProtection() {
+    if (!isOnline()) return;
     if (config.fixtureMode) {
       turnstileToken = "local-fixture-token";
       turnstileMessage.textContent = "";
@@ -144,18 +161,19 @@
     }
     try {
       const api = await loadTurnstile();
+      if (!isOnline()) return;
       if (widgetId) return;
       widgetId = api.render(turnstileHost, {
         sitekey: config.turnstileSiteKey,
         action: "ai_filter",
-        callback: token => { turnstileToken = token; turnstileMessage.textContent = ""; setBusy(false); },
-        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word search."; setBusy(false); },
-        "expired-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please complete the verification again."; setBusy(false); },
-        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = "Please try the verification again, or use the word search."; setBusy(false); },
+        callback: token => { if (!isOnline()) return; turnstileToken = token; turnstileMessage.textContent = ""; setBusy(busy); },
+        "error-callback": () => { turnstileToken = null; turnstileMessage.textContent = isOnline() ? "Please try the verification again, or use the word search." : ""; setBusy(busy); },
+        "expired-callback": () => { turnstileToken = null; turnstileMessage.textContent = isOnline() ? "Please complete the verification again." : ""; setBusy(busy); },
+        "timeout-callback": () => { turnstileToken = null; turnstileMessage.textContent = isOnline() ? "Please try the verification again, or use the word search." : ""; setBusy(busy); },
         theme: "auto",
       });
     } catch {
-      turnstileMessage.textContent = "Search couldn't get ready. Please try again or use the word search.";
+      turnstileMessage.textContent = isOnline() ? "Search couldn't get ready. Please try again or use the word search." : "";
     }
   }
 
@@ -174,6 +192,7 @@
 
   async function workerResult(query) {
     const controller = new AbortController();
+    pendingRequest = controller;
     const timer = setTimeout(() => controller.abort(), config.requestTimeoutMs);
     try {
       const response = await fetch(config.endpoint, {
@@ -193,13 +212,15 @@
     } finally {
       clearTimeout(timer);
       turnstileToken = null;
-      if (widgetId && window.turnstile) window.turnstile.reset(widgetId);
+      if (widgetId && window.turnstile && isOnline()) window.turnstile.reset(widgetId);
+      if (pendingRequest === controller) pendingRequest = null;
     }
   }
 
   async function previewRequest() {
     const query = input.value.trim();
     if (!query || query.length > 300 || busy) return;
+    if (!isOnline()) { updateNetworkState(); return; }
     if (!config.fixtureMode && (!config.configured || !turnstileToken)) {
       setMessage("Please complete the verification and try again.", "error");
       return;
@@ -209,8 +230,10 @@
     clearPreview();
     try {
       const raw = config.fixtureMode ? await fixtureResult(query) : await workerResult(query);
+      if (!isOnline()) return;
       renderInterpretation(contract.validateResult(raw));
     } catch (error) {
+      if (!isOnline()) { setMessage(""); return; }
       setMessage(error instanceof Error && error.message === "AI search is busy. Try again later."
         ? "Search is busy. Try again shortly or use the word search."
         : "We couldn't complete the search. Try again or use the word search.", "error");
@@ -245,6 +268,23 @@
     if (edit) setExpanded(true);
   }
 
+  function updateNetworkState() {
+    const connected = isOnline();
+    networkNote.hidden = connected;
+    turnstileHost.hidden = !connected;
+    turnstileMessage.textContent = "";
+    setMessage("");
+    if (!connected) {
+      turnstileToken = null;
+      pendingRequest?.abort();
+      if (widgetId && window.turnstile) window.turnstile.remove?.(widgetId);
+      widgetId = null;
+    } else if (toggle.getAttribute("aria-expanded") === "true") {
+      void prepareProtection();
+    }
+    setBusy(busy);
+  }
+
   toggle.addEventListener("click", () => setExpanded(toggle.getAttribute("aria-expanded") !== "true"));
   input.addEventListener("input", () => { clearPreview(); setMessage(""); setBusy(false); });
   previewButton.addEventListener("click", () => void previewRequest());
@@ -259,6 +299,8 @@
     setBusy(false);
   }));
   window.addEventListener("hkele:manual-browse-change", () => { active.hidden = true; clearPreview(); });
+  window.addEventListener("offline", updateNetworkState);
+  window.addEventListener("online", updateNetworkState);
   setExpanded(false);
-  setBusy(false);
+  updateNetworkState();
 })();

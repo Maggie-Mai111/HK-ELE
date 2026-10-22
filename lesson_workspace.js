@@ -39,7 +39,8 @@
       const focus = state.selected.filter(item => item.teaching_focus === "focus").length;
       const mention = state.selected.filter(item => item.teaching_focus === "mention").length;
       const count=lesson.wordCount(state.selected);
-      $("#lesson-word-count").textContent = `${count} selected ${count===1 ? "word" : "words"} · ${state.selected.length} ${state.selected.length===1 ? "family" : "families"}`;
+      const compounds=state.selected.filter(item=>item.record_type==='compound').length,families=state.selected.length-compounds;
+      $("#lesson-word-count").textContent = `${count} selected ${count===1 ? "word" : "words"} · ${families} ${families===1?'family':'families'}${compounds ? ` · ${compounds} ${compounds===1?'compound':'compounds'}` : ''}`;
       $("#lesson-plan-count").textContent = `${focus} teach in depth · ${mention} briefly introduce · ${state.selected.length-focus-mention} not decided`;
     }
     function renderList() {
@@ -51,7 +52,7 @@
       if (empty) { $("#list-body").innerHTML=""; return; }
       const ordered = [...state.selected].sort((a,b)=>a.order-b.order);
       $("#list-body").innerHTML = ordered.map((item,index) => `<article class="lesson-card" data-list-key="${esc(item.baseword_key)}">
-        <div class="lesson-card-preview"><div class="lesson-card-heading"><span class="lesson-order">${index+1}</span><div class="lesson-form-links">${item.selected_forms.map(form=>`<button type="button" data-open-form="${esc(form)}" ${item.data_review_status ? "disabled" : ""}>${esc(form)}</button>`).join("")}</div></div><span class="lesson-plan-pill ${item.teaching_focus==="focus" ? "focus" : ""}">${lesson.focusLabel(item.teaching_focus)}</span><span class="hint">Family: ${esc(item.display_family)}</span>${item.data_review_status ? `<p class="hint">${esc(item.data_review_status)}</p>` : ""}<p class="lesson-note-preview">${esc(item.notes)}</p><p class="lesson-related-preview hint">${item.connections ? `Related: ${esc(item.connections)}` : ""}</p></div>
+        <div class="lesson-card-preview"><div class="lesson-card-heading"><span class="lesson-order">${index+1}</span><div class="lesson-form-links">${item.selected_forms.map(form=>`<button type="button" data-open-form="${esc(form)}" ${item.data_review_status ? "disabled" : ""}>${esc(form)}</button>`).join("")}</div></div><span class="lesson-plan-pill ${item.teaching_focus==="focus" ? "focus" : ""}">${lesson.focusLabel(item.teaching_focus)}</span><span class="hint">${item.record_type === "compound" ? "Compound" : `Family: ${esc(item.display_family)}`}</span>${item.data_review_status ? `<p class="hint">${esc(item.data_review_status)}</p>` : ""}<p class="lesson-note-preview">${esc(item.notes)}</p><p class="lesson-related-preview hint">${item.connections ? `Related: ${esc(item.connections)}` : ""}</p></div>
         <details ${state.lessonOpen.has(item.baseword_key) ? "open" : ""}><summary><span class="lesson-edit-label">${state.lessonOpen.has(item.baseword_key) ? "Close editor" : "Edit plan and notes"}</span></summary>
         <div class="lesson-card-editor"><label>Your teaching plan<select class="list-focus">${lesson.focusOptions.map(([value,label])=>`<option value="${value}" ${value===(item.teaching_focus||"") ? "selected" : ""}>${label}</option>`).join("")}</select></label>
         <label>Teaching note (optional)<textarea class="notes" rows="2" placeholder="For example: compare reusable with disposable">${esc(item.notes)}</textarea></label>

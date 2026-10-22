@@ -1,0 +1,49 @@
+/* Only Find words: keep every evidence column, with widths that fit a desktop. */
+#view-browse { --work-group-height: 36px; }
+#view-browse #family-table {
+  width: 100%; min-width: 1180px; table-layout: fixed;
+  font-size: clamp(16px, .85vw, 18px);
+}
+#view-browse #family-table :is(th, td, .family-cell, .hk-cell, .first-seen-cell,
+  .external-cell, .subjects-cell, .root-cell, .root-meaning-cell, .action-cell) {
+  min-width: 0; max-width: none; padding: 9px 6px;
+  font-size: clamp(16px, .85vw, 18px); line-height: 1.4;
+  white-space: normal; overflow-wrap: anywhere; vertical-align: middle;
+  box-sizing: border-box;
+}
+#view-browse #family-table #family-column-groups th {
+  height: 36px; padding: 6px; font-size: 14px; line-height: 1.3;
+  white-space: normal; text-transform: none; letter-spacing: 0;
+}
+#view-browse #family-table #family-head th {
+  top: 36px; padding: 9px 6px; font-size: clamp(14px, .75vw, 16px);
+  line-height: 1.35; overflow-wrap: normal; word-break: normal;
+}
+#view-browse #family-table .family-cell .family-link {
+  font-size: clamp(18px, .95vw, 20px); line-height: 1.35;
+  min-height: 0; padding: 0; max-width: 100%; white-space: normal;
+  overflow-wrap: anywhere;
+}
+#view-browse #family-table :is(.hint, .set-pill, .band, .evidence-badge) {
+  font-size: clamp(14px, .75vw, 15px); line-height: 1.4;
+  max-width: 100%; white-space: normal; box-sizing: border-box;
+}
+#view-browse #family-table :is(.set-pill, .band, .evidence-badge) {
+  padding: 3px 5px; border-radius: 6px;
+}
+#view-browse #family-table .evidence-badge { gap: 0; }
+#view-browse #family-table .evidence-badge strong {
+  font-size: inherit; white-space: normal; overflow-wrap: anywhere;
+}
+#view-browse #family-table :is(.overall-cell, .hk-cell strong) {
+  font-size: clamp(16px, .85vw, 18px); font-variant-numeric: tabular-nums;
+}
+#view-browse #family-table .hint { margin-top: 3px; }
+#view-browse #family-table .action-cell button {
+  width: 100%; min-width: 0; max-width: 100%; min-height: 44px;
+  padding: 5px 3px; font-size: 14px; line-height: 1.3;
+  white-space: normal; overflow-wrap: normal;
+}
+@media (min-width: 1280px) {
+  #view-browse .table-scroll-hint { display: none; }
+}

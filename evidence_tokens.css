@@ -1,0 +1,16 @@
+/* Evidence labels are text, not controls. Keep full wording within the current column widths. */
+:is(#view-browse,#view-word) .evidence-tokens { display:flex; flex-wrap:wrap; gap:5px; align-items:flex-start; max-width:100%; }
+:is(#view-browse,#view-word) .evidence-token {
+  display:inline-block; max-width:100%; box-sizing:border-box; padding:4px 7px;
+  border:1px solid transparent; border-radius:6px; font-size:inherit; font-weight:500;
+  line-height:1.4; white-space:normal; overflow-wrap:anywhere; word-break:normal;
+  text-transform:none; letter-spacing:0;
+}
+:is(#view-browse,#view-word) .token-english { background:#e9f1ff; color:#274b80; border-color:#c8daf1; }
+:is(#view-browse,#view-word) .token-health { background:#faeaf0; color:#813b59; border-color:#eac7d5; }
+:is(#view-browse,#view-word) .token-math { background:#fff3d9; color:#725417; border-color:#e9d5a2; }
+:is(#view-browse,#view-word) .token-science { background:#e3f3ec; color:#235e45; border-color:#badbcb; }
+:is(#view-browse,#view-word) .token-social { background:#eeeafa; color:#58457c; border-color:#d3c9eb; }
+:is(#view-browse,#view-word) .token-root { background:#eaf0f6; color:#344f6b; border-color:#cbd6e3; font-weight:650; }
+:is(#view-browse,#view-word) .token-meaning { background:#fff4e7; color:#71502f; border-color:#e9d6be; }
+:is(#view-browse,#view-word) .token-subject { background:#edf3f0; color:#365647; border-color:#cbdad2; }

@@ -10,6 +10,9 @@
       dataVersion: String(config.dataVersion || "").slice(0, 100),
     };
     const reference = [
+      context.expressionId && "Record type: Compound",
+      context.expressionId && `Expression ID: ${String(context.expressionId).slice(0,160)}`,
+      context.expressionVersion && `Compound data version: ${String(context.expressionVersion).slice(0,100)}`,
       result.word && `Word: ${result.word}`,
       result.family && `Family: ${result.family}`,
       result.familyKey && `Family key: ${result.familyKey}`,
@@ -22,7 +25,7 @@
   }
   function buildFeedbackUrl(kind, context, config) {
     if (!["report", "rating"].includes(kind)) return null;
-    if (kind === "rating" && (!context.word || !context.familyKey)) return null;
+    if (kind === "rating" && (!context.word || (!context.familyKey && !context.expressionId))) return null;
     try {
       const target = config[kind];
       if (target.requiredContext && (target.requiredContext !== "reference" || !/^entry\.\d+$/.test(target.fields.reference || ""))) return null;

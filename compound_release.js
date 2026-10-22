@@ -1,0 +1,1 @@
+window.HKELE_COMPOUND_RELEASE = Object.freeze({"dataVersion": "2026-10-20-a-main-v1", "expressionVersion": "2026-10-22-a-main-closed-v1", "records": 57881, "manifestSha256": "7f28eb1bea6b40653f829ee07f3105913174ee3b847e3cfe3e069fd95a1811b2"});

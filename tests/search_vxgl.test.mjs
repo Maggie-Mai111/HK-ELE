@@ -6,6 +6,20 @@ import vm from 'node:vm';
 import test from 'node:test';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+test('selected-word annotations agree with actual form records instead of inheriting family summaries',async()=>{
+ const app=readFileSync(join(root,'app.js'),'utf8'),context=vm.createContext({});
+ vm.runInContext(app.slice(app.indexOf('  function hasAwl('),app.indexOf('  function rankBand(')),context);
+ const detail=await webApi().api.request('/families/stress');
+ const stressed=detail.forms.find(x=>x.form==='stressed'),stressors=detail.forms.find(x=>x.form==='stressors');
+ assert.notEqual(stressed.msvl,detail.family.msvl);
+ assert.equal(context.wordFormEvidence(stressed).msvl,stressed.msvl);
+ assert.equal(context.wordFormEvidence(stressors).awl,false);
+ assert.equal(context.wordFormEvidence(stressors).suffix,'or');
+ assert.equal(context.wordFormEvidence(null).msvl,null);
+ assert.equal(context.wordFormEvidence({...stressors,phase1c_evidence_withheld_fields:'suffix'}).suffix,null);
+ assert.equal(context.wordFormEvidence({...stressed,root_meaning_alignment_status:'AMBIGUOUS'}).meaning,null);
+ assert.match(app,/evidenceItem\("Middle School Vocabulary List \(MSVL\)", msvlDisplay\(selectedEvidence.msvl/);
+});
 function webApi({lineEndings, corruptIntegrity = false, corruptShard = false} = {}) {
   let failPath = '';
   const context = vm.createContext({window: {}, location: {href: 'https://fixture.invalid/'},

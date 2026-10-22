@@ -44,7 +44,7 @@
       (b.family.current_hk_frequency_rank ?? 0)-(a.family.current_hk_frequency_rank ?? 0) || a.family.display_family.localeCompare(b.family.display_family)).slice(0,8);
   }
 
-  function create({state, $, esc, openFamily, addToList, contractionDescription, showView}) {
+  function create({state, $, esc, openFamily, addToList, contractionDescription, showView, compoundUi}) {
     let classLevel = null, limit = 4, commonOn = false, hkOn = false;
     const dialog = document.createElement("dialog");
     dialog.className = "text-word-dialog"; dialog.setAttribute("aria-labelledby", "text-word-title");
@@ -55,6 +55,7 @@
       node.focus({preventScroll:true});
     }
     function openOccurrence(item) {
+      if(item.status === "REGISTERED_EXPRESSION" && item.expression && compoundUi) {compoundUi.open(item.expression,"Check a text");return;}
       const owners = (item.owners || []).filter(owner => !owner.blocked && !owner.display_blocked);
       const expansion = contractionDescription(item);
       if (!expansion && item.status === "RESOLVED" && item.owners.length === 1 && owners.length === 1) {
