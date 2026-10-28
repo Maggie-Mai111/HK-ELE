@@ -433,7 +433,7 @@
       const detail = await json(`/families/${encodeURIComponent(key)}`);
       if (request !== detailRequest || state.view !== origin || state.library.activeId !== lessonId) return;
       state.detail = detail; state.wordReturn=returnPoint;
-      $("#back-to-browse").textContent = origin === "check" ? "← Back to text" : origin === "list" ? "← Back to teaching list" : "← Back to results";
+      $("#back-to-browse").textContent = returnPoint.view === "check" ? "← Back to text" : returnPoint.view === "list" ? "← Back to teaching list" : "← Back to results";
       state.selectedForm = selected || state.detail.family.display_family;
       state.formFilter = "";
       state.formFilters = {hk:new Set(), first:new Set(), external:new Set(), academic:new Set()};
@@ -546,12 +546,13 @@
           <div id="form-filter-academic">${multiFilterMarkup("academic", "AWL / MSVL / subject", formFilterOptions.academic, state.formFilters.academic)}</div>
         </div>
         </details><div class="form-tiers">${tierTables}</div>
-        <details class="level-note"><summary>How to read this evidence</summary><p>Textbook levels show the earliest appearance of each form in the sampled Hong Kong textbooks. The family level is the earliest observation across its word forms. US grade references use the US school grading system. AWL and MSVL may link to the whole family. A dash means no recorded value.</p></details>
+        <details class="level-note"><summary>How to read this evidence</summary><p>Textbook levels show the earliest appearance of each form in the sampled Hong Kong textbooks. The family level is the earliest observation across its word forms. US grade references use the US school grading system. AWL and MSVL labels follow the selected word form where a record is available. A dash means no recorded value.</p></details>
       </section>`;
     window.dispatchEvent(new CustomEvent("hkele-word-feedback-context", { detail: { word: selected?.form || state.selectedForm, family: family.display_family, familyKey: family.baseword_key } }));
-    $("[data-add-selected]").addEventListener("click", () => addToList(family, selected?.form || state.selectedForm));
+    const sourceLabel = state.wordReturn?.view === "check" ? "Check a text" : state.wordReturn?.view === "list" ? "Teaching list" : "Find words";
+    $("[data-add-selected]").addEventListener("click", () => addToList(family, selected?.form || state.selectedForm, sourceLabel));
     $$('[data-select-form]').forEach(button => button.addEventListener("click", () => { state.selectedForm = detail.forms.find(form => form.form_key === button.dataset.selectForm)?.form || state.selectedForm; renderWord(); }));
-    $$('[data-add-form]').forEach(button => button.addEventListener("click", () => addToList(family, detail.forms.find(form => form.form_key === button.dataset.addForm)?.form || family.display_family)));
+    $$('[data-add-form]').forEach(button => button.addEventListener("click", () => addToList(family, detail.forms.find(form => form.form_key === button.dataset.addForm)?.form || family.display_family, sourceLabel)));
     [["hk", "#form-filter-hk"], ["first", "#form-filter-first"], ["external", "#form-filter-external"], ["academic", "#form-filter-academic"]].forEach(([key, selector]) => {
       bindMultiFilter($(selector), state.formFilters[key], () => renderWord(key));
     });

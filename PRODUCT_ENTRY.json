@@ -1,7 +1,7 @@
 {
-  "status": "LOCAL_COMPOUND_UPDATE_READY_MANUAL_PUBLICATION_PENDING",
+  "status": "LOCAL_TEACHER_FLOW_RELEASE_READY_PUBLIC_UPDATE_PENDING",
   "dataVersion": "2026-10-20-a-main-v1",
-  "uiBaseline": "Approved Web v31 layout retained; original Home design from v21",
+  "uiBaseline": "Approved Web v32 retained; only scoped teacher-flow corrections",
   "uiRedesigned": false,
   "dataCounts": {
     "candidate": 2871,
@@ -19,7 +19,7 @@
   "authenticationConnected": false,
   "deployedByThisTask": false,
   "provenance": "README.md",
-  "iteration": "teacher-web-closed-compounds-20261022-v32",
+  "iteration": "teacher-web-flow-polish-20261028-v33",
   "searchFlow": "Search -> all accepted forms grouped by family -> chosen form detail",
   "wordFormFrequencyResource": "data/word-forms/a-main-word-frequency-20261022-v1/",
   "wordFormFrequencySources": [
