@@ -25,7 +25,7 @@
       expected = storage.getItem(KEY);
       if (expected !== null) {
         library = validate(JSON.parse(expected));
-        const backupKey = KEY + ":before-a-main-v1";
+        const backupKey = KEY + ":before-repaired-main-core2827-v1";
         if (storage.getItem(backupKey) === null) storage.setItem(backupKey, expected);
       }
       else {
@@ -61,7 +61,7 @@
   }
   function emptyMessage(hasAi, core) {
     return hasAi ? "No words match these filters. Change or clear the filters to try again." : core ?
-      "No words found in the Core list. Try the Full database." : "No words found. Try another word or check the spelling.";
+      "No words found in the HK-ELE Word List. Try the Full database." : "No words found. Try another word or check the spelling.";
   }
   root.HKELE_LESSON_LIBRARY = {KEY, create, withCurrent, add, emptyMessage};
 })(globalThis);

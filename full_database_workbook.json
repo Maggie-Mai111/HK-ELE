@@ -1,0 +1,15 @@
+{
+  "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
+  "wordOriginsVersion": "2026-11-03-word-origins-v1",
+  "workbookVersion": "2026-11-03-teacher-word-information-a2658-v1",
+  "filename": "HK_ELE_Full_Database_20261103.xlsx",
+  "assetPath": "downloads/2026-11-03-teacher-word-information-a2658-v1/HK_ELE_Full_Database_20261103.xlsx",
+  "byteSize": 12156329,
+  "sha256": "a3363cbbee9ecf9786a9a3374e59ca01038f5a988686339957f9e501e204ceb2",
+  "counts": {
+    "wordForms": 328253,
+    "fullFamilies": 167630,
+    "wordListFamilies": 2658,
+    "worksheets": 1
+  }
+}

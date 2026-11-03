@@ -1,0 +1,6 @@
+HK-ELE source acknowledgements
+
+Word-origin information: BAWF (Green, Hiebert & Coxhead, 2026), including Wiktionary-derived etymology.
+Source article: https://doi.org/10.3389/fpsyg.2026.1985734
+The supplied project README declares CC BY 4.0; underlying Wiktionary attribution is retained.
+Original attribution, source-method and licence notices remain in the word-origins release descriptor. This notice does not change those terms.

@@ -1,0 +1,9 @@
+.word-origins { margin-block: 16px; }
+.word-origins-body { padding: 4px 20px 20px; display: grid; gap: 12px; }
+.word-origins-body > p { margin: 0; }
+.word-origin-item { padding: 14px 18px; border-radius: 10px; background: #f1f6f3; display: grid; grid-template-columns: minmax(70px,100px) minmax(120px,1fr) 2fr; gap: 8px 20px; align-items: baseline; }
+.word-origin-language { font-size: 16px; color: #0e6550; font-weight: 700; }
+.word-origin-form { font-size: 22px; font-weight: 700; overflow-wrap: anywhere; }
+.word-origin-meaning { font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+.word-origins-source { font-size: 15px; color: #586d64; }
+@media(max-width:640px) { .word-origin-item { grid-template-columns: 1fr; } }

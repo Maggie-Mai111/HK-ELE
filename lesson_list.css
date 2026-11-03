@@ -1,0 +1,12 @@
+/* Scoped to the selected lesson; other product pages keep their accepted styles. */
+#view-list .list-lesson-heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:18px; }
+#view-list .list-lesson-heading h2 { font-size:22px; margin:0; overflow-wrap:anywhere; }
+#view-list .list-lesson-options { max-width:100%; }
+#view-list .list-lesson-options > summary,
+#view-list .lesson-teaching-options > summary { cursor:pointer; color:var(--green); font-size:16px; font-weight:700; min-height:44px; align-content:center; }
+#view-list .list-lesson-options[open] { flex-basis:100%; }
+#view-list .lesson-name-box { margin:8px 0; }
+#view-list .lesson-card-preview { padding:16px 18px 0; }
+#view-list .lesson-card > details > summary { padding:0 18px 10px; min-height:44px; align-items:center; }
+#view-list .lesson-teaching-options label { display:grid; gap:6px; font-size:16px; }
+#view-list .lesson-plan-pill[hidden] { display:none; }

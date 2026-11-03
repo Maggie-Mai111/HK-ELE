@@ -10,7 +10,7 @@ const end = app.indexOf('    [["hk", "#form-filter-hk"]', start);
 assert.ok(start >= 0 && end > start);
 
 test('word-card Add keeps its concrete form and actual entry source after changing forms', () => {
-  for (const [view, expected] of [['check','Check a text'],['list','Teaching list'],['browse','Find words'],[undefined,'Find words']]) {
+  for (const [view, expected] of [['check','Check a text'],['list','Selected words'],['browse','Find words'],[undefined,'Find words']]) {
     const callbacks = new Map(), added = [];
     const button = name => ({dataset:{addForm:name},addEventListener:(_type,handler)=>callbacks.set(name,handler)});
     const family = {display_family:'cell'};

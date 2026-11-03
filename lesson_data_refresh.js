@@ -1,7 +1,18 @@
 (function(root) {
   "use strict";
+  function identityApplies(item, targetVersion) {
+    const registry = root.HKELE_IDENTITY_MIGRATION;
+    if (!registry || targetVersion !== registry.dataVersion || item.data_version === targetVersion) return true;
+    const changes = (registry.transitionsBySource?.[item.data_version] || registry.transitions)[item.baseword_key];
+    return item.selected_forms.every(form => {
+      const destinations = changes?.[String(form).normalize("NFKC").trim().toLowerCase()];
+      return !destinations || (destinations.length === 1 && destinations[0] === item.baseword_key);
+    });
+  }
   function refresh(item, detail) {
     const family = detail.family;
+    if (!identityApplies(item, family.data_version))
+      return {...item, data_review_status:"Saved word kept — its family has changed. Please check it in Find words."};
     const normalize = word => String(word).normalize("NFKC").trim().toLocaleLowerCase();
     const accepted = new Set(detail.forms.map(form => normalize(form.normalized_form)));
     const pronoun = family.baseword_key === "trial:pronoun:i" || family.baseword_key === "trial:pronoun:us";
@@ -15,5 +26,5 @@
       glowbe_hk_tokens:family.glowbe_hk_tokens, now_hk_tokens:family.now_hk_tokens,
       hk_corpus_frequency_rank:family.current_hk_frequency_rank, hk_corpus_frequency_band:family.current_hk_frequency_band};
   }
-  root.HKELE_LESSON_DATA_REFRESH = {refresh};
+  root.HKELE_LESSON_DATA_REFRESH = {refresh, identityApplies};
 })(globalThis);

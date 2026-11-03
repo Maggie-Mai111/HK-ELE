@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>HK-ELE Teacher Database</title>
-  <link rel="stylesheet" href="styles.css?v=20261028-flow33">
+  <link rel="stylesheet" href="styles.css?v=20261102-readable50-final2">
   <link rel="stylesheet" href="feedback.css?v=20261012">
   <link rel="stylesheet" href="home.css?v=20261020-v21">
   <link rel="stylesheet" href="privacy.css?v=20261012-v2">
   <link rel="stylesheet" href="teacher_view.css?v=20261020-v16">
   <link rel="stylesheet" href="text_workspace.css?v=20261020-v16">
   <link rel="stylesheet" href="workspace_readability.css?v=20261020-v20">
-  <link rel="stylesheet" href="browse_compact.css?v=20261021-fit1">
-  <link rel="stylesheet" href="word_family_results.css?v=20261022-ai-entry1">
+  <link rel="stylesheet" href="browse_compact.css?v=20261102-readable50-final2">
+  <link rel="stylesheet" href="word_family_results.css?v=20261102-readable50-final2">
   <link rel="stylesheet" href="evidence_tokens.css?v=20261022-tags1">
-  <link rel="stylesheet" href="word_detail.css?v=20261022-wide2">
+  <link rel="stylesheet" href="word_detail.css?v=20261102-readable50-final2">
+  <link rel="stylesheet" href="word_origins.css?v=20261029-v1">
+  <link rel="stylesheet" href="lesson_list.css?v=20261030-v41">
   <style>html[data-consent-pending] .site-header,html[data-consent-pending] main,html[data-consent-pending] .lesson-context{visibility:hidden}</style>
 <link rel="stylesheet" href="compound.css?v=20261022-c1"></head>
 <body>
@@ -25,11 +27,11 @@
       <button class="nav-button active" data-view="home">Home</button>
       <button class="nav-button" data-view="check">Check a Text</button>
       <button class="nav-button" data-view="browse">Find words</button>
-      <button class="nav-button" data-view="list">Teaching List <span id="list-count" class="count">0</span></button>
+      <button class="nav-button" data-view="list">Selected words <span id="list-count" class="count">0</span></button>
     </nav>
   </header>
   <aside class="lesson-context home-context" aria-label="Current lesson">
-    <div class="lesson-context-controls"><label for="active-lesson">Current lesson</label><select id="active-lesson"></select><button id="new-lesson" type="button">New lesson</button></div>
+    <details class="lesson-context-controls"><summary>Saved lists</summary><div class="lesson-controls-inner"><label for="active-lesson">Current list</label><select id="active-lesson"></select><button id="new-lesson" type="button">New lesson</button></div></details>
     <div id="lesson-save-state" role="status"><span id="lesson-save-message"></span><button id="retry-lesson-save" type="button" hidden>Try saving again</button><button id="export-unsaved-lesson" type="button" hidden>Export this lesson</button><button id="reload-saved-lessons" type="button" hidden>Reload saved lessons</button></div>
   </aside>
   <dialog id="new-lesson-dialog" class="text-word-dialog" aria-labelledby="new-lesson-title"><form id="new-lesson-form"><h2 id="new-lesson-title">New lesson</h2><label for="new-lesson-name">Lesson name</label><input id="new-lesson-name" maxlength="120" required placeholder="For example: P5 · A greener school"><p class="hint">Your other lessons will stay saved in this browser.</p><div class="lesson-actions"><button id="cancel-new-lesson" type="button">Cancel</button><button class="primary" type="submit">Create lesson</button></div></form></dialog>
@@ -47,7 +49,7 @@
       <div class="home-tasks">
         <button class="home-task" data-home-view="check"><small>01</small><strong>Check a text →</strong><span>Paste a passage, then review the words in context.</span></button>
         <button class="home-task" data-home-view="browse"><small>02</small><strong>Find words →</strong><span>Explore word families, frequency and textbook observations for your lesson.</span></button>
-        <button class="home-task" data-home-view="list"><small>03</small><strong>Build a teaching list →</strong><span>Keep your selected words and notes together, then export your plan.</span></button>
+        <button class="home-task" data-home-view="list"><small>03</small><strong>Keep selected words →</strong><span>Collect words, then copy them into your lesson materials.</span></button>
       </div>
     </section>
     <section id="view-browse" class="view" aria-labelledby="browse-title">
@@ -55,11 +57,12 @@
       <form id="browse-search-form" class="search-toolbar" role="search">
         <label class="search-box"><span>Search for a word</span><input id="browse-search" type="search" placeholder="For example: happiness" autocomplete="off"></label>
         <button class="primary" type="submit">Search</button>
-        <label>Sort<select id="sort-select"><option value="overall">Overall frequency rank</option><option value="hk">HK frequency rank</option><option value="az">A–Z</option></select></label>
+        <label>Sort<select id="sort-select"><option value="overall">Overall family rank</option><option value="hk">HK family rank</option><option value="az">A–Z</option></select></label>
       </form>
+      <p class="download-actions"><button id="download-full-database" type="button">Download full database (.xlsx)</button></p>
       <div class="scope-cards" role="group" aria-label="Database scope">
-        <button class="scope" data-scope="core"><strong>Core list</strong><span>2,871 families</span></button>
-        <button class="scope active" data-scope="full"><strong>Full database</strong><span>All 163,906 families</span></button>
+        <button class="scope" data-scope="core"><strong>HK-ELE Word List</strong><span>2,658 families</span></button>
+        <button class="scope active" data-scope="full"><strong>Full database</strong><span>All 167,630 families</span></button>
       </div>
       <section id="ai-filter-panel" class="ai-filter-panel" aria-labelledby="ai-filter-title" hidden>
         <button id="ai-filter-toggle" class="ai-filter-toggle" type="button" aria-expanded="false" aria-controls="ai-filter-body">
@@ -68,7 +71,7 @@
         </button>
         <div id="ai-filter-body" class="ai-filter-body" hidden>
           <p id="ai-network-note" class="hint" role="status" hidden>AI search needs an internet connection. Reconnect and try again.</p>
-          <p>Describe the words you need, then review the search. Only your request is sent to the AI service.</p>
+          <p>Describe the words you need, then review the search. Only your request is sent to the AI service. Filters apply to each spelling; frequency ranks describe its word family.</p>
           <label for="ai-filter-query"><strong>Teaching request</strong></label>
           <textarea id="ai-filter-query" maxlength="300" rows="3" placeholder="Example: Find words with the root act. Limit 20."></textarea>
           <div class="ai-examples" aria-label="Example searches">
@@ -76,7 +79,7 @@
             <button type="button" data-ai-example="Find 10 words first observed by P2 or earlier, sorted by overall rank">Grade: by P2</button>
             <button type="button" data-ai-example="Find 10 words in HK Top 1k, sorted by HK rank">HK Top 1k</button>
           </div>
-          <div id="ai-turnstile" aria-label="Cloudflare Turnstile"></div>
+          <div id="ai-turnstile" aria-label="Search verification"></div>
           <p id="ai-turnstile-message" class="hint"></p>
           <div class="ai-actions">
             <button id="ai-filter-preview-button" class="primary" type="button">Review search</button>
@@ -98,15 +101,15 @@
       </div>
       <section id="family-search-results" aria-labelledby="family-search-title" hidden></section>
       <div class="browse-results-bar"><p id="browse-result-count" role="status"></p><details class="columns-menu"><summary>Choose columns</summary><div id="column-choices"></div></details></div>
-      <div id="browse-table-shell" class="table-shell" tabindex="0" aria-label="Complete word family table; scroll horizontally for all evidence"><table id="family-table"><colgroup id="family-column-widths"></colgroup><thead><tr id="family-column-groups"></tr><tr id="family-head"></tr></thead><tbody id="family-body"></tbody></table></div>
+      <div id="browse-table-shell" class="table-shell" tabindex="0" aria-label="Word family table; scroll sideways for all information"><table id="family-table"><colgroup id="family-column-widths"></colgroup><thead><tr id="family-column-groups"></tr><tr id="family-head"></tr></thead><tbody id="family-body"></tbody></table></div>
       <p class="table-scroll-hint">Scroll sideways to see more columns.</p>
       <div class="pagination"><button id="prev-page">Previous</button><span id="page-label">Page 1</span><button id="next-page">Next</button><label>Rows <select id="page-size"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></label></div>
-      <details class="level-note"><summary>About the wordlist and its evidence</summary><p>Overall rank combines general English, textbook and Hong Kong corpus frequencies. HK rank uses the Hong Kong corpus frequencies.</p><p>Textbook levels show the earliest appearance in the sampled Hong Kong textbooks. US grade references use the US school grading system. A dash means no recorded value.</p><p>Wordlist updated: 20 October 2026. Closed-compound entries added: 22 October 2026.</p></details>
+      <details class="level-note"><summary>About the wordlist</summary><p>Overall family rank combines general English, textbook and Hong Kong corpus frequencies. HK family rank uses the ICE-HK and GloWbE-HK collections. Both ranks compare whole word families; 1 is the highest. Word-form counts show occurrences in those two collections.</p><p>HK-ELE Word List contains 2,713 word families selected to reach at least 90% in each of four research corpora. Choose words that fit your class and text. Full database includes more word families.</p><p>Textbook levels show the selected spelling’s earliest appearance in the sampled Hong Kong textbooks, not when students know it. US grade references use the US school grading system. A dash means no recorded value or list entry.</p><p>Check the words in your passage and explore compound words too. Your original text stays unchanged, including words without a match.</p></details>
     </section>
 
     <section id="view-word" class="view word-view" aria-labelledby="word-view-title">
       <button id="back-to-browse" class="back-button">← Back to Browse</button>
-      <div id="word-workspace" class="word-workspace"><div class="empty-state">Choose a word to view its evidence.</div></div>
+      <div id="word-workspace" class="word-workspace"><div class="empty-state">Choose a word to see its information.</div></div>
     </section>
 
     <section id="view-check" class="view" aria-labelledby="check-title">
@@ -121,14 +124,15 @@
         <section id="checked-reader" class="checked-reader" tabindex="-1" aria-labelledby="checked-reader-title">
           <div class="reader-heading"><h2 id="checked-reader-title">Your text</h2><span id="reader-word-count"></span></div>
           <p class="hint">Click a word to see its information.</p>
-          <div class="reader-actions"><button id="edit-checked-text" type="button">Edit text</button><details><summary>Highlight words</summary><label><input id="reader-common" type="checkbox">Common words</label><label><input id="reader-hk" type="checkbox">HK frequency</label></details><button id="reader-to-suggestions" type="button" hidden>Pre-teaching suggestions ↓</button></div>
+          <div class="reader-actions"><button id="edit-checked-text" type="button">Edit text</button><details><summary>Highlight words</summary><label><input id="reader-common" type="checkbox" aria-label="CPB100 sight words">CPB100 sight words</label><label><input id="reader-hk" type="checkbox" aria-label="HK family frequency">HK family frequency</label></details><button id="reader-to-suggestions" type="button" hidden>Pre-teaching suggestions ↓</button></div>
           <div id="passage-words" class="passage-words"></div><div id="reader-legend" class="reader-legend"></div>
         </section>
         <section id="preteach-panel" class="preteach-panel" tabindex="-1" aria-labelledby="preteach-title">
           <button id="suggestions-to-reader" type="button" hidden>↑ Back to text</button>
           <h2 id="preteach-title">Pre-teaching suggestions</h2>
-          <div class="preteach-controls"><span id="preteach-lesson"></span><label>Class level (optional)<select id="preteach-level"><option value="">Any level</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option><option>P6</option><option>S1</option><option>S2</option><option>S3</option></select></label></div>
-          <div id="preteach-items"></div><div class="row"><button id="preteach-more" type="button" hidden>Show more suggestions</button><button id="preteach-open-list" type="button">View teaching list</button></div>
+          <details><summary>How these words are chosen</summary><p class="hint">Suggestions include words first seen in textbooks after your class level, words listed in AWL or MSVL, and words outside the 1,000 most frequent HK families. Use these clues to choose what your class needs.</p><p class="hint">Words first seen in textbooks after your class level come first. Within each group, words repeated more often come first; ties follow their order in your text. Choose Show more suggestions to see the rest.</p><p class="hint">Repetition helps order suggestions; it does not make a word a suggestion on its own. All matched words remain available in your text.</p></details><p id="preteach-summary" class="hint" role="status"></p>
+          <div class="preteach-controls"><span id="preteach-lesson"></span><label>Class level (optional)<select id="preteach-level" aria-label="Class level (optional)"><option value="">Any level</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option><option>P6</option><option>S1</option><option>S2</option><option>S3</option></select></label></div>
+          <div id="preteach-items"></div><div class="row"><button id="preteach-more" type="button" hidden>Show more suggestions</button><div id="preteach-copy-actions"></div><button id="preteach-open-list" type="button">Review selected words</button></div>
         </section>
         <details id="lesson-picker-disclosure" class="workspace-disclosure"><summary>Choose more lesson words</summary>
           <div id="lesson-picker" class="lesson-picker hidden" aria-label="Choose words for this lesson"></div>
@@ -136,7 +140,7 @@
         <details id="all-text-details" class="workspace-disclosure"><summary>More text details</summary>
       <details class="workspace-disclosure" id="text-filter-disclosure"><summary>Filter results <span id="active-filter-count">All words</span></summary>
       <div id="text-filters" class="text-filters panel" aria-label="Check a Text filters">
-        <label class="single-filter"><span>Wordlist</span><select id="filter-word-set"><option value="all">Full database</option><option value="core">Core list</option></select></label>
+        <label class="single-filter"><span>Wordlist</span><select id="filter-word-set"><option value="all">Full database</option><option value="core">HK-ELE Word List</option></select></label>
         <div id="filter-hk" class="multi-filter-host"></div>
         <div id="filter-first" class="multi-filter-host"></div>
         <div id="filter-external" class="multi-filter-host"></div>
@@ -145,29 +149,33 @@
         <button id="reset-filters" type="button">Reset</button>
       </div>
       </details>
-      <div class="check-results-heading"><div><h2>Results</h2><span id="result-count">No text checked</span></div><label>Sort<select id="text-sort"><option value="hk">HK frequency</option><option value="overall">Overall frequency</option><option value="first">First appearance</option><option value="first_seen">Earliest HK textbook observation</option><option value="az">A–Z</option></select></label></div>
+      <div class="check-results-heading"><div><h2>Results</h2><span id="result-count">No text checked</span></div><label>Sort<select id="text-sort"><option value="hk">HK frequency</option><option value="overall">Overall frequency</option><option value="first">First appearance</option><option value="first_seen">First seen in HK textbooks</option><option value="az">A–Z</option></select></label></div>
       <div id="text-summary" class="text-summary hidden" aria-label="Text overview"></div>
-      <div id="text-results" class="empty-state">Your grouped results will appear here.</div>
+      <div id="text-results" class="empty-state">Your word results will appear here.</div>
         </details>
       </div>
     </section>
 
     <section id="view-list" class="view" aria-labelledby="list-title">
-      <div class="page-heading"><h1 id="list-title">Teaching List</h1></div>
-      <div class="lesson-name-box"><label for="lesson-name">Lesson name <span>(optional)</span></label><input id="lesson-name" type="text" placeholder="For example: P5 · A greener school"><p class="hint">Export a copy to keep or share.</p></div>
-      <div id="list-empty" class="empty-state large"><h2>Which words will you teach?</h2><p>Check a passage and choose a few words, or add words as you search.</p><div class="lesson-actions"><button class="primary" data-lesson-view="check">Choose words from a text</button><button data-lesson-view="browse">Find a word</button></div></div>
+      <div class="page-heading"><h1 id="list-title">Selected words</h1></div>
+      <div class="list-lesson-heading"><h2 id="list-lesson-title">Your lesson</h2><details class="list-lesson-options"><summary>List options</summary><div class="lesson-name-box"><label for="lesson-name">Lesson name <span>(optional)</span></label><input id="lesson-name" type="text" placeholder="For example: P5 · A greener school"><p id="lesson-plan-count" class="hint"></p></div></details></div>
+      <div id="list-empty" class="empty-state large"><h2>Which words would you like to keep?</h2><p>Check a passage and choose a few words, or add words as you search.</p><div class="lesson-actions"><button class="primary" data-lesson-view="check">Choose words from a text</button><button data-lesson-view="browse">Find a word</button></div></div>
       <div id="list-workspace" class="hidden">
-        <div class="lesson-export"><div><strong id="lesson-word-count"></strong><p id="lesson-plan-count" class="hint"></p></div><div class="lesson-actions"><button id="export-xlsx" class="primary">Export to Excel</button><details class="lesson-more"><summary>More formats</summary><div><button id="export-csv">CSV</button><button id="export-md">Markdown</button></div></details></div></div>
-        <div class="lesson-actions lesson-toolbar"><button data-lesson-view="check">Add from a text</button><button data-lesson-view="browse">Find more words</button><details class="lesson-more"><summary>More actions</summary><button id="clear-list">Clear list</button></details></div>
+        <div id="list-copy-actions"></div>
+        <div class="lesson-export"><div><strong id="lesson-word-count"></strong></div><div class="lesson-actions"><button id="export-xlsx">Download Excel</button></div></div>
         <div id="list-body" class="teaching-card-list"></div>
+        <div class="lesson-actions lesson-toolbar"><button data-lesson-view="check">Add from a text</button><button data-lesson-view="browse">Find more words</button><details class="lesson-more"><summary>More actions</summary><button id="clear-list">Clear list</button></details></div>
       </div>
       <div id="lesson-undo" class="lesson-undo hidden" role="status"><span>Lesson words updated.</span><button id="undo-lesson">Undo last change</button></div>
     </section>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script src="tokenizer.js?v=74"></script><script src="contractions.js?v=74"></script><script src="ai_runtime_config.js?v=20261022-connected1"></script><script src="ai_public_config.js?v=87"></script><script src="ai_filter_contract.js?v=20261016-v8"></script><script src="compound_release.js?v=20261022-compounds1"></script><script src="compound_data.js?v=20261022-compounds1"></script><script src="static_api.js?v=20261022-compounds1"></script><script src="xlsx_export.js?v=74"></script><script src="lesson_contract.js?v=20261019-v13"></script><script src="lesson_library.js?v=20261020-a1"></script><script src="lesson_library_ui.js?v=20261020-v16"></script><script src="lesson_workspace.js?v=20261020-a1"></script><script src="text_workspace.js?v=20261020-v16"></script><script src="lesson_data_refresh.js?v=20261020-a1"></script><script src="word_family_results.js?v=20261022-v1"></script><script src="evidence_tokens.js?v=20261022-tags1"></script><script src="compound_teaching.js?v=20261022-c1"></script><script src="compound_ui.js?v=20261022-c1"></script><script src="app.js?v=20261028-flow33"></script><script src="ai_filter.js?v=20261022-network1"></script>
-  <script src="feedback_contract.js?v=20261012"></script><script src="feedback.js?v=20261020-v19"></script>
+  <script src="tokenizer.js?v=20261028-partial1"></script><script src="contractions.js?v=74"></script><script src="ai_runtime_config.js?v=20261022-connected1"></script><script src="ai_public_config.js?v=87"></script><script src="ai_filter_contract.js?v=20261103-labels51"></script><script src="compound_release.js?v=20261103-a2658-v52"></script><script src="compound_data.js?v=20261022-compounds1"></script><script src="cpb100.js?v=20261028"></script>
+  <script src="ai_form_release.js?v=20261103-a2658-v52"></script><script src="ai_form_filter.js?v=20261102-data46-final1"></script><script src="text_normalization.js?v=20261103-a2658-v52"></script><script src="static_api.js?v=20261103-a2658-v52"></script><script src="xlsx_export.js?v=74"></script><script src="selected_words.js?v=20261102-selected48"></script><script src="lesson_contract.js?v=20261019-v13"></script><script src="lesson_library.js?v=20261020-a1"></script><script src="lesson_library_ui.js?v=20261102-selected48"></script><script src="lesson_workspace.js?v=20261102-selected48"></script><script src="text_workspace.js?v=20261102-selected48"></script><script src="identity_migration.js?v=20261103-a2658-v52"></script><script src="lesson_data_refresh.js?v=20261102-data46-final1"></script><script src="word_family_results.js?v=20261103-a2658-v52"></script><script src="evidence_tokens.js?v=20261022-tags1"></script><script src="compound_teaching.js?v=20261022-c1"></script><script src="compound_ui.js?v=20261102-selected48"></script><script src="word_origins_release.js?v=20261103-a2658-v52"></script><script src="word_origins.js?v=20261030-copy42"></script><script src="full_database_release.js?v=20261103-a2658-v52"></script><script src="full_database_download.js?v=20261102-single-sheet"></script>
+  <script src="lexical_uses.js?v=20261102-flow47"></script>
+  <script src="app.js?v=teacher-flow-20261103-v53"></script><script src="ai_filter.js?v=20261103-labels51"></script>
+  <script src="feedback_contract.js?v=20261012"></script><script src="feedback.js?v=20261102-selected48"></script>
   <script src="home.js?v=20261012"></script>
-  <script src="privacy_contract.js?v=20261012-v2"></script><script src="privacy.js?v=20261020-v19"></script>
+  <script src="privacy_contract.js?v=20261012-v2"></script><script src="privacy.js?v=20261030-language43"></script>
 </body>
 </html>

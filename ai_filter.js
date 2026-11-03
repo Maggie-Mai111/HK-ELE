@@ -84,9 +84,14 @@
 
   function displayConditions(filters) {
     return contract.describeConditions(filters).map(text => text
-      .replace(/^Sort: overall$/, "Sort: Overall frequency")
-      .replace(/^Sort: hk$/, "Sort: HK frequency")
+      .replace(/^Scope: /, "Search in: ")
+      .replace(/ or lower priority$/, " or greater")
+      .replace(/^Sort: overall$/, "Sort: Overall family rank")
+      .replace(/^Sort: hk$/, "Sort: HK family rank")
       .replace(/^Sort: az$/, "Sort: A–Z")
+      .replace(/^Grade: /, "First seen in HK textbooks: ")
+      .replace(/^External level: /, "US grade reference: ")
+      .replace(/^CPB 100: /, "CPB100 sight words: ")
       .replace(/^Result limit: /, "Show up to: "));
   }
 
@@ -99,7 +104,7 @@
       : "";
     const notes = [result.clarifyingQuestion, ...result.warnings].filter(Boolean)
       .filter(text => !/^No filters? (?:was|were) applied\.?$/i.test(text))
-      .map(text => text.replace(/\bregistered\b/gi, "available"));
+      .map(text => text.replace(/\bregistered\s+/gi, ""));
     if (notes.length) conditions.insertAdjacentHTML("beforeend", notes.map(item => `<li class="ai-warning">${esc(item)}</li>`).join(""));
     confirmButton.hidden = result.status !== "ready";
     editButton.hidden = false;

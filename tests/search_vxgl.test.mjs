@@ -25,11 +25,12 @@ function webApi({lineEndings, corruptIntegrity = false, corruptShard = false} = 
   const context = vm.createContext({window: {}, location: {href: 'https://fixture.invalid/'},
     URL, crypto:globalThis.crypto, TextDecoder, TextEncoder, Blob, Response, DecompressionStream,
     fetch: async path => {
+      path=String(path).split("?")[0];
       if (path === failPath) { failPath = ''; return new Response('unavailable', {status: 503}); }
       let bytes = readFileSync(join(root, path));
       if (path.endsWith('/integrity.json')) {
         let text = bytes.toString('utf8').replace(/\r\n/g, '\n');
-        if (corruptIntegrity) text = text.replace('2026-10-20-a-main-v1', '2026-10-20-a-main-vX');
+        if (corruptIntegrity) text = text.replace('2026-11-03-a2658-finite-family-closure-v1', '2026-10-20-a-main-vX');
         if (lineEndings === 'crlf') text = text.replace(/\n/g, '\r\n');
         bytes = Buffer.from(text);
       } else if (corruptShard && path.endsWith('/manifest.json.gz')) {
@@ -41,14 +42,41 @@ function webApi({lineEndings, corruptIntegrity = false, corruptShard = false} = 
   return {api: context.window.HKELE_STATIC_API, fail: path => { failPath = path; }};
 }
 
+test('text evidence and subject filters use the exact form, including negative and absent records', async () => {
+  const source=readFileSync(join(root,'app.js'),'utf8');
+  const ctx=vm.createContext({
+    blank:value=>value===null||value===undefined||value==='',
+    normalized:value=>String(value||'').normalize('NFKC').trim().toLowerCase(),
+  });
+  vm.runInContext(source.match(/const MSVL_LABELS = \{[\s\S]*?\};/)[0]+'\n'+source.match(/const MSVL_ORDER = \[[^\n]*\];/)[0],ctx);
+  for (const [start,end] of [
+    ['  function msvlSubjects(', '  function tokens('],
+    ['  function hasAwl(', '  function wordFormEvidence('],
+    ['  function connections(', '  function evidenceItem('],
+    ['  function academicTags(', '  let detailRequest'],
+    ['  function itemOwner(', '  // Display expansions'],
+    ['  function subjectText(', '  function passesFilters('],
+  ]) vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),ctx);
+  const {family,forms}=await webApi().api.request('/families/stress');
+  const stressed=forms.find(form=>form.form==='stressed'),stressors=forms.find(form=>form.form==='stressors');
+  assert.equal(ctx.selectedAcademicMatches(stressed,family,new Set(['Science'])),false);
+  assert.equal(ctx.selectedAcademicMatches(stressed,family,new Set(['Health'])),true);
+  assert.equal(ctx.selectedAcademicMatches(stressors,family,new Set(['AWL'])),false);
+  assert.equal(ctx.selectedAcademicMatches(null,family,new Set(['No record'])),true);
+  assert.equal(ctx.connections(null,family),'');
+  const item={owners:[{...family,matched_form_evidence:stressed}]};
+  assert.equal(ctx.subjectText(item),'AWL · MSVL: Health; Social Studies and History');
+  assert.doesNotMatch(ctx.subjectText(item),/Science|English Grammar/);
+});
+
 test('Web defaults to the full database and recovers failed manifest and letter loads', async () => {
   const {api, fail} = webApi();
-  fail('data/releases/2026-10-20-a-main-v1/manifest.json.gz');
+  fail('data/releases/2026-11-03-a2658-finite-family-closure-v1/manifest.json.gz');
   await assert.rejects(api.request('/families'), /503/);
   const page = await api.request('/families');
   assert.equal(page.scope, 'full');
-  assert.equal(page.available_items, 163906);
-  fail('data/releases/2026-10-20-a-main-v1/search/n.json.gz');
+  assert.equal(page.available_items, 167630);
+  fail('data/releases/2026-11-03-a2658-finite-family-closure-v1/search/n.json.gz');
   await assert.rejects(api.request('/search?q=NASA'), /503/);
   assert.equal((await api.request('/search?q=NASA')).status, 'RESOLVED');
 });
@@ -66,8 +94,8 @@ test('Web uses registered grades and does not display raw VXGL decimals or range
 test('Web loads the same pinned database after Git converts CRLF text to LF', async () => {
   for (const lineEndings of ['lf', 'crlf']) {
     const {api} = webApi({lineEndings});
-    assert.equal((await api.request('/families?scope=full')).available_items, 163906);
-    assert.equal((await api.request('/families?scope=core')).available_items, 2871);
+    assert.equal((await api.request('/families?scope=full')).available_items, 167630);
+    assert.equal((await api.request('/families?scope=core')).available_items, 2658);
     assert.equal((await api.request('/search?q=reusable')).owners[0].baseword_key, 'use');
   }
 });
@@ -79,9 +107,9 @@ test('line-ending normalization still rejects changed manifest contents and chan
 
 test('Web matches the displayed form rather than the family grade union or its minimum', async () => {
   const {api} = webApi();
-  const {family, forms} = await api.request('/families/be');
-  assert.match(family.external_level_reference_display, /;/);
-  for (const [word, expected] of [['be', 'Kindergarten–Grade 1'], ['BEINGNESS', 'Grades 10–11'],
+  const {family, forms} = await api.request('/families/stress');
+  assert.equal(family.external_level_reference_display, 'Grades 6–7');
+  for (const [word, expected] of [['stress', 'Grades 6–7'], ['DESTRESS', 'Grades 10–11'],
     ['beinghood', null], ['unregistered-form', null]]) {
     const row = api.displayedWordEvidence(family, forms, word);
     assert.equal(row.browse_external_level_reference, expected, word);

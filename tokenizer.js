@@ -142,5 +142,23 @@
     return scan(text, maxOccurrences).occurrences;
   }
 
-  globalThis.HKELE_TOKENIZER = Object.freeze({TOKENIZER_ID, REGISTERED_APOSTROPHES, SAFE_SEPARATORS, TokenizerError, inspectUnsupported, separatorAudit, normalizeSurface, scan, tokenize});
+  const TEACHER_TEXT_TOKENIZER_ID = "HK-ELE-TEACHER-PARTIAL-1.0.0";
+  const TEACHER_WORD_PATTERN = /['\u2018\u2019\u02bc\uff07]*[\p{L}\p{M}]+(?:['\u2018\u2019\u02bc\uff07\p{Cf}\u00ad]+[\p{L}\p{M}]+)*['\u2018\u2019\u02bc\uff07]*/gu;
+  function scanTeacherText(text, maxOccurrences = 500) {
+    const occurrences = [], scanText = quotationMask(text).masked;
+    TEACHER_WORD_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = TEACHER_WORD_PATTERN.exec(scanText)) !== null) {
+      const surface = match[0];
+      if (!/\p{L}/u.test(surface)) continue;
+      const supported = SUPPORTED_SURFACE_PATTERN.test(surface);
+      const normalized = supported ? normalizeSurface(surface) : {normalized_token:null,normalization_rule_ids:["UNCLEAR_TEXT_FORM_PRESERVED"]};
+      occurrences.push({occurrence_id:`occ-${String(occurrences.length+1).padStart(4,"0")}`,token_status:supported?"SUPPORTED_TOKEN":"UNSUPPORTED_TOKEN",surface,normalized_token:normalized.normalized_token,normalization_rule_ids:normalized.normalization_rule_ids,start_offset:match.index,end_offset:match.index+surface.length,occurrence_order:occurrences.length+1,failure_reason:supported?null:"UNCLEAR_TEXT_FORM"});
+      if (occurrences.length > maxOccurrences) throw new Error(`The technical limit is ${maxOccurrences} recognized occurrences. Shorten the text and try again.`);
+    }
+    return {occurrences, separator_events:separatorAudit(text)};
+  }
+  function tokenizeTeacherText(text, maxOccurrences = 500) { return scanTeacherText(text,maxOccurrences).occurrences; }
+
+  globalThis.HKELE_TOKENIZER = Object.freeze({TOKENIZER_ID, REGISTERED_APOSTROPHES, SAFE_SEPARATORS, TokenizerError, inspectUnsupported, separatorAudit, normalizeSurface, scan, tokenize, TEACHER_TEXT_TOKENIZER_ID, scanTeacherText, tokenizeTeacherText});
 })();

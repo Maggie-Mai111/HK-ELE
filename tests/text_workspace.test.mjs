@@ -21,8 +21,8 @@ test("missing rank is not rarity; class comparison uses form evidence before fam
   const items=[{status:"RESOLVED",surface:"reusable",normalized_token:"reusable",owners:[family]}];
   assert.equal(reader.suggestions(items,new Set()).length,0);
   const entries=reader.suggestions(items,new Set(),"P4");
-  assert.equal(entries.length,1);assert.deepEqual(entries[0].reasons,["Textbooks: P5"]);
-  assert.equal(reader.suggestions(items,new Set(["reusable"]),"P4").length,0);
+  assert.equal(entries.length,1);assert.deepEqual(entries[0].reasons,["Textbooks: P5 · after P4", "Appears 1 time"]);
+  assert.equal(reader.suggestions(items,new Set(["reusable"]),"P4").length,1);
 });
 test("list count distinguishes selected words from family rows",()=>{
   assert.equal(globalThis.HKELE_LESSON.wordCount([{selected_forms:["reuse","reusable"]},{selected_forms:["plastic"]}]),3);

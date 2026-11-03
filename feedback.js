@@ -10,7 +10,7 @@
   window.addEventListener("hkele-word-feedback-context", (event) => { wordContext = event.detail; });
   const currentContext = (useWord) => {
     const onWordPage = document.querySelector("#view-word")?.classList.contains("active");
-    return { product: "Web", page: useWord || onWordPage ? "Word detail" : ({ "#home": "Home", "#browse": "Browse", "#check": "Check a Text", "#list": "Teaching List" })[location.hash] || "Home", ...((useWord || onWordPage) && wordContext ? wordContext : {}) };
+    return { product: "Web", page: useWord || onWordPage ? "Word detail" : ({ "#home": "Home", "#browse": "Browse", "#check": "Check a Text", "#list": "Selected words" })[location.hash] || "Home", ...((useWord || onWordPage) && wordContext ? wordContext : {}) };
   };
   const showFeedback = async (kind, useWord) => {
     dialog.querySelector("h2").textContent = kind === "rating" ? "Rate this word" : "Report a problem";

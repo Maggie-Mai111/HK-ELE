@@ -170,11 +170,11 @@
   }
 
   function describeConditions(filters) {
-    const items = [filters.scope === "full" ? "Scope: Full database" : filters.scope === "candidate" ? "Scope: Core list" : "Scope: saved word data (partial)"];
+    const items = [filters.scope === "full" ? "Scope: Full database" : filters.scope === "candidate" ? "Scope: HK-ELE Word List" : "Scope: saved word data (partial)"];
     if (filters.earliestObservedFrom || filters.earliestObservedTo) items.push(filters.earliestObservedFrom && filters.earliestObservedTo ? `Grade: ${filters.earliestObservedFrom}–${filters.earliestObservedTo}` : filters.earliestObservedFrom ? `Grade: ${filters.earliestObservedFrom} or later` : `Grade: ${filters.earliestObservedTo} or earlier`);
     const range = (label, minimum, maximum) => { if (minimum !== undefined || maximum !== undefined) items.push(minimum !== undefined && maximum !== undefined ? `${label}: ${minimum.toLocaleString("en")}–${maximum.toLocaleString("en")}` : minimum !== undefined ? `${label}: ${minimum.toLocaleString("en")} or lower priority` : `${label}: up to ${maximum.toLocaleString("en")}`); };
-    range("Overall rank", filters.overallRankMin, filters.overallRankMax);
-    range("HK rank", filters.hkRankMin, filters.hkRankMax);
+    range("Overall family rank", filters.overallRankMin, filters.overallRankMax);
+    range("HK family rank", filters.hkRankMin, filters.hkRankMax);
     if (filters.hkBands) items.push(`HK band: ${filters.hkBands.join(", ")}`);
     for (const [label, key] of [["Prefix", "prefix"], ["Suffix", "suffix"], ["Root", "root"]]) if (filters[key]) items.push(`${label}: ${filters[key]}`);
     if (filters.awl !== undefined) items.push(`AWL: ${filters.awl ? "yes" : "no"}`);
@@ -188,16 +188,16 @@
 
   function teacherScope(query, selected = "full") {
     if (/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/i.test(query)) return "full";
-    if (/core\s+list|核心词[表库]/i.test(query)) return "core";
+    if (/hk[-–]?ele\s+word\s+list|core\s+list|核心词[表库]/i.test(query)) return "core";
     return selected === "core" ? "core" : "full";
   }
   function interpreterQuery(query) {
-    return query.replace(/core\s+list|核心词[表库]/gi,"Candidate").replace(/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/gi,"database").trim();
+    return query.replace(/hk[-–]?ele\s+word\s+list|core\s+list|核心词[表库]/gi,"Candidate").replace(/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/gi,"database").trim();
   }
   function teacherResult(raw, scope = "full") {
     const result = validateResult(raw);
-    const teacherText = text => text.replace(/Candidate\s*(?:and|\+)\s*Reference/gi, "Core list").replace(/Reference[ -]only/gi, "other database").replace(/\bCandidate\b/g, "Core list");
-    return {...result, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core" ? "Core list" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
+    const teacherText = text => text.replace(/Candidate\s*(?:and|\+)\s*Reference/gi, "HK-ELE Word List").replace(/Reference[ -]only/gi, "other database").replace(/\bCandidate\b/g, "HK-ELE Word List");
+    return {...result, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core" ? "HK-ELE Word List" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
   }
   return Object.freeze({GRADES, HK_BANDS, MSVL_SUBJECTS, FILTER_KEYS, ValidationError, validateConditions, validateResult, applyToRows, describeConditions, teacherScope, interpreterQuery, teacherResult});
 });

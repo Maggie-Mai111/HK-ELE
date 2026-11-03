@@ -14,34 +14,32 @@
   }
   const flag = value => value === true || value === 1;
   const levels = {P1:1,P2:2,P3:3,P4:4,P5:5,P6:6,S1:7,S2:8,S3:9};
-  function suggestions(occurrences, common, classLevel = null) {
+  function suggestions(occurrences, _common, classLevel = null) {
     const groups = new Map();
     for (const item of occurrences) {
-      if (item.status !== "RESOLVED" || item.owners?.length !== 1 || common.has(item.normalized_token) || /^[A-Z]/.test(item.surface)) continue;
-      const family = item.owners[0];
-      if (family.blocked || flag(family.display_blocked)) continue;
-      const group = groups.get(family.baseword_key) || {family, items:[]};
-      group.items.push(item); groups.set(family.baseword_key, group);
+      if (item.status !== "RESOLVED" || item.owners?.length !== 1) continue;
+      const family=item.owners[0]; if(family.blocked || flag(family.display_blocked))continue;
+      const key=family.baseword_key+"\u0000"+String(item.normalized_token || item.surface.toLocaleLowerCase());
+      const group=groups.get(key)||{family,items:[]};group.items.push(item);groups.set(key,group);
     }
-    const entries = [];
-    for (const [key, {family, items}] of groups) {
-      const reasons = [], rank = family.current_hk_frequency_rank;
-      if (rank != null && rank > 2000) reasons.push("Beyond HK Top 2k");
-      else if (rank != null && rank > 1000) reasons.push("Beyond HK Top 1k");
-      if (flag(family.awl)) reasons.push("Academic vocabulary (AWL)");
-      if (family.msvl != null && family.msvl !== "" && family.msvl !== 0) reasons.push("Subject vocabulary");
-      if (items.length >= 2) reasons.push(`Family appears ${items.length} times`);
-      const evidence = items.map(item => item.owners[0].matched_form_evidence).find(Boolean);
-      if (evidence && (evidence.root || evidence.prefix || evidence.suffix)) reasons.push("Word parts available");
-      const firstForm = items[0].owners[0].matched_form_evidence;
-      const first = firstForm ? firstForm.first_seen_hk_textbooks : family.textbook_first_seen_level;
-      const level = String(first || "").toUpperCase().match(/\b([PS][1-6])\b/)?.[1];
-      if (classLevel && level && levels[level] > levels[classLevel]) reasons.unshift(`${firstForm ? "Textbooks" : "Family first seen"}: ${first}`);
-      if (!flag(family.candidate_member)) reasons.push("Outside Core list");
-      if (reasons.length) entries.push({key, family, form:items[0].surface, count:items.length, reasons});
+    const entries=[];
+    for(const [selectionKey,{family,items}] of groups){
+      const first=items[0], evidence=first.owners[0].matched_form_evidence, rank=family.current_hk_frequency_rank;
+      const level=String(evidence?.first_seen_hk_textbooks||"").toUpperCase().match(/\b([PS][1-6])\b/)?.[1];
+      const laterThanClass=!!classLevel && !!level && levels[level]>levels[classLevel];
+      const subject=evidence?.msvl!=null && evidence.msvl!=="" && evidence.msvl!==0;
+      if(!laterThanClass && !flag(evidence?.awl) && !subject && !(rank!=null && rank>1000))continue;
+      const reasons=[];
+      if(laterThanClass)reasons.push(`Textbooks: ${evidence.first_seen_hk_textbooks} · after ${classLevel}`);
+      reasons.push(`Appears ${items.length} ${items.length===1?"time":"times"}`);
+      if(flag(evidence?.awl))reasons.push("Listed in AWL");
+      if(subject)reasons.push(`MSVL: ${evidence.msvl}`);
+      if(rank!=null)reasons.push(`HK family rank: ${rank.toLocaleString("en")}`);
+      if(evidence?.first_seen_hk_textbooks && !laterThanClass)reasons.push(`Textbooks: ${evidence.first_seen_hk_textbooks}`);
+      if(evidence && (evidence.root||evidence.prefix||evidence.suffix))reasons.push("Word parts available");
+      entries.push({key:family.baseword_key,selectionKey,family,form:first.surface,count:items.length,reasons,laterThanClass,firstOrder:first.occurrence_order});
     }
-    return entries.sort((a,b) => b.reasons.length-a.reasons.length || b.count-a.count ||
-      (b.family.current_hk_frequency_rank ?? 0)-(a.family.current_hk_frequency_rank ?? 0) || a.family.display_family.localeCompare(b.family.display_family)).slice(0,8);
+    return entries.sort((a,b)=>Number(b.laterThanClass)-Number(a.laterThanClass)||b.count-a.count||a.firstOrder-b.firstOrder||a.form.localeCompare(b.form));
   }
 
   function create({state, $, esc, openFamily, addToList, contractionDescription, showView, compoundUi}) {
@@ -65,7 +63,7 @@
         ? `<p>Full form: ${esc(expansion)}</p>`
         : item.status === "AMBIGUOUS" && owners.length
           ? `<p>Choose the family that fits this sentence.</p>${owners.map((owner,index)=>`<button data-reader-owner="${index}">${esc(owner.display_family)}</button>`).join("")}`
-          : `<p>${item.status === "UNSUPPORTED" ? "Try the English spelling of this word." : item.status === "BLOCKED" ? "Check the spelling or use in this sentence." : "No entry found in the wordlist."}</p>`}<button data-reader-close>Close</button>`;
+        : `<p>${item.status === "UNSUPPORTED" ? "No word entry for this part. You can still explore the other words in your text." : item.status === "BLOCKED" ? "Check the spelling or use in this sentence." : "No automatic match in this text."}</p>`}<button data-reader-close>Close</button>`;
       dialog.querySelectorAll("[data-reader-owner]").forEach(button => button.addEventListener("click", () => {
         const owner = owners[Number(button.dataset.readerOwner)]; dialog.close();
         void openFamily(owner.baseword_key, owner.matched_form_evidence?.form || item.surface);
@@ -78,22 +76,24 @@
         const item = part.item, owner = item.status === "RESOLVED" && item.owners.length === 1 && !item.owners[0].blocked && !item.owners[0].display_blocked ? item.owners[0] : null;
         const rank = owner?.current_hk_frequency_rank;
         const band = !hkOn || rank == null ? "" : rank <= 1000 ? "hk-top" : rank <= 2000 ? "hk-next" : "hk-later";
-        const common = commonOn && state.commonTokens.has(item.normalized_token);
+        const common = commonOn && state.cpbTokens.has(item.normalized_token);
         return `<button type="button" class="passage-word ${band}${common ? " is-common" : ""}" data-reader-word="${esc(item.occurrence_id)}" aria-label="${esc(item.surface)}">${esc(part.text)}</button>`;
       }).join("");
       $("#passage-words").querySelectorAll("[data-reader-word]").forEach(button => button.addEventListener("click", () => {
         const item = state.textAudit.find(row => row.occurrence_id === button.dataset.readerWord); if (item) openOccurrence(item);
       }));
-      $("#reader-legend").innerHTML = `${commonOn ? '<span class="is-common">Common words</span>' : ""}${hkOn ? '<span class="hk-top">HK Top 1k</span><span class="hk-next">HK Next 1k</span><span class="hk-later">HK rank 2,001+</span>' : ""}`;
+      $("#reader-legend").innerHTML = `${commonOn ? '<span class="is-common">CPB100 sight words</span>' : ""}${hkOn ? '<span class="hk-top">HK family ranks 1–1,000</span><span class="hk-next">HK family ranks 1,001–2,000</span><span class="hk-later">HK family ranks 2,001+</span>' : ""}`;
     }
     function refreshSuggestions() {
       if (state.checkedText === null) return;
-      const entries = suggestions(state.textAudit.filter(item => !contractionDescription(item)), state.commonTokens, classLevel);
+      root.HKELE_SELECTED_WORDS?.mount($("#preteach-copy-actions"),()=>state.selected);
+      const entries = suggestions(state.textAudit.filter(item => !contractionDescription(item)), state.cpbTokens, classLevel);
+      $("#preteach-summary").textContent = classLevel ? `${entries.filter(item=>item.laterThanClass).length} words first seen after ${classLevel}. Use your knowledge of the class to decide which words need teaching.` : `${entries.length} suggestions · repeated words appear first.`;
       $("#preteach-lesson").textContent = `Adding to: ${state.lessonTitle || "Your lesson"}`;
       $("#preteach-items").innerHTML = entries.slice(0,limit).map((entry,index) => {
         const added = state.selected.some(item => item.baseword_key === entry.key && item.selected_forms.some(form=>form.toLocaleLowerCase()===entry.form.toLocaleLowerCase()));
-        return `<article class="preteach-word"><div><button class="family-link" data-preteach-view="${index}">${esc(entry.form)}</button>${entry.form.toLocaleLowerCase() !== entry.family.display_family.toLocaleLowerCase() ? `<small>Family: ${esc(entry.family.display_family)}</small>` : ""}<div class="preteach-reasons">${entry.reasons.slice(0,2).map(reason=>`<span>${esc(reason)}</span>`).join("")}</div></div><button data-preteach-add="${index}" ${added ? "disabled" : ""}>${added ? "Added" : "Add"}</button></article>`;
-      }).join("") || '<p class="hint">No suggestions for this class level. You can choose words directly from the text.</p>';
+        return `<article class="preteach-word"><div><button class="family-link" data-preteach-view="${index}">${esc(entry.form)}</button>${entry.form.toLocaleLowerCase() !== entry.family.display_family.toLocaleLowerCase() ? `<small>Family: ${esc(entry.family.display_family)}</small>` : ""}<div class="preteach-reasons">${entry.reasons.slice(0,2).map(reason=>`<span>${esc(reason)}</span>`).join("")}</div><details><summary>Why this word?</summary><p class="hint">${entry.reasons.map(esc).join(" · ")}</p></details></div><button data-preteach-add="${index}" ${added ? "disabled" : ""}>${added ? "Added" : "Add"}</button></article>`;
+      }).join("") || '<p class="hint">No suggestions for this text. You can choose matched words directly from the text.</p>';
       $("#preteach-items").querySelectorAll("[data-preteach-view]").forEach(button=>button.addEventListener("click",()=>{
         const entry=entries[Number(button.dataset.preteachView)]; void openFamily(entry.key,entry.form);
       }));
@@ -130,7 +130,7 @@
       $("#reader-common").addEventListener("change",event=>{commonOn=event.target.checked;renderReader();});
       $("#reader-hk").addEventListener("change",event=>{hkOn=event.target.checked;renderReader();});
       $("#preteach-level").addEventListener("change",event=>{classLevel=event.target.value || null;limit=4;refreshSuggestions();});
-      $("#preteach-more").addEventListener("click",()=>{limit=8;refreshSuggestions();});
+      $("#preteach-more").addEventListener("click",()=>{limit+=20;refreshSuggestions();});
       $("#preteach-open-list").addEventListener("click",()=>showView("list"));
     }
     function resetLessonContext() {

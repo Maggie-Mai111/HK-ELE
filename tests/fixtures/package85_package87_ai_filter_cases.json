@@ -17,15 +17,16 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 7,
+      "expectedMatchCount": 8,
       "expectedKeys": [
         "act",
-        "age",
         "actual",
-        "exact",
         "agent",
+        "exact",
+        "transact",
         "react",
-        "agenda"
+        "agendum",
+        "navigate"
       ]
     },
     {
@@ -43,7 +44,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 1118
+      "expectedMatchCount": 576
     },
     {
       "id": "hk_top_1k",
@@ -62,7 +63,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 997
+      "expectedMatchCount": 996
     },
     {
       "id": "prefix",
@@ -79,7 +80,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 804
+      "expectedMatchCount": 817
     },
     {
       "id": "suffix",
@@ -96,7 +97,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 711
+      "expectedMatchCount": 714
     },
     {
       "id": "awl",
@@ -113,7 +114,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 517
+      "expectedMatchCount": 222
     },
     {
       "id": "msvl",
@@ -130,7 +131,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 598
+      "expectedMatchCount": 267
     },
     {
       "id": "cpb100",
@@ -147,7 +148,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 91
+      "expectedMatchCount": 86
     },
     {
       "id": "zero_result",
@@ -180,5 +181,6 @@
       }
     }
   ],
-  "dataVersion": "2026-10-20-a-main-v1"
+  "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
+  "sourceEntrySha256": "17d221b5b5fa57074a2242c73d27dd9557fa1b032bfb1d644a1d08423dd6afa0"
 }

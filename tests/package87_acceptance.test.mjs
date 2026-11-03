@@ -22,27 +22,35 @@ async function gzipJson(...parts) {
 }
 
 async function context(scope = "broader", sort = "overall") {
-  const manifest = await gzipJson(package87, "data", "releases", "2026-10-20-a-main-v1", "manifest.json.gz");
+  const manifest = await gzipJson(package87, "data", "releases", "2026-11-03-a2658-finite-family-closure-v1", "manifest.json.gz");
   const info = manifest.browse[scope][sort];
   const rows = [];
   for (let index = 0; index < info.chunk_count; index += 1) {
-    const packed = await gzipJson(package87, "data", "releases", "2026-10-20-a-main-v1", "browse", scope, sort, `${String(index).padStart(4, "0")}.json.gz`);
+    const packed = await gzipJson(package87, "data", "releases", "2026-11-03-a2658-finite-family-closure-v1", "browse", scope, sort, `${String(index).padStart(4, "0")}.json.gz`);
     rows.push(...packed.map(row => Object.fromEntries(manifest.browse_fields.map((field, fieldIndex) => [field, row[fieldIndex] ?? null]))));
   }
-  return {manifest, rows, index:await gzipJson(package87, "data", "releases", "2026-10-20-a-main-v1", "ai_filter_index.json.gz")};
+  return {manifest, rows, index:await gzipJson(package87, "data", "releases", "2026-11-03-a2658-finite-family-closure-v1", "ai_filter_index.json.gz")};
 }
 
 test("principal populations and unchanged static baseline metadata", async () => {
   const {manifest} = await context();
   const metadata = manifest.metadata;
-  assert.equal(Number(metadata.family_count), 163906);
-  assert.equal(Number(metadata.ranked_family_count), 163371);
-  assert.equal(Number(metadata.unranked_family_count), 535);
-  assert.equal(manifest.browse.core.overall.available_items, 2871);
-  assert.equal(manifest.browse.broader.overall.available_items, 2871);
+  assert.equal(Number(metadata.family_count), 167630);
+  assert.equal(Number(metadata.ranked_family_count), 142432);
+  assert.equal(Number(metadata.unranked_family_count), 25022);
+  assert.equal(manifest.browse.core.overall.available_items, 2658);
+  assert.equal(manifest.browse.broader.overall.available_items, 2658);
   assert.equal(manifest.browse.broader.overall.available_items - manifest.browse.core.overall.available_items, 0);
   for (const name of ["tokenizer.js", "contractions.js", "xlsx_export.js"]) {
-    assert.equal(createHash("sha256").update(await readFile(path.join(package87,name))).digest("hex"),captured.baselineHelperSha256[name], `${name} changed from the selected UI baseline`);
+    let source = await readFile(path.join(package87,name));
+    if (name === "tokenizer.js") {
+      // Only the separately named teacher-input entry was appended. Protect the exact old contract.
+      const legacy = source.toString("utf8")
+        .replace(/\n  const TEACHER_TEXT_TOKENIZER_ID[\s\S]*?\n(?=  globalThis.HKELE_TOKENIZER)/, "\n")
+        .replace(", TEACHER_TEXT_TOKENIZER_ID, scanTeacherText, tokenizeTeacherText", "");
+      source = Buffer.from(legacy, "utf8");
+    }
+    assert.equal(createHash("sha256").update(source).digest("hex"),captured.baselineHelperSha256[name], `${name} legacy contract changed from the selected UI baseline`);
   }
 });
 

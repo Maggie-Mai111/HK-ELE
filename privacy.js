@@ -19,7 +19,7 @@
     <p class="privacy-note">Feedback is shared only when you submit a Google Form. Click and feature-use records are not currently collected. We will ask again before enabling them.</p>
     <details><summary>Read data information</summary>
       <p>Your choice is saved on this device. Please leave student names and other identifying information out of your feedback.</p>
-      <p>Teaching lists and notes are saved in this browser. Checked texts stay in the current session. Export a list to keep a copy. AI word search sends your request to the AI service.</p>
+      <p>Teaching lists and notes are saved in this browser. Your checked text clears when you close or reload this page. Export a list to keep a copy. AI word search sends your request to the AI service.</p>
       <p>Review or withdraw your agreement using Your data choices. Any research study will have separate information and consent.</p>
     </details>
     <div class="privacy-first"><label class="privacy-choice"><input id="privacy-agree" type="checkbox"><span>I have read the data information and agree to the uses described above.</span></label>

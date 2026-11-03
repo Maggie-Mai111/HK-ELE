@@ -1,0 +1,124 @@
+{
+  "schema": "hkele-word-origins/1",
+  "version": "2026-11-03-word-origins-v1",
+  "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
+  "sourceSha256": "7545ad88c8967cdfd13fa3d2a8145f38bf4af73bbd609776365ba9bdd94f6333",
+  "attribution": "BAWF (Green, Hiebert & Coxhead, 2026); Wiktionary-derived etymology",
+  "sourceMethod": "Supplied BAWF extraction; code and LLM assisted, not a sense-resolved dictionary",
+  "sourceLicenceNotice": "Supplied project README declares CC BY 4.0; underlying Wiktionary attribution retained",
+  "sourceArticle": "https://doi.org/10.3389/fpsyg.2026.1985734",
+  "binding": "Selected accepted source_form_key → raw Word → exact auxiliary Word; conflicts withheld",
+  "counts": {
+    "annotatedAcceptedPairs": 116283
+  },
+  "files": {
+    "a.json.gz": {
+      "sha256": "be7d6ae812a66b298586da730b57357e65bc45e4088c6eea50901de027520e9d",
+      "bytes": 222663
+    },
+    "b.json.gz": {
+      "sha256": "2eadc53f172a3528e5699cae0df5e0f4692bec3cad3cc0a6eaeef9b4c2b12832",
+      "bytes": 65760
+    },
+    "c.json.gz": {
+      "sha256": "cfd66b0a180523912ac5b291a08f2a76e86d6ff31325cfc1fb8b940300bc70f9",
+      "bytes": 248988
+    },
+    "d.json.gz": {
+      "sha256": "6e2fe88fb61f9378303301c5d1c6debb01db9e0a3a7a361d217c18e854730a53",
+      "bytes": 188525
+    },
+    "e.json.gz": {
+      "sha256": "89b77de1cb9ea7ac975078e395dae6216c76a198f1b8124659462c27cea3520a",
+      "bytes": 131305
+    },
+    "f.json.gz": {
+      "sha256": "ce94062700f5bf31f3b7077b58e8475727cda11b3b2b23055f3c2889e2ef9a71",
+      "bytes": 67601
+    },
+    "g.json.gz": {
+      "sha256": "d0e09736acca143b71ab70380847d47f42bab1b42eca77394a60857b18cc8226",
+      "bytes": 50429
+    },
+    "h.json.gz": {
+      "sha256": "49659da66991707608144501e657ac6731b9003c47ee281a2960fa20346a9f13",
+      "bytes": 80869
+    },
+    "i.json.gz": {
+      "sha256": "960438e09f340883e54fbfe9d00273310241e569c82c16f22e17f4f17afefb94",
+      "bytes": 165901
+    },
+    "j.json.gz": {
+      "sha256": "6f21d70f45601c5ae953287be7ac9a2c220a5fc4712c12d27e0164b9c98e51ea",
+      "bytes": 16438
+    },
+    "k.json.gz": {
+      "sha256": "8648e720fb6ef0fa480ff2f7726a49b2c5815b33c086d9d984299044b7a82671",
+      "bytes": 11703
+    },
+    "l.json.gz": {
+      "sha256": "2276feb9c0d0f99d52c635ba926b47be4c76d0c24dfce61181293bddc3139d6d",
+      "bytes": 57513
+    },
+    "m.json.gz": {
+      "sha256": "97029541098cab96d2b6534e5b8082ffcba3ae8f89b70839a487f49d4b205985",
+      "bytes": 199214
+    },
+    "n.json.gz": {
+      "sha256": "f25d57f92a169137a1c59222ec5d5abb26dea06a2164110f087bb9f1fcd0b1ee",
+      "bytes": 142822
+    },
+    "o.json.gz": {
+      "sha256": "3af5759b8d63c988f92c4e4dbb03d511fba6d17c55f1ef5c5e09eb506a587331",
+      "bytes": 82758
+    },
+    "p.json.gz": {
+      "sha256": "55a10bc483b470ced0b9dc8cd2ff7b2d27f2c042d77b29a21914215d492c877c",
+      "bytes": 283651
+    },
+    "q.json.gz": {
+      "sha256": "8b007e1f6ab16980b18a6b4dc065506bb52cbe7f85660d6006c19431f917f1fb",
+      "bytes": 14168
+    },
+    "r.json.gz": {
+      "sha256": "b98e73f9c315ca62ba2e1e6f79b80336221ffa18cb59bcd44ec5580c862a6f8d",
+      "bytes": 176562
+    },
+    "s.json.gz": {
+      "sha256": "e8240091950054a74912ca4373d04d3a5db70d6f92e39bc7e242f4d14f584e30",
+      "bytes": 241647
+    },
+    "t.json.gz": {
+      "sha256": "fb3832af2f8e07f46eb763c8e5b42fe28422df7cdc3df5d7ca28ff652f21f43d",
+      "bytes": 114695
+    },
+    "u.json.gz": {
+      "sha256": "594b4108872082b370a5edeea14965fc1e8d2fe85994b620fbf5a59108d0f64b",
+      "bytes": 162201
+    },
+    "v.json.gz": {
+      "sha256": "5b74d0857d78b3693b2e3ea346625914fb227c1a8f372a9a51e7584a258b69ed",
+      "bytes": 46473
+    },
+    "w.json.gz": {
+      "sha256": "6476c82d4230265b7237206a29212cfca74fd24f2010a5b499f4380d28bba84e",
+      "bytes": 10906
+    },
+    "x.json.gz": {
+      "sha256": "60a4e8d44236ec88e5a4d0fbd2f3719279e73ccbfa23226af0dc48fa996e8ea7",
+      "bytes": 3118
+    },
+    "y.json.gz": {
+      "sha256": "523e0981d126dc79114a3da73940a0b5224a2e64da37c0261b9348ac005d1e72",
+      "bytes": 2462
+    },
+    "z.json.gz": {
+      "sha256": "4f34f9f163df19dbf677cc67a87a47dc75811e7d848a8e321cd0997c9b275f5c",
+      "bytes": 5659
+    },
+    "_other.json.gz": {
+      "sha256": "24437b5ba557ed0e7c77700a4f62e18378631fd336fd9cddb7571dd457dc1a3e",
+      "bytes": 122
+    }
+  }
+}

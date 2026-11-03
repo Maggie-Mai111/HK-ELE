@@ -7,7 +7,7 @@
       $(".lesson-context").classList.toggle("has-save-error", Boolean(reason));
       const selector = $("#active-lesson");
       selector.innerHTML = state.library.lessons.map((lesson, index) =>
-        `<option value="${esc(lesson.id)}">${esc(lesson.title || "Your lesson")} · ${root.HKELE_LESSON.wordCount(lesson.items)} words</option>`).join("");
+        `<option value="${esc(lesson.id)}">${esc(lesson.title || "Your lesson")} · ${root.HKELE_LESSON.wordCount(lesson.items)} ${root.HKELE_LESSON.wordCount(lesson.items) === 1 ? "word" : "words"}</option>`).join("");
       selector.value = state.library.activeId;
       const messages = {
         conflict:"Another tab changed your saved lessons. Export this copy before reloading the saved lessons.",

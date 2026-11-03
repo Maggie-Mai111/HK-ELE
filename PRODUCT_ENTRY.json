@@ -1,79 +1,45 @@
 {
-  "status": "LOCAL_TEACHER_FLOW_RELEASE_READY_PUBLIC_UPDATE_PENDING",
-  "dataVersion": "2026-10-20-a-main-v1",
-  "uiBaseline": "Approved Web v32 retained; only scoped teacher-flow corrections",
-  "uiRedesigned": false,
+  "status": "LOCAL_VALIDATED_PUBLIC_PENDING",
+  "iteration": "v53",
+  "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
+  "expressionDataVersion": "2026-11-03-closed-compounds-v1",
+  "wordOriginsVersion": "2026-11-03-word-origins-v1",
   "dataCounts": {
-    "candidate": 2871,
-    "forms": 319961,
-    "inclusiveReference": 2871,
-    "ranked": 163371,
+    "candidate": 2658,
+    "inclusiveReference": 2658,
     "referenceOnly": 0,
-    "totalFamilies": 163906,
-    "unranked": 535
+    "totalFamilies": 167630,
+    "forms": 328253,
+    "ranked": 142432,
+    "unranked": 25022,
+    "teachingScopeExcluded": 176
   },
+  "uiRedesigned": false,
+  "approvedUiPredecessor": "Web v52 / App v46",
   "registeredWorkerEnvironment": "production",
   "workerEnvironmentChanged": false,
   "feedbackFormsConnected": true,
   "researchTelemetryEnabled": false,
   "authenticationConnected": false,
-  "deployedByThisTask": false,
+  "pushPerformed": false,
+  "deploymentPerformed": false,
+  "publicUpdated": false,
   "provenance": "README.md",
-  "iteration": "teacher-web-flow-polish-20261028-v33",
-  "searchFlow": "Search -> all accepted forms grouped by family -> chosen form detail",
-  "wordFormFrequencyResource": "data/word-forms/a-main-word-frequency-20261022-v1/",
-  "wordFormFrequencySources": [
-    "A ICE-HK normalized spelling counts",
-    "A GloWbE-HK normalized spelling counts"
-  ],
-  "teacherWordLabels": {
-    "version": "20261022-labels2",
-    "firstSeen": "First seen in HK textbooks",
-    "externalGrade": "US grade reference",
-    "awl": "Academic Word List (AWL)",
-    "msvl": "Middle School Vocabulary List (MSVL)",
-    "earlierHkShown": false
+  "fullDatabaseWorkbook": {
+    "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
+    "wordOriginsVersion": "2026-11-03-word-origins-v1",
+    "workbookVersion": "2026-11-03-teacher-word-information-a2658-v1",
+    "filename": "HK_ELE_Full_Database_20261103.xlsx",
+    "assetPath": "downloads/2026-11-03-teacher-word-information-a2658-v1/HK_ELE_Full_Database_20261103.xlsx",
+    "byteSize": 12156329,
+    "sha256": "a3363cbbee9ecf9786a9a3374e59ca01038f5a988686339957f9e501e204ceb2",
+    "counts": {
+      "wordForms": 328253,
+      "fullFamilies": 167630,
+      "wordListFamilies": 2658,
+      "worksheets": 1
+    }
   },
-  "evidenceTokens": {
-    "style": "independent pastel labels with full text and wrapping",
-    "fields": [
-      "MSVL subjects",
-      "root variants",
-      "root gloss alternatives"
-    ],
-    "rootMeaningPairsInferred": false,
-    "sourceDataChanged": false
-  },
-  "wordCard": "Grouped teaching records, word parts and family frequency; no duplicate status or overview badges",
-  "detailFormTable": "10 independent columns using the approved compact Browse typography",
-  "wordCardWidth": "Full available width with 16–32px side padding; subject labels use the group width",
-  "wordCardTypography": "Desktop field labels and tokens 22–27px; values 26–32px; compact detail tables unchanged",
-  "aiSearchEntry": "Visible before and after exact-form search; availability shown only when expanded",
-  "aiConnection": {
-    "environment": "production",
-    "configuredInCurrentBuild": true,
-    "origin": "original public product configuration, recovered and verified 2026-10-22",
-    "localLoopbackPolicy": "Original inline controls retained; real service accepts the registered public host, not loopback",
-    "workerEnvironmentChanged": false,
-    "realCompletionVerifiedThisIteration": false,
-    "interaction": "Enter request, verify, review suggested filters, confirm matching words within the same product"
-  },
-  "aiNetwork": {
-    "singleBuildOnlineOffline": true,
-    "entryRetained": true,
-    "offlineMessage": "AI search needs an internet connection. Reconnect and try again.",
-    "queryRetainedOnDisconnect": true,
-    "automaticRequestOnReconnect": false,
-    "interpretedFiltersRetained": true,
-    "onlineServiceErrorsNotLabelledOffline": true,
-    "backendEnvironmentChanged": false
-  },
-  "compoundData": {
-    "version": "2026-10-22-a-main-closed-v1",
-    "records": 57881,
-    "manifestSha256": "7f28eb1bea6b40653f829ee07f3105913174ee3b847e3cfe3e069fd95a1811b2",
-    "scope": "Exact registered closed whole words; no inferred family, grade, rank or Core membership",
-    "newResearchComputation": false
-  },
-  "selectedFormRecordParity": "Exact selected form for educational records and word parts; family frequency remains family-level"
+  "sourceHandoverSha256": "716cd5fb100507b8b22635552890e1b6a4c697a4685107f62c7bd63b3f93b7cc",
+  "productEntry": "../PRODUCT_ENTRY.json"
 }

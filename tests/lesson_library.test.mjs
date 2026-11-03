@@ -96,7 +96,7 @@ function harness() {
     addEventListener:(name,fn)=>events[name]=fn,confirm:()=>false,location:{hash:"",reload(){}},
     setTimeout:()=>{}, CustomEvent:class{},scrollY:0});
   context.window=context;
-  for(const file of ["lesson_contract.js","lesson_library.js","lesson_library_ui.js","word_family_results.js","evidence_tokens.js","compound_teaching.js","compound_ui.js"])
+  for(const file of ["identity_migration.js","lesson_data_refresh.js","cpb100.js","lesson_contract.js","lesson_library.js","lesson_library_ui.js","word_family_results.js","evidence_tokens.js","compound_teaching.js","compound_ui.js"])
     vm.runInContext(fs.readFileSync(new URL(`../${file}`,import.meta.url),"utf8"),context);
   context.HKELE_LESSON_WORKSPACE={create:()=>({renderList(){},renderPicker(){},rememberUndo(){}})};
   context.HKELE_TEXT_WORKSPACE={create:()=>({refreshSuggestions(){},resetLessonContext(){}})};

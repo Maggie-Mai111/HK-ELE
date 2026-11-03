@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const DATA_ROOT = "data/releases/2026-10-20-a-main-v1/";
+  const DATA_ROOT = "data/releases/2026-11-03-a2658-finite-family-closure-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -35,13 +35,13 @@
   let integrityPromise;
   const hash = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2,"0")).join("");
   async function integrity() {
-    integrityPromise ??= fetch(DATA_ROOT + "integrity.json", {cache:"force-cache"}).then(async response => {
+    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=06d24536d752334f", {cache:"force-cache"}).then(async response => {
       if (!response.ok) throw new Error("Please reload to open the word data.");
       const bytes = await response.arrayBuffer();
       const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
       // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
       const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
-      if (await hash(normalized) !== "0c3c53c1523bbc6118ad84115497b7035987745007f5fcc2ceacb4b356e4678d") throw new Error("Please reload to open the word data.");
+      if (await hash(normalized) !== "06d24536d752334f66114da05d70b1bde906f7abc8b782acb6adcf28f013ecee") throw new Error("Please reload to open the word data.");
       return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
@@ -50,10 +50,11 @@
     path = path.replace(/^data\//, DATA_ROOT);
     if (cache.has(path)) return cache.get(path);
     const promise = (async () => {
-      const response = await fetch(path, {cache: "force-cache"});
+      const expected = (await integrity()).files[path.slice(DATA_ROOT.length)];
+      if (!expected) throw new Error("Please reload to open the word data.");
+      const response = await fetch(path + "?v=" + expected.slice(0,16), {cache: "force-cache"});
       if (!response.ok) throw new Error(`Data file unavailable (${response.status}): ${path}`);
       const bytes = await response.arrayBuffer();
-      const expected = (await integrity()).files[path.slice(DATA_ROOT.length)];
       if (!expected || await hash(bytes) !== expected) throw new Error("The word data changed. Please reload this page.");
       if (typeof DecompressionStream !== "function") throw new Error("This browser cannot open the compressed database. Please use a current version of Chrome, Edge, Firefox, or Safari.");
       const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
@@ -70,6 +71,17 @@
     return loadGzipJson("data/manifest.json.gz");
   }
 
+  let formEvidencePromise;
+  async function aiFormEvidence() {
+    const release=window.HKELE_AI_FORM_RELEASE;
+    formEvidencePromise??=(async()=>{
+      const response=await fetch(release.path,{cache:"force-cache"});if(!response.ok)throw new Error("Word filters need downloading.");
+      const bytes=await response.arrayBuffer();if(await hash(bytes)!==release.sha256)throw new Error("Word filter evidence changed.");
+      const document=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).json();
+      if(document.schemaVersion!=="HK_ELE_AI_FORM_EVIDENCE_V1"||document.dataVersion!==release.dataVersion||document.sourceManifestSha256!==release.sourceManifestSha256||document.familyCount!==release.familyCount||document.formCount!==release.formCount)throw new Error("Incompatible word filter evidence.");
+      return document;
+    })().catch(error=>{formEvidencePromise=null;throw error;});return formEvidencePromise;
+  }
   async function aiFilterIndex() {
     return loadGzipJson("data/ai_filter_index.json.gz");
   }
@@ -120,11 +132,9 @@
         }
         filterIndex = await aiFilterIndex();
       }
-      const execution = window.HKELE_AI_FILTER_CONTRACT.applyToRows(
-        allRows,
-        filters,
-        filterIndex,
-      );
+      const execution = window.HKELE_AI_WORD_FILTER.hasWordConditions(filters)
+        ? window.HKELE_AI_WORD_FILTER.apply(allRows, filters, await aiFormEvidence(), new Set(window.HKELE_CPB100.tokens))
+        : window.HKELE_AI_FILTER_CONTRACT.applyToRows(allRows, filters, filterIndex);
       const start = (page - 1) * pageSize;
       const stop = Math.min(start + pageSize, execution.families.length);
       return {
@@ -139,6 +149,7 @@
         populations: info.populations,
         families: execution.families.slice(start, stop),
         ai_filters: execution.filters,
+        result_unit: execution.resultUnit || "family",
       };
     }
     const start = (page - 1) * pageSize;
@@ -163,7 +174,7 @@
 
   async function detail(key) {
     const config = await manifest();
-    const normalized = norm(key);
+    const normalized = key;
     const bucket = String(fnvBucket(normalized, config.detail_buckets)).padStart(3, "0");
     const values = await loadGzipJson(`data/detail/${bucket}.json.gz`);
     const record = values[normalized];
@@ -202,7 +213,7 @@
     if (!normalized) return {status: "UNMATCHED", ...empty, api_version: config.api_version};
     if (submitted === "US") return {...identityResponse(submitted, normalized, "US requires contextual classification and is not counted as the pronoun us.", "COUNTRY_ABBREVIATION_OR_OTHER_CONTEXT_REQUIRED"), api_version: config.api_version};
     if (["i'll", "won't", "hadn't"].includes(apostropheNorm(submitted))) return {...identityResponse(submitted, normalized, "This contraction is retained for review and is not assigned to the similarly spelled family.", "REGISTERED_CONTRACTION_ROUTE"), api_version: config.api_version};
-    if (normalized === "does") return {...identityResponse(submitted, normalized, "does requires contextual classification and is retained for review here.", "CONTEXT_REQUIRED_DO_VERB_OR_DOE_PLURAL"), api_version: config.api_version};
+    if (!config.metadata.complete_lexical_relations && normalized === "does") return {...identityResponse(submitted, normalized, "does requires contextual classification and is retained for review here.", "CONTEXT_REQUIRED_DO_VERB_OR_DOE_PLURAL"), api_version: config.api_version};
     if (config.special_surfaces[normalized]) {
       const owner = inflate(config.family_fields, config.special_surfaces[normalized]);
       owner.blocked = false;
@@ -256,11 +267,20 @@
         output.push({...base, status: "UNSUPPORTED", best_owner_count: 0, owners: [], alternatives: [], identity_exception: null});
       } else {
         const result = await unique.get(String(item.surface || item.normalized_token));
+        const lookupOnly = result.owners.length && result.owners.every(owner => owner.match_classes.includes("CONDITIONAL_LOOKUP_ONLY") || owner.match_classes.includes("FAMILY_LABEL_ONLY"));
+        if (lookupOnly) { output.push({...base, ...result, status:"UNMATCHED", owners:[], alternatives:[...result.owners,...result.alternatives], best_owner_count:0}); continue; }
+
         output.push({...base, ...Object.fromEntries(["status", "best_priority", "best_owner_count", "owners", "alternatives", "identity_exception", "expression", "expression_layer_status"].map(key => [key, result[key]]))});
       }
     }
+    for (const item of output) { if (globalThis.HKELE_TEXT_NORMALIZATION && item.token_status !== "UNSUPPORTED_TOKEN") {
+ const surface=typeof payload.source==="string" ? globalThis.HKELE_TEXT_NORMALIZATION.analysisSurface(payload.source,item.start_offset,item.end_offset) : item.surface;
+ item.normalizedAnalysis=surface===null ? {applied:true,ambiguous:false,tokens:[]} : await globalThis.HKELE_TEXT_NORMALIZATION.normalizedAnalysis(surface,search);
+ } }
     return {api_version: config.api_version, occurrences: output, occurrence_count: output.length};
   }
+
+  window.HKELE_LEXICAL_USE_DATA = async word => { const shard = await loadGzipJson(`data/lexical-uses/${String(fnvBucket(norm(word),128)).padStart(3,"0")}.json.gz`); return shard.uses[norm(word)] || []; };
 
   async function request(path, options = {}) {
     const config = await manifest();

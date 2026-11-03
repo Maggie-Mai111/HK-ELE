@@ -15,6 +15,7 @@ function resources(options = {}) {
   const context = vm.createContext({window:{}, location:{href:'https://fixture.invalid/'}, URL,
     crypto:globalThis.crypto, TextEncoder, TextDecoder, Blob, Response, DecompressionStream,
     fetch:async path => {
+      path=String(path).split("?")[0];
       if (failure && path.endsWith(failure)) {failure = ''; return new Response('try again', {status:503});}
       let bytes = readFileSync(join(root, path));
       if (options.crlf && path.endsWith('/manifest.json')) bytes = Buffer.from(bytes.toString('utf8').replace(/\r?\n/g, '\r\n'));
@@ -52,9 +53,9 @@ test('real A family lists preserve all accepted forms and bind each grade to its
       assert.ok(rest.every((r, index) => index === 0 || rest[index-1].frequency >= r.frequency));
     }
   }
-  const {forms} = await api.request('/families/be');
-  assert.equal(forms.find(f => f.form === 'be').external_level_reference, 'Kindergarten–Grade 1');
-  assert.equal(forms.find(f => f.form === 'beingness').external_level_reference, 'Grades 10–11');
+  const {forms} = await api.request('/families/stress');
+  assert.equal(forms.find(f => f.form === 'stress').external_level_reference, 'Grades 6–7');
+  assert.equal(forms.find(f => f.form === 'destress').external_level_reference, 'Grades 10–11');
   const use = await reader.load('use');
   assert.ok(results.frequency(use.use) > results.frequency(use.reusable));
 });
@@ -97,7 +98,7 @@ test('equal-best homonym owners are separate groups, without changing their acce
   const source = resources();
   // Discover an existing equal-best ambiguity within the registered A search shard.
   const {gunzipSync} = await import('node:zlib');
-  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-10-20-a-main-v1/search/a.json.gz'))));
+  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-03-a2658-finite-family-closure-v1/search/d.json.gz'))));
   const query = Object.keys(shard).find(key => shard[key][1]?.length > 1);
   assert.ok(query);
   const expected = (await source.api.request('/search?q='+query)).owners.filter(owner => !owner.blocked);
@@ -137,7 +138,7 @@ test('choosing two individual forms preserves the same lesson notes and the exac
 });
 
 test('rendered results pin the query, keep form grades separate, and route View/Add with the concrete form', async () => {
-  const source = resources(), detail = await source.api.request('/families/be');
+  const source = resources(), detail = await source.api.request('/families/stress');
   const opened = [], added = [], nodes = new Map();
   class Node {
     constructor() {this.listeners={};this.hidden=false;this.innerHTML='';this.dataset={};this.classList={toggle(){}};}
@@ -157,8 +158,8 @@ test('rendered results pin the query, keep form grades separate, and route View/
     }
   }
   const get = selector => {if (!nodes.has(selector)) nodes.set(selector, new Node()); return nodes.get(selector);};
-  const state = {selected:[], familySearch:{query:'beingness',sort:'frequency-desc',loading:false,
-    groups:[{...detail, frequencies:await source.reader.load('be')}],frequencyError:false}};
+  const state = {selected:[], familySearch:{query:'destress',sort:'frequency-desc',loading:false,
+    groups:[{...detail, frequencies:await source.reader.load('stress')}],frequencyError:false}};
   const esc = value => String(value ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
   const context = vm.createContext({state, familyResults:results, $:get, $$:()=>[], esc,
     tokens:(value,kind)=>globalThis.HKELE_EVIDENCE_TOKENS.chips(value,kind),subjectTokens:()=> '—',
@@ -167,7 +168,7 @@ test('rendered results pin the query, keep form grades separate, and route View/
     integer:value => value === null || value === undefined ? '—' : String(value),
     shown:value => value === null || value === undefined ? '—' : esc(value),
     evidenceBadge:(_label, value) => value ? `<span>${esc(value)}</span>` : '',
-    hasAwl:form => Boolean(form?.awl), msvlDisplay:() => '', statusClass:()=>'core',statusLabel:()=>'Core list',
+    hasAwl:form => Boolean(form?.awl), msvlDisplay:() => '', statusClass:()=>'core',statusLabel:()=>'HK-ELE Word List',
     rankBand:(rank, band)=>`${rank} · ${band}`, yes:value=>value?'Yes':'—',refreshSearchAddButtons:()=>{},
     openFamily:(...args)=>opened.push(args),addToList:(...args)=>added.push(args)});
   vm.runInContext(readFileSync(new URL('../compound_ui.js',import.meta.url),'utf8'),context);
@@ -178,14 +179,14 @@ test('rendered results pin the query, keep form grades separate, and route View/
   context.renderFamilySearch();
   const host = get('#family-search-results'), rows = [...host.innerHTML.matchAll(/<tr(?: class="search-hit")?>[\s\S]*?<\/tr>/g)].map(m=>m[0]).filter(row=>row.includes('data-search-view'));
   assert.match(rows[0], /class="search-hit"/); assert.match(rows[0], /Your search/);
-  assert.match(rows[0], /data-form="beingness"/); assert.match(rows[0], /Grades 10–11/);
-  const beRow = rows.find(row=>row.includes('data-form="be"'));
-  assert.match(beRow, /Kindergarten–Grade 1/); assert.doesNotMatch(beRow, /Grades 10–11/);
+  assert.match(rows[0], /data-form="destress"/); assert.match(rows[0], /Grades 10–11/);
+  const beRow = rows.find(row=>row.includes('data-form="stress"'));
+  assert.match(beRow, /Grades 6–7/); assert.doesNotMatch(beRow, /Grades 10–11/);
   assert.equal(rows.length, detail.forms.length);
   host.querySelectorAll('[data-search-view]')[0].click();
   host.querySelectorAll('[data-search-add]')[0].click();
-  assert.deepEqual(opened[0], ['be','beingness']);
-  assert.equal(added[0][0].baseword_key, 'be'); assert.equal(added[0][1], 'beingness');
+  assert.deepEqual(opened[0], ['stress','destress']);
+  assert.equal(added[0][0].baseword_key, 'stress'); assert.equal(added[0][1], 'destress');
   assert.equal(get('#browse-table-shell').hidden, true);
   state.familySearch = null; context.renderFamilySearch();
   assert.equal(get('#browse-table-shell').hidden, false); assert.equal(host.hidden, true);
