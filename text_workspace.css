@@ -9,3 +9,11 @@
 .text-word-dialog{width:min(480px,calc(100vw - 32px));box-sizing:border-box;border:1px solid #cbd8cf;border-radius:16px;padding:24px;color:#1d2c23;max-height:85vh;overflow:auto}.text-word-dialog::backdrop{background:#0006}.text-word-dialog button{min-height:44px;margin:6px}.check-message{color:#9e3431;margin:12px 0}.check-message:empty{display:none}
 #checked-workspace[hidden],#check-compose[hidden]{display:none!important}#all-text-details{margin-top:18px}#checked-reader:focus,#preteach-panel:focus{outline:2px solid #176847;outline-offset:3px}
 @media(max-width:600px){.reader-actions>button{flex:1}.preteach-word{padding:12px}.preteach-controls{align-items:flex-start;flex-direction:column}.checked-reader,.preteach-panel{scroll-margin-top:145px}}
+
+/* Scoped grouped suggestions; other tables and pages keep their approved layout. */
+.preteach-word{display:block}.preteach-family{margin:0 0 8px;color:#53645b;font-size:1rem}
+.preteach-form{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.preteach-form>div{min-width:0;flex:1}.preteach-form>button{flex-shrink:0;min-height:44px}
+.preteach-form+.preteach-form{border-top:1px solid #cbd8cf;margin-top:12px;padding-top:12px}
+.preteach-form details summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+#text-tools>.workspace-disclosure{margin:12px 0 0}

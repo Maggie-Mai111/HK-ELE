@@ -580,3 +580,9 @@ button,input,select,textarea{font-size:18px}
 .lesson-controls-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;padding-top:.6rem}
 #list-copy-actions,[data-picker-copy],#preteach-copy-actions{margin-block:.75rem}
 [data-copy-fallback] textarea{width:100%;min-height:7rem;font:inherit;line-height:1.5}
+
+/* Selected-list comparison only; existing page typography stays unchanged. */
+#passage-coverage{display:grid;gap:12px;margin:18px 0;}
+#passage-coverage select{margin-left:10px;max-width:100%;}
+#passage-coverage .coverage-value{font-size:24px;font-weight:750;margin:0;}
+@media(max-width:600px){#passage-coverage select{display:block;margin:8px 0 0;}}

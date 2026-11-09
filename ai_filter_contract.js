@@ -189,7 +189,9 @@
   function teacherScope(query, selected = "full") {
     if (/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/i.test(query)) return "full";
     if (/hk[-–]?ele\s+word\s+list|core\s+list|核心词[表库]/i.test(query)) return "core";
-    return selected === "core" ? "core" : "full";
+    if (/95\s*%/.test(query)) return "core95";
+    if (/90\s*%/.test(query)) return "core";
+    return selected === "core95" ? "core95" : selected === "core" ? "core" : "full";
   }
   function interpreterQuery(query) {
     return query.replace(/hk[-–]?ele\s+word\s+list|core\s+list|核心词[表库]/gi,"Candidate").replace(/full database|entire database|whole database|完整(?:数据库|词库)|全部词库/gi,"database").trim();
@@ -197,7 +199,7 @@
   function teacherResult(raw, scope = "full") {
     const result = validateResult(raw);
     const teacherText = text => text.replace(/Candidate\s*(?:and|\+)\s*Reference/gi, "HK-ELE Word List").replace(/Reference[ -]only/gi, "other database").replace(/\bCandidate\b/g, "HK-ELE Word List");
-    return {...result, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core" ? "HK-ELE Word List" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
+    return {...result, teacherScope:scope, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core95" ? "95% list" : scope === "core" ? "HK-ELE Word List" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
   }
   return Object.freeze({GRADES, HK_BANDS, MSVL_SUBJECTS, FILTER_KEYS, ValidationError, validateConditions, validateResult, applyToRows, describeConditions, teacherScope, interpreterQuery, teacherResult});
 });

@@ -25,7 +25,7 @@
       if(!dialog){dialog=document.createElement('dialog');dialog.className='feedback-dialog';document.body.appendChild(dialog);}
       dialog.setAttribute('aria-label',expression.displayExpression+' compound');
       dialog.innerHTML=html(expression,source)+'<button type="button" data-compound-close>Close</button>';bind(dialog);
-      dialog.querySelector('[data-compound-close]').addEventListener('click',()=>dialog.close());if(!dialog.open)dialog.showModal();
+      dialog.querySelector('[data-compound-close]').addEventListener('click',()=>dialog.close());if(!dialog.open)dialog.showModal();return dialog;
     }
     return {html,bind,open};
   }

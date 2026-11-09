@@ -14,16 +14,16 @@
   };
   const showFeedback = async (kind, useWord) => {
     dialog.querySelector("h2").textContent = kind === "rating" ? "Rate this word" : "Report a problem";
-    dialog.querySelector(".feedback-description").textContent = kind === "rating" ? "Rate how easy this word is to teach and how suitable it is for your students. Select the target grade in the form." : "Describe what happened and what you expected. Leave out student names, classroom photos and full source texts.";
+    dialog.querySelector(".feedback-description").textContent = kind === "rating" ? "Rate how easy this word is to teach and how suitable it is for your students." : "Describe what happened and what you expected. Leave out student names, classroom photos and full source texts.";
     const context = currentContext(useWord);
-    dialog.querySelector(".feedback-context").textContent = [context.word, context.family && `Family: ${context.family}`, context.page].filter(Boolean).join(" · ");
+    dialog.querySelector(".feedback-context").textContent = [context.word, context.family && `Family: ${context.family}`].filter(Boolean).join(" · ");
     const link = dialog.querySelector(".feedback-open");
     link.removeAttribute("href"); link.hidden = true;
     const status = dialog.querySelector(".feedback-status");
     status.textContent = "Opening form…";
     dialog.showModal();
     try {
-      if (!config) { const response = await fetch("./feedback_forms.json"); if (!response.ok) throw new Error(); config = await response.json(); }
+      if (!config) { const response = await fetch("./feedback_forms.json?v=20261109-v64"); if (!response.ok) throw new Error(); config = await response.json(); }
       const url = window.HkeleFeedbackContract.buildFeedbackUrl(kind, context, config);
       if (url) { link.href = url; link.hidden = false; status.textContent = ""; }
       else status.textContent = "Please try this form again later.";

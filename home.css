@@ -160,3 +160,17 @@
     flex-wrap: wrap;
   }
 }
+
+/* Selected words is offered once there are words to keep. */
+.nav-button[hidden], .home-task[hidden], #saved-lists-entry[hidden] { display: none !important; }
+@media (min-width: 1101px) { #view-home .home-tasks.two-tasks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.text-word-dialog { max-height: calc(100dvh - 48px); overflow-y: auto; }
+.occurrences-heading { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.occurrences-heading h2 { margin: 0; }
+.occurrences-list { display: grid; gap: 16px; }
+.occurrences-list article { border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.occurrences-list article p { overflow-wrap: anywhere; }
+.occurrences-link { margin-top: 8px; }
+
+/* Only interrupt the word flow when saving actually needs attention. */
+.lesson-context:not(.has-save-error) { display: none !important; }

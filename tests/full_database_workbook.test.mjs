@@ -25,5 +25,5 @@ test('full-database link points to the complete pinned workbook, separately from
  const workbook=zipEntry(bytes,'xl/workbook.xml');
  assert.equal((workbook.match(/<x:sheet /g)||[]).length,1);
  assert.ok(workbook.includes('name="Word information"'));
- assert.ok(zipEntry(bytes,'xl/tables/table1.xml').includes('ref="A1:P328254"'));
+ assert.ok(zipEntry(bytes,'xl/tables/table1.xml').includes('ref="A1:P329203"'));
 });

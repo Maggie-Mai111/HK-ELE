@@ -2,16 +2,16 @@
   "use strict";
   function create({state, store, $, esc, saveList, renderList, refreshContext, exportCsv}) {
     let dirty = false, reason = store.problem;
-    const dialog = $("#new-lesson-dialog");
     function render() {
       $(".lesson-context").classList.toggle("has-save-error", Boolean(reason));
       const selector = $("#active-lesson");
-      selector.innerHTML = state.library.lessons.map((lesson, index) =>
-        `<option value="${esc(lesson.id)}">${esc(lesson.title || "Your lesson")} · ${root.HKELE_LESSON.wordCount(lesson.items)} ${root.HKELE_LESSON.wordCount(lesson.items) === 1 ? "word" : "words"}</option>`).join("");
+      selector.innerHTML = state.library.lessons.map((lesson, index) => ({lesson,index})).filter(({lesson}) => lesson.id === state.library.activeId || lesson.items.length > 0).map(({lesson, index}) =>
+        `<option value="${esc(lesson.id)}">Saved words ${index + 1} · ${root.HKELE_LESSON.wordCount(lesson.items)} ${root.HKELE_LESSON.wordCount(lesson.items) === 1 ? "word" : "words"}</option>`).join("");
       selector.value = state.library.activeId;
+      $(".lesson-context-controls").hidden = state.view !== "list" || !state.library.lessons.some(item => item.id !== state.library.activeId && item.items.length > 0);
       const messages = {
-        conflict:"Another tab changed your saved lessons. Export this copy before reloading the saved lessons.",
-        invalid:"Your saved lessons could not be opened. They have not been replaced. Export any new work before reloading.",
+        conflict:"Another tab changed your saved words. Export this copy before reloading the saved words.",
+        invalid:"Your saved words could not be opened. They have not been replaced. Export any new work before reloading.",
         unavailable:"Changes are only on this page. They have not been saved. Try again or export a copy before leaving."
       };
       $("#lesson-save-message").textContent = reason ? messages[reason] : "Saved in this browser";
@@ -21,10 +21,7 @@
       $("#export-unsaved-lesson").hidden = !reason;
       $("#reload-saved-lessons").hidden = !reason;
       selector.disabled = Boolean(reason);
-      $("#new-lesson").disabled = Boolean(reason);
-      document.querySelectorAll("[data-current-lesson]").forEach(node => {
-        node.textContent = `Adding to: ${state.lessonTitle || "Your lesson"}`;
-      });
+
     }
     function persist() {
       dirty = true; state.lessonEditVersion += 1;
@@ -54,25 +51,10 @@
         if (!saveList()) { render(); return; }
         commit({...state.library, activeId});
       });
-      $("#new-lesson").addEventListener("click", () => {
-        if (!saveList()) return;
-        $("#new-lesson-name").value = "";
-        dialog.showModal(); $("#new-lesson-name").focus();
-      });
-      $("#cancel-new-lesson").addEventListener("click", () => dialog.close());
-      $("#new-lesson-form").addEventListener("submit", event => {
-        event.preventDefault();
-        const title = $("#new-lesson-name").value.trim();
-        if (!title) { $("#new-lesson-name").focus(); return; }
-        if (!saveList()) { dialog.close(); return; }
-        if (commit(root.HKELE_LESSON_LIBRARY.add(state.library, title))) {
-          dialog.close(); $("#active-lesson").focus();
-        } else dialog.close();
-      });
       $("#retry-lesson-save").addEventListener("click", saveList);
       $("#export-unsaved-lesson").addEventListener("click", exportCsv);
       $("#reload-saved-lessons").addEventListener("click", () => {
-        if (root.confirm("Reload saved lessons? Changes that have not been saved and the current passage will be cleared. Export or copy them first.")) root.location.reload();
+        if (root.confirm("Reload saved words? Changes that have not been saved and the current passage will be cleared. Export or copy them first.")) root.location.reload();
       });
       root.addEventListener("beforeunload", event => {
         if (!dirty) return; event.preventDefault(); event.returnValue = "";

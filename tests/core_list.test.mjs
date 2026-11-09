@@ -11,7 +11,7 @@ const contract=require(join(root,'ai_filter_contract.js'));
 function api(failFullIndexOnce = false) {
   const context=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},location:{href:'https://fixture.invalid/'},URL,crypto:globalThis.crypto,TextDecoder,TextEncoder,Blob,Response,DecompressionStream,fetch:async path=>{
       path=String(path).split("?")[0];
-    if (failFullIndexOnce && path === 'data/releases/2026-11-03-a2658-finite-family-closure-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
+    if (failFullIndexOnce && path === 'data/releases/2026-11-08-hk4-familiar1764-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
     return new Response(new Uint8Array(readFileSync(join(root,path))));
   }});
   context.HKELE_AI_FILTER_CONTRACT=contract;
@@ -26,8 +26,8 @@ function api(failFullIndexOnce = false) {
 }
 test('default Full and Core scopes retain exact populations and the former Reference-only word fabric',async()=>{
   const repository=api();
-  assert.equal((await repository.request('/families')).available_items,167630);
-  assert.equal((await repository.request('/families?scope=core')).available_items,2658);
+  assert.equal((await repository.request('/families')).available_items,167780);
+  assert.equal((await repository.request('/families?scope=core')).available_items,1764);
   const result=await repository.request('/search?q=fabric');
   assert.equal(result.status,'RESOLVED');
   assert.equal(Number(result.owners[0].candidate_member),0);
@@ -55,9 +55,9 @@ test('teacher scope controls contain only Full database and HK-ELE Word List',()
   assert.equal(contract.interpreterQuery('HK-ELE Word List root act'),'Candidate root act');
 
   const html=readFileSync(join(root,'index.html'),'utf8');
-  assert.deepEqual([...html.matchAll(/class="scope(?: active)?" data-scope="([^"]+)"/g)].map(m=>m[1]).sort(),['core','full']);
+  assert.deepEqual([...html.matchAll(/class="scope(?: active)?" data-scope="([^"]+)"/g)].map(m=>m[1]).sort(),['core','core95','full']);
   assert.doesNotMatch(html,/Candidate|Candidate \+ reference|value="broader"/);
-  assert.match(html,/<strong>HK-ELE Word List<\/strong>/);
+  assert.match(html,/<strong>90% list<\/strong>/);
   assert.match(html,/<table id="family-table">/);
 });
 test('actual full AI filtering reaches non-Core and non-reference families with all-member morphology',async()=>{

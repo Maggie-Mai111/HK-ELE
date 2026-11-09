@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import vm from 'node:vm';
-const root=new URL('../',import.meta.url),base='data/releases/2026-11-03-a2658-finite-family-closure-v1/';
+const root=new URL('../',import.meta.url),base='data/releases/2026-11-08-hk4-familiar1764-v1/';
 const read=p=>readFileSync(new URL(p,root));
 function api(){const ctx={window:{},location:{href:'http://fixture.invalid/'},URL,TextEncoder,TextDecoder,Blob,Response,DecompressionStream,crypto:globalThis.crypto,fetch:async path=>new Response(new Uint8Array(read(path)))};vm.runInNewContext(read('static_api.js').toString(),ctx);return ctx.window.HKELE_STATIC_API;}
 test('opaque identity keys keep their exact case instead of becoming another family',async()=>{
@@ -17,7 +17,7 @@ test('limited-only readings stay queryable but never become an ordinary passage 
  assert.equal(result.occurrences[0].status,'UNMATCHED');assert.equal(result.occurrences[0].owners.length,0);assert.ok(result.occurrences[0].alternatives.length);
 });
 test('word-list membership and counts use the new generation; exact spelling keeps its own grade',async()=>{
- const repo=api(),m=await repo.manifest();assert.equal(m.metadata.data_version,'2026-11-03-a2658-finite-family-closure-v1');assert.equal(m.browse.core.overall.total_items,2658);assert.equal(m.browse.full.overall.total_items,167630);
+ const repo=api(),m=await repo.manifest();assert.equal(m.metadata.data_version,'2026-11-08-hk4-familiar1764-v1');assert.equal(m.browse.core.overall.total_items,1764);assert.equal(m.browse.full.overall.total_items,167780);
  const {forms}=await repo.request('/families/stress');assert.equal(forms.find(f=>f.form==='stressed').external_level_reference,'Grade 6');assert.equal(forms.find(f=>f.form==='stressful').external_level_reference,'Grades 8–9');
 });
 

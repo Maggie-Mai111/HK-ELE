@@ -17,16 +17,14 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 8,
+      "expectedMatchCount": 6,
       "expectedKeys": [
         "act",
         "actual",
         "agent",
         "exact",
         "transact",
-        "react",
-        "agendum",
-        "navigate"
+        "react"
       ]
     },
     {
@@ -44,7 +42,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 576
+      "expectedMatchCount": 461
     },
     {
       "id": "hk_top_1k",
@@ -63,7 +61,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 996
+      "expectedMatchCount": 1000
     },
     {
       "id": "prefix",
@@ -80,7 +78,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 817
+      "expectedMatchCount": 620
     },
     {
       "id": "suffix",
@@ -97,7 +95,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 714
+      "expectedMatchCount": 473
     },
     {
       "id": "awl",
@@ -114,7 +112,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 222
+      "expectedMatchCount": 155
     },
     {
       "id": "msvl",
@@ -131,7 +129,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 267
+      "expectedMatchCount": 178
     },
     {
       "id": "cpb100",
@@ -148,7 +146,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 86
+      "expectedMatchCount": 89
     },
     {
       "id": "zero_result",
@@ -181,6 +179,6 @@
       }
     }
   ],
-  "dataVersion": "2026-11-03-a2658-finite-family-closure-v1",
-  "sourceEntrySha256": "17d221b5b5fa57074a2242c73d27dd9557fa1b032bfb1d644a1d08423dd6afa0"
+  "dataVersion": "2026-11-08-hk4-familiar1764-v1",
+  "sourceEntrySha256": "ce6fdc099e552fcf3c2d43a45231495078d4892e859ba0a58263995ab174ed77"
 }

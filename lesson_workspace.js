@@ -15,7 +15,7 @@
       if (!choices.length) { host.innerHTML = ""; return; }
       const matches = choices.filter(choice => `${choice.selectedForms.join(" ")} ${choice.family.display_family}`.toLocaleLowerCase().includes((state.lessonQuery||"").trim().toLocaleLowerCase()));
       const selected = choices.filter(choice => state.lessonSelection.has(choice.family.baseword_key));
-      host.innerHTML = `<p class="hint">Adding to: ${esc(state.lessonTitle || "Your lesson")}</p><input class="lesson-search" aria-label="Find a word in this text" placeholder="Find a word in this text" value="${esc(state.lessonQuery || "")}"><div class="lesson-choices">${matches.slice(0,state.lessonLimit).map(choice => {
+      host.innerHTML = `<input class="lesson-search" aria-label="Find a word in this text" placeholder="Find a word in this text" value="${esc(state.lessonQuery || "")}"><div class="lesson-choices">${matches.slice(0,state.lessonLimit).map(choice => {
         const key = choice.family.baseword_key, existing = state.selected.find(item => item.baseword_key === key);
         const complete = choice.selectedForms.every(form => existing?.selected_forms.includes(form));
         return `<label class="lesson-choice"><input type="checkbox" data-lesson-pick="${esc(key)}" ${state.lessonSelection.has(key) ? "checked" : ""}><span><strong>${choice.selectedForms.map(esc).join(", ")}</strong><small>Family: ${esc(choice.family.display_family)}${complete ? " · In your list" : ""}</small></span></label>`;
@@ -28,26 +28,22 @@
       }));
       host.querySelector("[data-lesson-more]")?.addEventListener("click", () => { state.lessonLimit += 6; renderPicker(); });
       host.querySelector("[data-lesson-clear]")?.addEventListener("click", () => {state.lessonSelection.clear(); renderPicker();});
+      host.querySelector("[data-lesson-open]").hidden = lesson.wordCount(state.selected) === 0;
       host.querySelector("[data-lesson-open]").addEventListener("click", () => showView("list"));
       host.querySelector("[data-lesson-add]").addEventListener("click", () => {
         rememberUndo();
         const merged = lesson.mergeSelections(state.selected, selected, createLessonItem);
         state.selected = merged.items; state.lessonSelection.clear(); const saved = saveList();
-        renderPicker(!saved ? "Added on this page. Save or export your changes." : merged.formsAdded ? `${merged.formsAdded} words added to your lesson.` : "These words are already in your lesson.");
+        renderPicker(!saved ? "Added on this page. Save or export your changes." : merged.formsAdded ? `${merged.formsAdded} words saved.` : "These words are already saved.");
       });
     }
     function updateCounts() {
-      const focus = lesson.wordCount(state.selected.filter(item => item.teaching_focus === "focus"));
-      const mention = lesson.wordCount(state.selected.filter(item => item.teaching_focus === "mention"));
       const count=lesson.wordCount(state.selected);
       $("#lesson-word-count").textContent = `${count} selected ${count===1 ? "word" : "words"}`;
-      $("#lesson-plan-count").textContent = `In depth ${focus} · Brief ${mention} · Undecided ${count-focus-mention}`;
-      $("#list-lesson-title").textContent = state.lessonTitle || "Your lesson";
     }
     function renderList() {
       updateListCount(); const empty = state.selected.length === 0;
       $("#list-empty").classList.toggle("hidden", !empty); $("#list-workspace").classList.toggle("hidden", empty);
-      if(document.activeElement !== $("#lesson-name")) $("#lesson-name").value = state.lessonTitle;
       $("#lesson-undo").classList.toggle("hidden", !state.undoList);
       updateCounts();
       root.HKELE_SELECTED_WORDS?.mount($("#list-copy-actions"),()=>state.selected);
@@ -58,11 +54,11 @@
         <details ${state.lessonOpen.has(item.baseword_key) ? "open" : ""}><summary><span class="lesson-edit-label">${state.lessonOpen.has(item.baseword_key) ? "Done" : item.notes ? "Edit note" : "Add note"}</span></summary>
         <div class="lesson-card-editor">
         <label>Teaching note (optional)<textarea class="notes" rows="2" placeholder="For example: compare reusable with disposable">${esc(item.notes)}</textarea></label>
-        <details class="lesson-teaching-options"><summary>Teaching options <span class="lesson-plan-pill ${item.teaching_focus==="focus" ? "focus" : ""}" ${item.teaching_focus ? "" : "hidden"}>${lesson.focusLabel(item.teaching_focus)}</span></summary><label>Teaching focus<select class="list-focus">${lesson.focusOptions.map(([value,label])=>`<option value="${value}" ${value===(item.teaching_focus||"") ? "selected" : ""}>${label}</option>`).join("")}</select></label></details>
+        <details class="lesson-more"><summary>More actions</summary><details class="lesson-teaching-options"><summary>Teaching options <span class="lesson-plan-pill ${item.teaching_focus==="focus" ? "focus" : ""}" ${item.teaching_focus ? "" : "hidden"}>${lesson.focusLabel(item.teaching_focus)}</span></summary><label>Teaching focus<select class="list-focus">${lesson.focusOptions.map(([value,label])=>`<option value="${value}" ${value===(item.teaching_focus||"") ? "selected" : ""}>${label}</option>`).join("")}</select></label></details>
         <details class="lesson-related" ${item.connections ? "open" : ""}><summary>Related words or example (optional)</summary><textarea class="connections" rows="2" aria-label="Related words or example for ${esc(item.display_family)}">${esc(item.connections)}</textarea></details>
         <div class="selected-forms-list">${item.selected_forms.map(form=>`<span class="selected-form-chip">${esc(form)} <button data-remove-form="${esc(form)}" aria-label="Remove selected form ${esc(form)}">×</button></span>`).join("")}</div>
         ${item.source_labels?.length ? `<p class="hint">Added from: ${item.source_labels.map(value=>esc(value === "Teaching list" ? "Selected words" : value)).join(" · ")}</p>` : ""}${item.depth && item.depth !== "Notice" ? `<p class="hint">Previous teaching depth: ${esc(item.depth)}</p>` : ""}
-        <div class="lesson-actions"><button data-move="-1" ${index===0 ? "disabled" : ""}>Move up</button><button data-move="1" ${index===ordered.length-1 ? "disabled" : ""}>Move down</button><button data-remove-family>Remove from lesson</button></div></div></details>
+        <div class="lesson-actions"><button data-move="-1" ${index===0 ? "disabled" : ""}>Move up</button><button data-move="1" ${index===ordered.length-1 ? "disabled" : ""}>Move down</button><button data-remove-family>Remove word</button></div></details></div></details>
         </article>`).join("");
       $$('#list-body [data-list-key]').forEach(row => {
         const item = state.selected.find(value => value.baseword_key === row.dataset.listKey);
@@ -84,7 +80,6 @@
       });
     }
     function bind() {
-      $("#lesson-name").addEventListener("input",event=>{state.lessonTitle=event.target.value;saveList();$("#list-lesson-title").textContent=state.lessonTitle || "Your lesson";});
       $$("[data-lesson-view]").forEach(button=>button.addEventListener("click",()=>showView(button.dataset.lessonView)));
       $("#undo-lesson").addEventListener("click",()=>{if(!state.undoList)return;state.selected=state.undoList;state.undoList=null;saveList();renderList();});
     }

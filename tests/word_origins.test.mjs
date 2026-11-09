@@ -45,5 +45,5 @@ test('all published sidecar bytes match the pinned release and contain no altern
   const shard=JSON.parse(await inflate(b));
   for(const r of Object.values(shard.records)){assert.equal(select(shard,r.familyKey,r.normalizedForm,release),r);assert.deepEqual(Object.keys(r).sort(),['familyKey','normalizedForm','origins','sourceWords']);n++;}
  }
- assert.equal(n,116283);
+ assert.equal(n,116897);
 });

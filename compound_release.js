@@ -1,1 +1,1 @@
-globalThis.HKELE_COMPOUND_RELEASE = Object.freeze({"dataVersion":"2026-11-03-a2658-finite-family-closure-v1","expressionVersion":"2026-11-03-closed-compounds-v1","records":57881,"manifestSha256":"639018b72602a62d3fc453a77d9aabff48779976c4855cbed81d8dab10e1e793"});
+globalThis.HKELE_COMPOUND_RELEASE = Object.freeze({"dataVersion":"2026-11-08-hk4-familiar1764-v1","expressionVersion":"2026-11-05-closed-compounds-v1","records":57881,"manifestSha256":"1a6b4e237fb106a1f3a324aef1cef8cce79bbc07e154ee1f900381bedbe302a5"});

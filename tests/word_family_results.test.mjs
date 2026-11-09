@@ -79,6 +79,7 @@ function workflow(api, reader) {
     renderFamilySearch:() => renders++, syncBrowseControls:() => {},
     clearFamilySearch:() => {clears++; state.familySearch=null;}, identityNote:() => 'Check the sentence.',
     openFamily:() => {throw new Error('Search must not open a detail page.');}});
+  vm.runInContext(readFileSync(new URL('../coverage_lists.js',import.meta.url),'utf8'),context);
   vm.runInContext(app.slice(app.indexOf('  async function searchWordFamily('), app.indexOf('  window.HKELE_BROWSE_ADAPTER')), context);
   return {state, input, context, search:sort => context.searchWordFamily(sort), clears:() => clears, renders:() => renders};
 }
@@ -98,7 +99,7 @@ test('equal-best homonym owners are separate groups, without changing their acce
   const source = resources();
   // Discover an existing equal-best ambiguity within the registered A search shard.
   const {gunzipSync} = await import('node:zlib');
-  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-03-a2658-finite-family-closure-v1/search/d.json.gz'))));
+  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-08-hk4-familiar1764-v1/search/d.json.gz'))));
   const query = Object.keys(shard).find(key => shard[key][1]?.length > 1);
   assert.ok(query);
   const expected = (await source.api.request('/search?q='+query)).owners.filter(owner => !owner.blocked);

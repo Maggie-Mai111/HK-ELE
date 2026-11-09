@@ -1,7 +1,34 @@
 (() => {
   "use strict";
 
-  const DATA_ROOT = "data/releases/2026-11-03-a2658-finite-family-closure-v1/";
+const POLICY={"a":{"secondary":["mechanism20261101:a-alphabetic-numeral","to"]},"we":{"secondary":["ah"]},"had":{"secondary":["hav"]},"has":{"secondary":["ha","hav"]},"yeah":{"secondary":["year"]},"got":{"secondary":["git"]},"year":{"secondary":["here"]},"having":{"secondary":["hav"]},"free":{"secondary":["three"]},"air":{"secondary":["be"]},"wall":{"secondary":["well"]},"ve":{"secondary":["we"]},"caught":{"secondary":["cotch"]},"wan":{"secondary":["one"]},"tree":{"secondary":["three"]},"ta":{"secondary":["to"]},"spring":{"secondary":["sprain","strain"]},"route":{"secondary":["root"]},"dan":{"secondary":["than"]},"hits":{"secondary":["it"]},"fought":{"secondary":["fink"]},"earn":{"secondary":["erne"]},"bye":{"secondary":["boy"]},"gang":{"secondary":["gan"]},"ma":{"secondary":["my"]},"sum":{"secondary":["some"]},"da":{"secondary":["the"]},"gotten":{"secondary":["git"]},"noting":{"secondary":["nothing"]},"dug":{"secondary":["dog"]},"cheer":{"secondary":["chair"]},"tanks":{"secondary":["thank"]},"yo":{"secondary":["your"]},"fur":{"secondary":["for"]},"parish":{"secondary":["perish"]},"jess":{"secondary":["just"]},"den":{"secondary":["then"]},"chile":{"secondary":["child"]},"wit":{"secondary":["with"]},"lin":{"secondary":["lin"]},"yer":{"secondary":["your"]},"nash":{"secondary":["nesh"]},"fella":{"secondary":["fellow"]},"med":{"secondary":["might"]},"bred":{"secondary":["braid"]},"li'l":{"secondary":["little"]},"doe":{"secondary":["though"]},"ahh":{"secondary":["ass"]},"pitcher":{"secondary":["picture"]},"ole":{"secondary":["old"]},"comb":{"secondary":["coomb"]},"ish":{"secondary":["be"]},"nun":{"secondary":["nothing"]},"mane":{"secondary":["man"]},"ord":{"secondary":["ord"]},"bile":{"secondary":["boil"]},"tex":{"secondary":["text"]},"rook":{"secondary":["look"]},"jag":{"secondary":["jagoff"]},"cum":{"secondary":["come"]},"foo":{"secondary":["fool"]},"yeh":{"secondary":["you"]},"whit":{"secondary":["with"]},"goo":{"secondary":["go"]},"whirled":{"secondary":["world"]},"writhing":{"secondary":["writh"]},"yah":{"secondary":["you"]},"waller":{"secondary":["wallow"]},"wen":{"secondary":["when"]},"naw":{"secondary":["not"]},"fink":{"secondary":["think"]},"deg":{"secondary":["deg"]},"dum":{"secondary":["damn"]},"lew":{"secondary":["lue"]},"roo":{"secondary":["roo"]},"jest":{"secondary":["just"]},"shep":{"secondary":["ship"]},"whiz":{"secondary":["with"]},"toon":{"secondary":["tune"]},"vid":{"secondary":["with"]},"yam":{"secondary":["be"]},"mah":{"secondary":["my"]},"yew":{"secondary":["you"]},"soo":{"secondary":["sow"]},"mite":{"secondary":["might"]},"flue":{"secondary":["flew"]},"sho":{"secondary":["sure","so"]},"nigga":{"secondary":["nigger"]},"bai":{"secondary":["bye"]},"zee":{"secondary":["the"]},"doze":{"secondary":["that"]},"dey":{"secondary":["there","they"]},"dag":{"secondary":["dog"]},"noo":{"secondary":["new"]},"oot":{"secondary":["out"]},"tek":{"secondary":["take"]},"cair":{"secondary":["cair"]},"oop":{"secondary":["up"]},"sed":{"secondary":["say"]},"offa":{"secondary":["offer"]},"neb":{"secondary":["neb"]},"orf":{"secondary":["off"]},"retch":{"secondary":["reach"]},"wiz":{"secondary":["with"]},"madder":{"secondary":["matter"]},"mooch":{"secondary":["much"]},"tuff":{"secondary":["tough"]},"bene":{"secondary":["bene"]},"dawg":{"secondary":["dog"]},"strang":{"secondary":["strong"]},"thang":{"secondary":["thing"]},"mudder":{"secondary":["mother"]},"hoss":{"secondary":["horse"]},"ern":{"secondary":["ern"]},"elt":{"secondary":["elt"]},"odder":{"secondary":["other"]},"winder":{"secondary":["window"]},"wer":{"secondary":["were"]},"vill":{"secondary":["will"]},"synchronisation":{"secondary":["synchrony"]},"saar":{"secondary":["sir"]},"dere":{"secondary":["there"]},"foist":{"secondary":["first"]},"brack":{"secondary":["black"]},"tedder":{"secondary":["tether"]},"agg":{"secondary":["egg"]},"faw":{"secondary":["for"]},"centralisation":{"secondary":["center"]},"tew":{"secondary":["too"]},"erd":{"secondary":["earth"]},"ketch":{"secondary":["catch"]},"hist":{"secondary":["hoist"]},"weel":{"secondary":["will"]},"yeller":{"secondary":["yellow"]},"darter":{"secondary":["daughter"]},"e'er":{"secondary":["ever"]},"sitch":{"secondary":["such"]},"zat":{"secondary":["that"]},"darty":{"secondary":["dirt"]},"chitlins":{"secondary":["chitterling"]},"whup":{"secondary":["whup"]},"hing":{"secondary":["hang"]},"swart":{"secondary":["swath"]},"massy":{"secondary":["mercy","master"]},"spick":{"secondary":["speak"]},"s'pose":{"secondary":["suppose"]},"betta":{"secondary":["better","well"]},"orl":{"secondary":["all"]},"brek":{"secondary":["break"]},"piller":{"secondary":["pillow"]},"wos":{"secondary":["be"]},"supa":{"secondary":["super"]},"hawt":{"secondary":["heart"]},"prob'ly":{"secondary":["probable"]},"zis":{"secondary":["this"]},"awf":{"secondary":["off"]},"rawk":{"secondary":["rock"]},"wimmin":{"secondary":["woman"]},"fah":{"secondary":["far"]},"licker":{"secondary":["liquor"]},"miny":{"secondary":["many"]},"kelt":{"secondary":["kilt"]},"titch":{"secondary":["touch","teach"]},"gorn":{"secondary":["go"]},"niggah":{"secondary":["nigger"]},"rine":{"secondary":["rine"]},"dood":{"secondary":["dude"]},"gurt":{"secondary":["great"]},"cah":{"secondary":["car"]},"centralise":{"secondary":["central"]},"coff":{"secondary":["cough"]},"scart":{"secondary":["scarf"]},"bahs":{"secondary":["boss"]},"sicc":{"secondary":["sick"]},"moh":{"secondary":["many"]},"fren":{"secondary":["friend"]},"yass":{"secondary":["yes"]},"foh":{"secondary":["four"]},"bovver":{"secondary":["bother"]},"minch":{"secondary":["mince"]},"sistahs":{"secondary":["sistah"]},"yur":{"secondary":["year"]},"sposed":{"secondary":["spose"]},"s'posed":{"secondary":["spose"]},"yod":{"secondary":["yard"]},"colly":{"secondary":["colly"]},"tawn":{"secondary":["town"]},"chitter":{"secondary":["chitterling"]},"nucular":{"secondary":["nuclear"]},"canidates":{"secondary":["canidate"]},"oker":{"secondary":["oker"]},"stoor":{"secondary":["stoor"]},"suckas":{"secondary":["sucka"]},"cark":{"secondary":["caulk"]},"wus":{"secondary":["be"]},"favourability":{"secondary":["favor"]},"yoh":{"secondary":["you"]},"clep":{"secondary":["clep"]},"dook":{"secondary":["duck","duke"]},"argies":{"secondary":["argy"]},"hooman":{"secondary":["human"]},"evangelise":{"secondary":["evangelize"]},"cotch":{"secondary":["catch"]},"radge":{"secondary":["rodge"]},"souse":{"secondary":["source"]},"keks":{"secondary":["keck"]},"womantic":{"secondary":["romance"]},"joll":{"secondary":["joll"]},"drap":{"secondary":["drop"]},"herry":{"secondary":["hurry"]},"anaesthetise":{"secondary":["candidate:canonicalhead20261009:299a2ea3392e8028a4e8f0f4"]},"brog":{"secondary":["brogue"]},"hoit":{"secondary":["hurt"]},"sprankle":{"secondary":["sprinkle"]},"greeve":{"secondary":["greeve"]},"gawn":{"secondary":["go"]},"mussy":{"secondary":["mercy"]},"famlies":{"secondary":["famly"]},"boose":{"secondary":["boose"]},"hayer":{"secondary":["here"]},"gibs":{"secondary":["give"]},"bawn":{"secondary":["bear"]},"thrain":{"secondary":["train"]},"shet":{"secondary":["shut","shit"]},"skeered":{"secondary":["scare"]},"wone":{"secondary":["one"]},"yarr":{"secondary":["yarr"]},"militarise":{"secondary":["militarize"]},"glore":{"secondary":["glore"]},"bhoy":{"secondary":["boy"]},"vallies":{"secondary":["vally"]},"maffs":{"secondary":["candidate:multisignal20261009:c90e097e46db1931c2fb3c0f"]},"innard":{"secondary":["inward"]},"biling":{"secondary":["bile"]},"fellars":{"secondary":["fellar"]},"tiddy":{"secondary":["tiddy"]},"wrassle":{"secondary":["wrestle"]},"vonce":{"secondary":["once"]},"mitey":{"secondary":["might","mate"]},"hafter":{"secondary":["after"]},"needer":{"secondary":["neither"]},"cauf":{"secondary":["calf"]},"dollas":{"secondary":["dolla"]},"libaries":{"secondary":["libary"]},"reanalyse":{"secondary":["analyze"]},"sparrer":{"secondary":["sparrow"]},"mussies":{"secondary":["muss"]},"samwich":{"secondary":["sandwich"]},"shity":{"secondary":["shite"]},"rassler":{"secondary":["wrestle"]},"consarn":{"secondary":["concern"]},"widdy":{"secondary":["widow"]},"o'n'ry":{"secondary":["ornery"]},"deodorise":{"secondary":["deodorize"]},"dogtor":{"secondary":["doctor"]},"crine":{"secondary":["cry"]},"hainted":{"secondary":["haunt"]},"bushwah":{"secondary":["bourgeois"]},"kween":{"secondary":["queen"]},"deodoriser":{"secondary":["deodorize"]},"chitlings":{"secondary":["chitterling"]},"cavel":{"secondary":["cavel"]},"dooty":{"secondary":["duty"]},"hask":{"secondary":["ask"]},"imputs":{"secondary":["imput"]},"nussing":{"secondary":["nuss"]},"woosy":{"secondary":["woosy"]},"deodorisation":{"secondary":["deodorize"]},"chicking":{"secondary":["chicken"]},"bwoys":{"secondary":["bwoy"]},"chittlings":{"secondary":["chitterling"]},"cludge":{"secondary":["cludge"]},"crevis":{"secondary":["crevis"]},"cudden":{"secondary":["could"]},"eggsperience":{"secondary":["experience"]},"fleg":{"secondary":["flag"]},"sodies":{"secondary":["sody"]},"tillow":{"secondary":["tillow"]},"windas":{"secondary":["winda"]},"yure":{"secondary":["your"]},"unacclimatised":{"secondary":["acclimatize"]},"demilitarise":{"secondary":["militarize"]},"relativise":{"secondary":["relative"]},"voops":{"secondary":["whoop"]},"massacree":{"secondary":["massacre"]},"biggen":{"secondary":["begin"]},"blabbling":{"secondary":["babble"]},"boddle":{"secondary":["bottle"]},"jark":{"secondary":["jerk"]},"killas":{"secondary":["killa"]},"pawty":{"secondary":["party"]},"sowan":{"secondary":["sowan"]},"youff":{"secondary":["youth"]},"kyarn't":{"secondary":["can"]},"es":{"secondary":["be","candidate:finaladoption20261029:as:function"]}};
+function teacherUseKeys(surface,keys,ctx){
+  const key=surface.normalize("NFKC").toLowerCase();
+  const rule=POLICY[key];
+  if(!rule || keys.length<2)return [...keys];
+  if(ctx){
+    const before=ctx.text.slice(0,ctx.start),after=ctx.text.slice(ctx.end);
+    const quoted=/["'“‘]\s*$/.test(before)&&/^\s*["'”’]/.test(after);
+    const letter=key.length===1&&(/\b(?:letter|symbol|variable|option|grade|section|point)\s*$/i.test(before)||/^\s*[=+*/<>]/.test(after));
+    const historical=/\b(?:archaic|obsolete|dialect|pronounced|spelled|spelt)\s*$/i.test(before);
+    const nounHas=key==="has"&&(/\b(?:the|these|those|several|many|two|three)\s*$/i.test(before)||/^\s+(?:are|were)\b/i.test(after));
+    const interjection=key==="wall"&&/(?:^|[.!?][\s"“]*)$/.test(before)&&/^\s*,/.test(after);
+    if(quoted||letter||historical||nounHas||interjection)return [...keys];
+  }else if(key.length===1&&surface!==surface.toLowerCase())return [...keys];
+  const preferred=keys.filter(k=>!rule.secondary.includes(k));
+  return preferred.length ? preferred : [...keys];
+}
+function teacherUseResult(result,ctx){
+ if(!["RESOLVED","AMBIGUOUS"].includes(result.status))return result;
+ const mark="SECONDARY_RECORDED_READING";
+ const restored=result.alternatives.filter(o=>o.match_classes.includes(mark)).map(o=>({...o,match_classes:o.match_classes.filter(c=>c!==mark)}));
+ const pool=[...result.owners,...restored],preferred=new Set(teacherUseKeys(result.submitted_query,pool.map(o=>o.baseword_key),ctx));
+ const owners=pool.filter(o=>preferred.has(o.baseword_key)),moved=pool.filter(o=>!preferred.has(o.baseword_key)).map(o=>({...o,match_classes:[...o.match_classes,mark]}));
+ const allowed=owners.filter(o=>!o.blocked);
+ return {...result,owners,alternatives:[...result.alternatives.filter(o=>!o.match_classes.includes(mark)),...moved],best_owner_count:allowed.length,status:allowed.length>1?"AMBIGUOUS":allowed.length?"RESOLVED":"BLOCKED"};
+}
+
+  const DATA_ROOT = "data/releases/2026-11-08-hk4-familiar1764-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -35,13 +62,13 @@
   let integrityPromise;
   const hash = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2,"0")).join("");
   async function integrity() {
-    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=06d24536d752334f", {cache:"force-cache"}).then(async response => {
+    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=d2ef37aab9c85ced", {cache:"force-cache"}).then(async response => {
       if (!response.ok) throw new Error("Please reload to open the word data.");
       const bytes = await response.arrayBuffer();
       const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
       // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
       const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
-      if (await hash(normalized) !== "06d24536d752334f66114da05d70b1bde906f7abc8b782acb6adcf28f013ecee") throw new Error("Please reload to open the word data.");
+      if (await hash(normalized) !== "d2ef37aab9c85cedd6aab999990a86dc7d9691b84ef117f42b3a19d047d1b7c6") throw new Error("Please reload to open the word data.");
       return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
@@ -112,6 +139,14 @@
     const sort = filters?.sort || params.get("sort") || "overall";
     const page = Math.max(1, Number(params.get("page")) || 1);
     const pageSize = [10, 25, 50, 100].includes(Number(params.get("page_size"))) ? Number(params.get("page_size")) : 25;
+    if (scope === "core95" && !filters) {
+      const release=window.HKELE_COVERAGE_RELEASE;
+      if(config.metadata.data_version!==release.dataVersion)throw new Error("Please reload the word data.");
+      const rows=await loadGzipJson(`data/coverage-lists/${release.version}/${sort}.json.gz`);
+      if(rows.length!==3779)throw new Error("Please reload the word data.");
+      const start=(page-1)*pageSize;
+      return {api_version:config.api_version,scope,sort,page,page_size:pageSize,total_items:3779,available_items:3779,families:rows.slice(start,start+pageSize).map(row=>inflate(config.browse_fields,row))};
+    }
     const info = config.browse?.[scope]?.[sort];
     if (!info) throw new Error("Unsupported Browse selection");
     if (filters) {
@@ -131,6 +166,9 @@
           allRows.push(...values.map(row => inflate(config.browse_fields, row)));
         }
         filterIndex = await aiFilterIndex();
+      }
+      if(params.get("scope")==="core95") {
+        const within=allRows.filter(row=>window.HKELE_COVERAGE_LISTS.inFamily(row,"95"));allRows.splice(0,allRows.length,...within);
       }
       const execution = window.HKELE_AI_WORD_FILTER.hasWordConditions(filters)
         ? window.HKELE_AI_WORD_FILTER.apply(allRows, filters, await aiFormEvidence(), new Set(window.HKELE_CPB100.tokens))
@@ -230,12 +268,12 @@
     const owners = expandOwners(config, record[1]);
     const alternatives = expandOwners(config, record[2]);
     const allowed = owners.filter(owner => !owner.blocked);
-    return {
+    return teacherUseResult({
       status: allowed.length === 0 ? "BLOCKED" : allowed.length > 1 ? "AMBIGUOUS" : "RESOLVED",
       submitted_query: submitted, normalized_query: normalized, best_priority: record[0],
       best_owner_count: allowed.length, owners, alternatives, identity_exception: null,
       api_version: config.api_version,
-    };
+    });
   }
 
   async function search(submitted) {
@@ -266,7 +304,8 @@
       if (item?.token_status === "UNSUPPORTED_TOKEN" || !item?.normalized_token) {
         output.push({...base, status: "UNSUPPORTED", best_owner_count: 0, owners: [], alternatives: [], identity_exception: null});
       } else {
-        const result = await unique.get(String(item.surface || item.normalized_token));
+        const raw = await unique.get(String(item.surface || item.normalized_token));
+        const result=teacherUseResult(raw,typeof payload.source==="string"?{text:payload.source,start:item.start_offset,end:item.end_offset}:undefined);
         const lookupOnly = result.owners.length && result.owners.every(owner => owner.match_classes.includes("CONDITIONAL_LOOKUP_ONLY") || owner.match_classes.includes("FAMILY_LABEL_ONLY"));
         if (lookupOnly) { output.push({...base, ...result, status:"UNMATCHED", owners:[], alternatives:[...result.owners,...result.alternatives], best_owner_count:0}); continue; }
 
@@ -275,7 +314,7 @@
     }
     for (const item of output) { if (globalThis.HKELE_TEXT_NORMALIZATION && item.token_status !== "UNSUPPORTED_TOKEN") {
  const surface=typeof payload.source==="string" ? globalThis.HKELE_TEXT_NORMALIZATION.analysisSurface(payload.source,item.start_offset,item.end_offset) : item.surface;
- item.normalizedAnalysis=surface===null ? {applied:true,ambiguous:false,tokens:[]} : await globalThis.HKELE_TEXT_NORMALIZATION.normalizedAnalysis(surface,search);
+ item.normalizedAnalysis=surface===null ? {applied:true,ambiguous:false,tokens:[]} : await globalThis.HKELE_TEXT_NORMALIZATION.normalizedAnalysis(surface,async word=>teacherUseResult(await search(word),typeof payload.source==="string"?{text:payload.source,start:item.start_offset,end:item.end_offset}:undefined));
  } }
     return {api_version: config.api_version, occurrences: output, occurrence_count: output.length};
   }

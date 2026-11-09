@@ -251,7 +251,7 @@
     if (!interpretation?.filters || busy || !window.HKELE_BROWSE_ADAPTER) return;
     setBusy(true);
     try {
-      const result = await window.HKELE_BROWSE_ADAPTER.apply(interpretation.filters);
+      const result = await window.HKELE_BROWSE_ADAPTER.apply(interpretation.filters,interpretation.teacherScope);
       activeTitle.textContent = `${result.matchedBeforeLimit.toLocaleString("en")} matches · showing first ${result.availableItems.toLocaleString("en")}`;
       activeConditions.textContent = displayConditions(interpretation.filters).join(" · ");
       active.hidden = false;

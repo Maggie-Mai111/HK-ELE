@@ -15,7 +15,7 @@ function repository(corruptOnce=false){
   return ctx.window.HKELE_STATIC_API;
 }
 test('actual word evidence rejects corrupt AI projection, retries, and retains agency under its canonical age owner',async()=>{
-  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:771,overallRankMax:771,sort:'overall',limit:100};
+  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:787,overallRankMax:787,sort:'overall',limit:100};
   const query='/families?ai_filters='+encodeURIComponent(JSON.stringify(filters));
   await assert.rejects(repo.request(query),/integrity|changed|hash/i);
   const result=await repo.request(query);
@@ -48,25 +48,18 @@ test('Web CPB100 filtering uses the fixed 100-word list rather than the legacy 5
   const oldTokens=new Set((await repository().request('/filters')).common_word_register.tokens);
   assert.ok(result.families.some(row=>!oldTokens.has(row.ai_match_form.toLowerCase())));
 });
-test('pre-teaching has no hidden eight-word cap and keeps exact-form annotation cues and classroom priority',()=>{
-  const ctx={};vm.runInNewContext(read('text_workspace.js').toString(),ctx);
-  const items=Array.from({length:12},(_,i)=>({surface:'word'+i,normalized_token:'word'+i,occurrence_order:i,status:'RESOLVED',owners:[{baseword_key:'f'+i,display_family:'family'+i,current_hk_frequency_rank:2001,awl:1,msvl:'Science',matched_form_evidence:{awl:0,msvl:0,first_seen_hk_textbooks:i===11?'P5':null}}]}));
-  const results=ctx.HKELE_TEXT_WORKSPACE.suggestions(items,new Set(),'P4');
-  assert.equal(results.length,12);assert.equal(results[0].form,'word11');
-  assert.ok(results.every(item=>!item.reasons.some(reason=>reason.includes('AWL')||reason.startsWith('MSVL:'))));
+test('fact filters keep exact-form evidence and have no hidden cap',()=>{
+ const ctx={};vm.runInNewContext(read('text_workspace.js').toString(),ctx);
+ const items=Array.from({length:12},(_,i)=>({occurrence_id:String(i),surface:'word'+i,occurrence_order:i,status:'RESOLVED',owners:[{baseword_key:'f'+i,display_family:'family'+i,current_hk_frequency_rank:2001,awl:1,msvl:'Science',matched_form_evidence:{awl:0,msvl:0,first_seen_hk_textbooks:i===11?'P5':null}}]}));
+ const api=ctx.HKELE_TEXT_WORKSPACE;
+ assert.equal(api.suggestions(items,new Set(),'P4').length,0);
+ assert.equal(api.suggestions(items,new Set(),'P4',{filter:'all'}).length,12);
+ assert.equal(api.suggestions(items,new Set(),'P4',{filter:'later'})[0].form,'word11');
+ assert.equal(api.suggestions(items,new Set(),'P4',{filter:'academic'}).length,0);
 });
 
-test('CPB membership never suppresses evidence; repetition only sorts eligible words',()=>{
+test('CPB membership does not exclude a teacher-selected use',()=>{
  const ctx={};vm.runInNewContext(read('text_workspace.js').toString(),ctx);
- const make=(word,rank,level=null,awl=0,order=0)=>({surface:word,normalized_token:word,occurrence_order:order,status:'RESOLVED',owners:[{baseword_key:word,display_family:word,current_hk_frequency_rank:rank,matched_form_evidence:{first_seen_hk_textbooks:level,awl,msvl:null}}]});
- const suggest=(items,common,level=null)=>ctx.HKELE_TEXT_WORKSPACE.suggestions(items,common,level);
- const our=make('our',50,'P5');
- assert.equal(suggest([our],new Set(['our']),'P1').length,1);
- assert.equal(suggest([our],new Set(),'P1').length,1);
- assert.equal(suggest([our],new Set(['our']),'P6').length,0);
- assert.equal(suggest([make('the',1),make('the',1,null,0,1)],new Set(['the'])).length,0);
- assert.equal(suggest([make('frequent',80),make('frequent',80,null,0,1)],new Set()).length,0);
- const a=make('alpha',2000,null,0,0),b=make('beta',3000,null,0,10);
- assert.equal(suggest([a,b,{...b,occurrence_order:20}],new Set())[0].form,'beta');
- assert.equal(suggest([make('the',1,null,1)],new Set(['the'])).length,1);
+ const item={occurrence_id:'the-0',surface:'the',status:'RESOLVED',owners:[{baseword_key:'the',display_family:'the',current_hk_frequency_rank:1,matched_form_evidence:{}}]};
+ assert.equal(ctx.HKELE_TEXT_WORKSPACE.suggestions([item],new Set(['the']),null,{judgements:{'the-0':false}}).length,1);
 });

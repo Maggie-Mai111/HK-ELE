@@ -107,21 +107,25 @@ function harness() {
   const hooks=context.hooks; hooks.libraryUi.bind(); hooks.saveList();
   return {context,hooks,get,disk,events,requests};
 }
-test("real UI handlers switch/new/reopen lessons without copying words or clearing the checked passage",()=>{
-  const h=harness(), {hooks,get,disk}=h;
+test("old saved collections reopen without exposing new-lesson creation or changing their notes",()=>{
+  const {hooks,get,disk}=harness();
   hooks.state.selected=[structuredClone(item)]; hooks.state.lessonTitle="First";hooks.saveList();
   const first=hooks.state.library.activeId; hooks.state.checkedText="Keep this passage";
-  get("#new-lesson").fire("click"); get("#new-lesson-name").value="Second";get("#new-lesson-form").fire("submit");
-  assert.equal(hooks.state.lessonTitle,"Second");assert.equal(hooks.state.selected.length,0);
-  hooks.state.selected=[{...item,baseword_key:"cell",selected_forms:["cell"],notes:"Biology"}];hooks.saveList();
+  const legacy=api.add(hooks.state.library,"Second"), second=legacy.activeId;
+  legacy.lessons[1].items=[{...item,baseword_key:"cell",selected_forms:["cell"],notes:"Biology"}];
+  legacy.activeId=first;hooks.state.library=legacy;hooks.saveList();hooks.libraryUi.render();
+  assert.equal(get("#new-lesson").listeners.click,undefined);
+  assert.equal(get("#new-lesson-form").listeners.submit,undefined);
+  get("#active-lesson").value=second;get("#active-lesson").fire("change");
+  assert.equal(hooks.state.lessonTitle,"Second");assert.equal(hooks.state.selected[0].notes,"Biology");
   assert.equal(hooks.exportItems()[0].lesson_title,"Second");
-  assert.equal(hooks.lessonExportRows().length,2);assert.equal(hooks.lessonExportRows()[1][2],"cell");
   get("#active-lesson").value=first;get("#active-lesson").fire("change");
   assert.equal(hooks.state.lessonTitle,"First");assert.equal(hooks.state.selected[0].notes,item.notes);
   assert.equal(hooks.state.checkedText,"Keep this passage");
   assert.equal(hooks.lessonExportRows().length,3);
   assert.equal(api.create(disk).library.activeId,first);
 });
+
 test("save failure stays visible after adding and blocks switching; retry saves the draft",()=>{
   const {hooks,get,disk,events}=harness();
   disk.fail=true;

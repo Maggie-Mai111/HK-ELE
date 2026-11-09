@@ -16,6 +16,7 @@ test('word-card Add keeps its concrete form and actual entry source after changi
     const family = {display_family:'cell'};
     const selected = {form:'cells'};
     const context = vm.createContext({
+      HKELE_TEXT_WORKSPACE:{wordOccurrences:()=>[]},textWorkspace:{mountReviewTools:()=>{}},
       window:{dispatchEvent:()=>{}},CustomEvent:class {},family,selected,
       state:{wordReturn:view ? {view} : null,selectedForm:'cells'},
       detail:{forms:[{form_key:'f:cell',form:'cell'}]},
