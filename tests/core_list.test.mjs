@@ -11,7 +11,7 @@ const contract=require(join(root,'ai_filter_contract.js'));
 function api(failFullIndexOnce = false) {
   const context=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},location:{href:'https://fixture.invalid/'},URL,crypto:globalThis.crypto,TextDecoder,TextEncoder,Blob,Response,DecompressionStream,fetch:async path=>{
       path=String(path).split("?")[0];
-    if (failFullIndexOnce && path === 'data/releases/2026-11-08-hk4-familiar1764-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
+    if (failFullIndexOnce && path === 'data/releases/2026-11-10-all-members1663-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
     return new Response(new Uint8Array(readFileSync(join(root,path))));
   }});
   context.HKELE_AI_FILTER_CONTRACT=contract;
@@ -27,7 +27,7 @@ function api(failFullIndexOnce = false) {
 test('default Full and Core scopes retain exact populations and the former Reference-only word fabric',async()=>{
   const repository=api();
   assert.equal((await repository.request('/families')).available_items,167780);
-  assert.equal((await repository.request('/families?scope=core')).available_items,1764);
+  assert.equal((await repository.request('/families?scope=core')).available_items,1663);
   const result=await repository.request('/search?q=fabric');
   assert.equal(result.status,'RESOLVED');
   assert.equal(Number(result.owners[0].candidate_member),0);

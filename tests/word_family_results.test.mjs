@@ -99,7 +99,7 @@ test('equal-best homonym owners are separate groups, without changing their acce
   const source = resources();
   // Discover an existing equal-best ambiguity within the registered A search shard.
   const {gunzipSync} = await import('node:zlib');
-  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-08-hk4-familiar1764-v1/search/d.json.gz'))));
+  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-10-all-members1663-v1/search/d.json.gz'))));
   const query = Object.keys(shard).find(key => shard[key][1]?.length > 1);
   assert.ok(query);
   const expected = (await source.api.request('/search?q='+query)).owners.filter(owner => !owner.blocked);

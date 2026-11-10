@@ -28,7 +28,7 @@ function teacherUseResult(result,ctx){
  return {...result,owners,alternatives:[...result.alternatives.filter(o=>!o.match_classes.includes(mark)),...moved],best_owner_count:allowed.length,status:allowed.length>1?"AMBIGUOUS":allowed.length?"RESOLVED":"BLOCKED"};
 }
 
-  const DATA_ROOT = "data/releases/2026-11-08-hk4-familiar1764-v1/";
+  const DATA_ROOT = "data/releases/2026-11-10-all-members1663-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -68,7 +68,7 @@ function teacherUseResult(result,ctx){
       const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
       // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
       const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
-      if (await hash(normalized) !== "d2ef37aab9c85cedd6aab999990a86dc7d9691b84ef117f42b3a19d047d1b7c6") throw new Error("Please reload to open the word data.");
+      if (await hash(normalized) !== "20ab2d4a718c0cae02ae59ae930b8793a0ffe00a1643ba0ffbf2ff24123ffdb6") throw new Error("Please reload to open the word data.");
       return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
@@ -143,9 +143,9 @@ function teacherUseResult(result,ctx){
       const release=window.HKELE_COVERAGE_RELEASE;
       if(config.metadata.data_version!==release.dataVersion)throw new Error("Please reload the word data.");
       const rows=await loadGzipJson(`data/coverage-lists/${release.version}/${sort}.json.gz`);
-      if(rows.length!==3779)throw new Error("Please reload the word data.");
+      if(rows.length!==2907)throw new Error("Please reload the word data.");
       const start=(page-1)*pageSize;
-      return {api_version:config.api_version,scope,sort,page,page_size:pageSize,total_items:3779,available_items:3779,families:rows.slice(start,start+pageSize).map(row=>inflate(config.browse_fields,row))};
+      return {api_version:config.api_version,scope,sort,page,page_size:pageSize,total_items:2907,available_items:2907,families:rows.slice(start,start+pageSize).map(row=>inflate(config.browse_fields,row))};
     }
     const info = config.browse?.[scope]?.[sort];
     if (!info) throw new Error("Unsupported Browse selection");
@@ -334,5 +334,24 @@ function teacherUseResult(result,ctx){
     throw new Error(`Unsupported static request: ${path}`);
   }
 
-  window.HKELE_STATIC_API = {request, manifest, teacherRecord, displayedWordEvidence};
+  async function viewRequest(path,options={}) {
+    const view=globalThis.HKELE_WORD_VIEW;if(!view||view.get()==="all"||new URL(path,location.href).searchParams.get("view")==="all")return request(path,options);
+    const url=new URL(path,location.href);
+    if(url.pathname.endsWith("/families")){
+      const config=await manifest(),projection=await loadGzipJson("data/ai_full_projection.json.gz");
+      let pool=projection.rows.map(row=>inflate(projection.fields,row)).filter(f=>view.eligible(f.baseword_key)).map(view.project);
+      const scope=url.searchParams.get("scope")||"full",sort=url.searchParams.get("sort")||"overall",page=Math.max(1,Number(url.searchParams.get("page"))||1),size=Number(url.searchParams.get("page_size"))||25;
+      if(scope!=="full")pool=pool.filter(f=>globalThis.HKELE_COVERAGE_LISTS.inFamily(f,scope==="core95"?"95":"90"));
+      const filters=url.searchParams.get("ai_filters");let execution;
+      if(filters){const proposed=JSON.parse(filters);if(proposed.scope==="candidate"&&scope==="full")pool=pool.filter(f=>f.candidate_member);execution=window.HKELE_AI_WORD_FILTER.hasWordConditions(proposed)?window.HKELE_AI_WORD_FILTER.apply(pool,proposed,await aiFormEvidence(),new Set(window.HKELE_CPB100.tokens)):window.HKELE_AI_FILTER_CONTRACT.applyToRows(pool,proposed,await aiFilterIndex());pool=execution.families;}
+      else{const field=sort==="az"?"display_family":sort==="hk"?"current_hk_frequency_rank":"overall_frequency_order";pool.sort((a,b)=>a[field]==null?b[field]==null?a.baseword_key.localeCompare(b.baseword_key):1:b[field]==null?-1:typeof a[field]==="string"?a[field].localeCompare(b[field],"en"):a[field]-b[field]||a.baseword_key.localeCompare(b.baseword_key));}
+      return {api_version:config.api_version,scope,sort,page,page_size:size,total_items:execution?.matchedBeforeLimit??pool.length,available_items:pool.length,families:pool.slice((page-1)*size,page*size),...(execution?{matched_before_limit:execution.matchedBeforeLimit,ai_filters:execution.filters,result_unit:execution.resultUnit||"family"}:{})};
+    }
+    const result=await request(path,options);
+    if(url.pathname.includes("/families/"))return {...result,family:view.project(result.family),forms:result.forms.filter(f=>view.familiarForm(result.family.baseword_key,f.normalized_form||f.form)||norm(f.normalized_form||f.form)===norm(url.searchParams.get("retain_form")||""))};
+    if(url.pathname.endsWith("/search")){const owners=result.owners.filter(o=>o.match_classes.includes("FAMILY_LABEL_ONLY")?view.eligible(o.baseword_key):view.familiarForm(o.baseword_key,o.matched_form_evidence?.normalized_form||o.matched_form_evidence?.form||url.searchParams.get("q"))).map(view.project);return {...result,owners,alternatives:result.alternatives.map(view.project),status:owners.length>1?"AMBIGUOUS":owners.length?"RESOLVED":result.expression?"REGISTERED_EXPRESSION":"UNMATCHED",best_owner_count:owners.length};}
+    if(result.occurrences)return {...result,occurrences:result.occurrences.map(view.item)};
+    return result;
+  }
+  window.HKELE_STATIC_API = {request:viewRequest, manifest, teacherRecord, displayedWordEvidence};
 })();

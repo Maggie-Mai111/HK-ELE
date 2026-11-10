@@ -31,8 +31,12 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "Related forms grouped together, such as stress, stressed and stressful. Check the meaning of each form in your passage."
     ],
     [
-      "Word list",
-      "The 90% list has 1,764 families. The 95% list has 3,779 and includes the 90% list. These names refer to the study’s Hong Kong texts. Full database has more families and forms. A family label does not include every possible form: text percentages count only the forms included in that list."
+      "All words / Familiar words",
+      "All words searches the full database. Familiar words uses general English familiarity estimates of 3.5 or above to select a smaller set of word forms. Your Known / May need explaining marks describe individual uses in your passage."
+    ],
+    [
+      "90% / 95% lists",
+      "These lists were selected to reach those coverage targets in each of the four Hong Kong text collections in the study. The 95% list includes the 90% list. The percentage for your passage counts included word forms each time they occur."
     ],
     [
       "Overall family rank",
@@ -105,8 +109,17 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "Use Menu → Offline use to download the full package while connected. Once ready, saved word data and text checking work offline; AI still needs the internet."
     ],
     [
-      "Downloads and feedback",
-      "Find words includes Download full database (.xlsx). Word cards offer Rate this word and Report a problem; feedback opens a Google Form."
+      "Excel downloads and feedback",
+      "On the website, use Find words to download the database as Excel for your computer. In the App, Menu → Offline use saves the wordlist for use without internet. Rate this word and Report a problem open feedback forms."
     ]
-  ]
+  ],
+  "viewHelp": {
+    "allHint": "Search every word form in the database.",
+    "familiarHint": "Show word forms estimated to be familiar in general English.",
+    "title": "Which view should I use?",
+    "paragraphs": [
+      "Start with All words to explore the full database. Familiar words narrows it to word forms with general English familiarity estimates of 3.5 or above.",
+      "Your class may know different words. In your passage, mark Known or May need explaining to record your own judgement."
+    ]
+  }
 };

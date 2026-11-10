@@ -30,7 +30,7 @@ function webApi({lineEndings, corruptIntegrity = false, corruptShard = false} = 
       let bytes = readFileSync(join(root, path));
       if (path.endsWith('/integrity.json')) {
         let text = bytes.toString('utf8').replace(/\r\n/g, '\n');
-        if (corruptIntegrity) text = text.replace('2026-11-08-hk4-familiar1764-v1', '2026-10-20-a-main-vX');
+        if (corruptIntegrity) text = text.replace('2026-11-10-all-members1663-v1', '2026-10-20-a-main-vX');
         if (lineEndings === 'crlf') text = text.replace(/\n/g, '\r\n');
         bytes = Buffer.from(text);
       } else if (corruptShard && path.endsWith('/manifest.json.gz')) {
@@ -71,12 +71,12 @@ test('text evidence and subject filters use the exact form, including negative a
 
 test('Web defaults to the full database and recovers failed manifest and letter loads', async () => {
   const {api, fail} = webApi();
-  fail('data/releases/2026-11-08-hk4-familiar1764-v1/manifest.json.gz');
+  fail('data/releases/2026-11-10-all-members1663-v1/manifest.json.gz');
   await assert.rejects(api.request('/families'), /503/);
   const page = await api.request('/families');
   assert.equal(page.scope, 'full');
   assert.equal(page.available_items, 167780);
-  fail('data/releases/2026-11-08-hk4-familiar1764-v1/search/n.json.gz');
+  fail('data/releases/2026-11-10-all-members1663-v1/search/n.json.gz');
   await assert.rejects(api.request('/search?q=NASA'), /503/);
   assert.equal((await api.request('/search?q=NASA')).status, 'RESOLVED');
 });
@@ -95,7 +95,7 @@ test('Web loads the same pinned database after Git converts CRLF text to LF', as
   for (const lineEndings of ['lf', 'crlf']) {
     const {api} = webApi({lineEndings});
     assert.equal((await api.request('/families?scope=full')).available_items, 167780);
-    assert.equal((await api.request('/families?scope=core')).available_items, 1764);
+    assert.equal((await api.request('/families?scope=core')).available_items, 1663);
     assert.equal((await api.request('/search?q=reusable')).owners[0].baseword_key, 'use');
   }
 });

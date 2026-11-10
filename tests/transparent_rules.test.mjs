@@ -15,7 +15,7 @@ function repository(corruptOnce=false){
   return ctx.window.HKELE_STATIC_API;
 }
 test('actual word evidence rejects corrupt AI projection, retries, and retains agency under its canonical age owner',async()=>{
-  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:787,overallRankMax:787,sort:'overall',limit:100};
+  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:788,overallRankMax:788,sort:'overall',limit:100};
   const query='/families?ai_filters='+encodeURIComponent(JSON.stringify(filters));
   await assert.rejects(repo.request(query),/integrity|changed|hash/i);
   const result=await repo.request(query);

@@ -1,3 +1,25 @@
+# HK-ELE web v68 — vocabulary-view guidance
+
+Continues the accepted v67 product. Adds concise vocabulary-view guidance, with the threshold and distinction from classroom judgements under an optional explanation. App workbook download entries are removed; website workbook download and App offline preparation remain. Database, user records, existing layouts and AI/Worker environments are unchanged. Current entry: PRODUCT_ENTRY.json.
+
+## Preserved predecessor notes
+
+# HK-ELE web v67 — scoped review fixes
+
+Current entry: PRODUCT_ENTRY.json. Continues the accepted v66 product with the same database, layout and workflows. Corrects view-aware family list labels (App), unmatched hints, non-English result guidance (Web), the unused Lesson column in teacher selected-word Excel, and remaining Words to explain wording. Full database workbooks, saved records, AI connections and Worker environments are unchanged. Live AI will be checked by the user after manual push.
+
+## Preserved predecessor notes
+
+# HK-ELE web v66 — two vocabulary views
+
+Current entry: PRODUCT_ENTRY.json. Data: 2026-11-10-all-members1663-v1. All words is the default, with 90% / 95% lists of 1,663 / 2,907 families. Familiar words reuses the sealed general-English familiarity member set (estimates ≥3.5), ranking and 1,764 / 3,779 lists. The complete resource remains available through All words.
+
+Search, passage list membership and the single-sheet Excel download follow the selected view. Switching retains the passage and original occurrence denominator. The study coverage targets are not a promise of coverage for a new classroom passage. Saved exact forms, notes and old collections are retained.
+
+The confirmed layout, teacher-led Words to explain, OCR, readability, CPB marking and AI service environments are retained. App main push deploys automatically to its fixed staging environment; Web retains production. No push or deployment has been performed.
+
+## Historical notes — not the current release selector
+
 Current local release: Web v65 / App v62. Passage review uses teacher-marked occurrences; textbook and list records are optional filters. Word data, storage and Worker configuration are unchanged.
 
 # Current HK-ELE local preview — Web v63

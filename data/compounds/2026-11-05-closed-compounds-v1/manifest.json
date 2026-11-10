@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "productDataVersion": "2026-11-08-hk4-familiar1764-v1",
+  "productDataVersion": "2026-11-10-all-members1663-v1",
   "expressionDataVersion": "2026-11-05-closed-compounds-v1",
   "sourceSha256": "a42a13b5ad81a00d677ed06dc53076303783c135a13880949b9ae98f4ef64e90",
   "normalizationPolicyId": "NFKC_LOWER_EXACT_RECORDED_CLOSED",

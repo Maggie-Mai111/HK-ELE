@@ -15,7 +15,7 @@
       form.baseword_key=key;form.normalized_form=norm(form.form);
       form.external_level_reference=label(form.external_level_reference_teacher_display)??label(form.external_level_reference);
       return form;
-    });
+    }).filter(form=>!root.HKELE_WORD_VIEW||root.HKELE_WORD_VIEW.allowsForm(key,form.form));
   }
   function matches(form,f,common){
     if(form.lookup_only) return false;

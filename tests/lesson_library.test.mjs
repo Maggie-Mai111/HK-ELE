@@ -9,6 +9,21 @@ const api = globalThis.HKELE_LESSON_LIBRARY;
 const legacyKey = "hkele-phase1v-teaching-list-v1";
 const item = {baseword_key:"use", display_family:"use", selected_forms:["use","reusable"], order:2,
   notes:"Keep target meaning", connections:"reuse", depth:"Master", teaching_focus:"focus"};
+
+test("teacher Excel omits the lesson column while saved collection data remains intact",async()=>{
+  const {hooks,context}=harness();hooks.state.selected=[structuredClone(item)];hooks.state.lessonTitle="Saved title";
+  const before=JSON.stringify(hooks.state.selected);let exported;
+  context.HKELE_XLSX={download:rows=>{exported=rows;}};
+  await hooks.exportExcel();assert.equal(exported[0][0],"Order");assert.ok(!exported[0].includes("Lesson"));
+  assert.equal(exported.length,3);assert.equal(exported[1][1],"use");assert.equal(exported[2][1],"reusable");
+  assert.ok(exported[1].includes("Keep target meaning"));assert.equal(hooks.state.lessonTitle,"Saved title");
+  assert.equal(hooks.lessonExportRows()[0][0],"Lesson");assert.equal(JSON.stringify(hooks.state.selected),before);
+});
+
+test("non-English fragments keep their text without an impossible family-choice instruction",()=>{
+  const {hooks}=harness();const html=hooks.resultCard({display_word:"测试",status:"UNSUPPORTED",token_status:"UNSUPPORTED_TOKEN",count:1,owners:[]});
+  assert.match(html,/测试/);assert.match(html,/Kept in your text/);assert.doesNotMatch(html,/choosing a family/);
+});
 test("mixed compound and family lessons keep saved notes, exact forms and separate export identities",()=>{
   const {hooks,context,disk}=harness();
   const expression={expressionId:"hc_test",displayExpression:"classroom",normalizedExpression:"classroom",sourceVersion:"compound-test"};
@@ -96,14 +111,14 @@ function harness() {
     addEventListener:(name,fn)=>events[name]=fn,confirm:()=>false,location:{hash:"",reload(){}},
     setTimeout:()=>{}, CustomEvent:class{},scrollY:0});
   context.window=context;
-  for(const file of ["identity_migration.js","lesson_data_refresh.js","cpb100.js","lesson_contract.js","lesson_library.js","lesson_library_ui.js","word_family_results.js","evidence_tokens.js","compound_teaching.js","compound_ui.js"])
+  for(const file of ["identity_migration.js","lesson_data_refresh.js","cpb100.js","contractions.js","lesson_contract.js","lesson_library.js","lesson_library_ui.js","word_family_results.js","evidence_tokens.js","compound_teaching.js","compound_ui.js"])
     vm.runInContext(fs.readFileSync(new URL(`../${file}`,import.meta.url),"utf8"),context);
   context.HKELE_LESSON_WORKSPACE={create:()=>({renderList(){},renderPicker(){},rememberUndo(){}})};
   context.HKELE_TEXT_WORKSPACE={create:()=>({refreshSuggestions(){},resetLessonContext(){}})};
   context.HKELE_STATIC_API={request:()=>new Promise(resolve=>requests.push(resolve))};
   const source=fs.readFileSync(new URL("../app.js",import.meta.url),"utf8");
   vm.runInContext(source.replace('  init().catch(error => toast("We couldn\'t complete that action. Please try again."));',
-    'globalThis.hooks={state,saveList,exportItems,lessonExportRows,addToList,refreshSelectedFromDatabase,libraryUi};'),context);
+    'globalThis.hooks={state,saveList,exportItems,lessonExportRows,exportExcel,resultCard,addToList,refreshSelectedFromDatabase,libraryUi};'),context);
   const hooks=context.hooks; hooks.libraryUi.bind(); hooks.saveList();
   return {context,hooks,get,disk,events,requests};
 }
