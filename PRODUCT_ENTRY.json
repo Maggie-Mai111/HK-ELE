@@ -1,17 +1,17 @@
 {
-  "status": "LOCAL_VALIDATED_PUBLIC_PENDING",
-  "iteration": "v74",
-  "dataVersion": "2026-11-13-s4s6-all1676-v1",
+  "status": "LOCAL_DATA_VALIDATED_PUBLIC_PENDING",
+  "iteration": "v75",
+  "dataVersion": "2026-11-15-general-as-all1677-v1",
   "expressionDataVersion": "2026-11-05-closed-compounds-v1",
   "wordOriginsVersion": "2026-11-05-word-origins-v1",
   "dataCounts": {
-    "candidate": 1676,
-    "inclusiveReference": 1676,
+    "candidate": 1677,
+    "inclusiveReference": 1677,
     "referenceOnly": 0,
     "totalFamilies": 167780,
     "forms": 329202,
-    "ranked": 138717,
-    "unranked": 29063,
+    "ranked": 138719,
+    "unranked": 29061,
     "teachingScopeExcluded": 0
   },
   "uiRedesigned": false,
@@ -26,17 +26,17 @@
   "publicUpdated": false,
   "provenance": "README.md",
   "fullDatabaseWorkbook": {
-    "dataVersion": "2026-11-13-s4s6-all1676-v1",
+    "dataVersion": "2026-11-15-general-as-all1677-v1",
     "wordOriginsVersion": "2026-11-05-word-origins-v1",
-    "workbookVersion": "2026-11-13-s4s6-all1676-v1-all",
-    "filename": "HK_ELE_Full_Database_S4_S6_20261113.xlsx",
-    "assetPath": "assets/downloads/2026-11-13-s4s6-all1676-v1-all/HK_ELE_Full_Database_S4_S6_20261113.xlsx",
-    "byteSize": 12067772,
-    "sha256": "2ef82cfd8cb3e90dba863533d40cb676264f91da25815b8cf4d1b575079faa88",
+    "workbookVersion": "2026-11-15-general-as-all1677-v1-all",
+    "filename": "HK_ELE_Full_Database_20261115.xlsx",
+    "assetPath": "assets/downloads/2026-11-15-general-as-all1677-v1-all/HK_ELE_Full_Database_20261115.xlsx",
+    "byteSize": 12067904,
+    "sha256": "116da78bf75d446d028f85a4744637ef9d80a7e12b1990ebbb23d3a68a41d6fd",
     "counts": {
       "wordForms": 329202,
       "fullFamilies": 167780,
-      "wordListFamilies": 1676,
+      "wordListFamilies": 1677,
       "worksheets": 1
     }
   },
@@ -59,27 +59,27 @@
     "default": "all",
     "all": {
       "full": 167780,
-      "90": 1676,
+      "90": 1677,
       "95": 2910
     },
     "familiar": {
       "full": 14253,
-      "90": 1750,
+      "90": 1749,
       "95": 3685
     }
   },
   "familiarDatabaseWorkbook": {
-    "dataVersion": "2026-11-13-s4s6-all1676-v1",
+    "dataVersion": "2026-11-15-general-as-all1677-v1",
     "wordOriginsVersion": "2026-11-05-word-origins-v1",
-    "workbookVersion": "2026-11-13-s4s6-all1676-v1-familiar",
-    "filename": "HK_ELE_Familiar_Words_S4_S6_20261113.xlsx",
-    "assetPath": "assets/downloads/2026-11-13-s4s6-all1676-v1-familiar/HK_ELE_Familiar_Words_S4_S6_20261113.xlsx",
-    "byteSize": 2290826,
-    "sha256": "1f35eb069c237c069dbaa67f98afb330a04419e1deba2aa118e40fa710a64c67",
+    "workbookVersion": "2026-11-15-general-as-all1677-v1-familiar",
+    "filename": "HK_ELE_Familiar_Words_20261115.xlsx",
+    "assetPath": "assets/downloads/2026-11-15-general-as-all1677-v1-familiar/HK_ELE_Familiar_Words_20261115.xlsx",
+    "byteSize": 2290650,
+    "sha256": "fed71d54c6c6b5f3d18e03d1f14f8bb5a465701a4c21401128079c5910ca5060",
     "counts": {
       "wordForms": 49305,
       "fullFamilies": 14253,
-      "wordListFamilies": 1750,
+      "wordListFamilies": 1749,
       "worksheets": 1
     }
   },

@@ -10,7 +10,7 @@
     return record;
   }
   function createLoader(release,options={}){
-    const read=options.read||(async path=>{const r=await fetch(`data/word-origins/${release.version}/${path}`,{cache:'force-cache'});if(!r.ok)throw new Error('Word origins could not load.');return new Uint8Array(await r.arrayBuffer());});
+    const read=options.read||(async path=>{const r=await fetch(`data/word-origins/${release.version}/${path}?v=${release.files[path].sha256.slice(0,16)}`,{cache:'force-cache'});if(!r.ok)throw new Error('Word origins could not load.');return new Uint8Array(await r.arrayBuffer());});
     const hash=options.hash||(async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join(''));
     const inflate=options.inflate||(async bytes=>new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
     const cache=new Map();

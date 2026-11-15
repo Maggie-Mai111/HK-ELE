@@ -1,9 +1,9 @@
 (function (root) {
   "use strict";
-  const DATA_VERSION = "2026-11-13-s4s6-all1676-v1";
+  const DATA_VERSION = "2026-11-15-general-as-all1677-v1";
   const VERSION = "spelling-frequency-20261105-v1";
   const DATA_ROOT = `data/word-forms/${VERSION}/`;
-  const MANIFEST_HASH = "d78dd4718432f3e981d8792dcf4757186963922d20f7bd9ccf88e402e36abfd2";
+  const MANIFEST_HASH = "48412c0897a16ea0c2832d1f297c0b9de28029fb727f4f79e6fe599fb65b041a";
   const normalize = value => String(value ?? "").normalize("NFKC").trim().toLowerCase().replace(/[’‘ʼ＇]/g, "'");
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : null;
   function frequency(record) {
@@ -32,7 +32,7 @@
     const cache = new Map();
     const hash = async bytes => Array.from(new Uint8Array(await root.crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2, "0")).join("");
     async function getBytes(name) {
-      const response = await fetcher(DATA_ROOT + name, {cache:"force-cache"});
+      const response = await fetcher(DATA_ROOT + name + "?v=" + MANIFEST_HASH.slice(0,16), {cache:"force-cache"});
       if (!response.ok) throw new Error("Word frequencies could not be loaded.");
       return response.arrayBuffer();
     }

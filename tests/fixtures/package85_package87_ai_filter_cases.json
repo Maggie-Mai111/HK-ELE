@@ -95,7 +95,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 448
+      "expectedMatchCount": 447
     },
     {
       "id": "awl",
@@ -179,6 +179,6 @@
       }
     }
   ],
-  "dataVersion": "2026-11-13-s4s6-all1676-v1",
+  "dataVersion": "2026-11-15-general-as-all1677-v1",
   "sourceEntrySha256": "b9da2faf2277fd0588b42a2c89a4905793c3ff13d24b355fb510ea34a1104012"
 }

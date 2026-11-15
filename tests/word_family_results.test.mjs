@@ -15,6 +15,7 @@ function resources(options = {}) {
   const context = vm.createContext({window:{}, location:{href:'https://fixture.invalid/'}, URL,
     crypto:globalThis.crypto, TextEncoder, TextDecoder, Blob, Response, DecompressionStream,
     fetch:async path => {
+      if (options.staleCache && String(path).includes("/word-forms/") && !String(path).includes("?v=")) return new Response("old cached bytes");
       path=String(path).split("?")[0];
       if (failure && path.endsWith(failure)) {failure = ''; return new Response('try again', {status:503});}
       let bytes = readFileSync(join(root, path));
@@ -61,6 +62,7 @@ test('real A family lists preserve all accepted forms and bind each grade to its
 });
 test('frequency reader survives Git CRLF conversion, rejects altered gzip, and retries failed loads', async () => {
   assert.ok(Object.keys(await resources({crlf:true}).reader.load('be')).length > 0);
+  assert.ok(Object.keys(await resources({staleCache:true}).reader.load('stress')).length > 0);
   await assert.rejects(resources({corrupt:true}).reader.load('be'), /reload/);
   const retry = resources({failure:'/manifest.json'}).reader;
   await assert.rejects(retry.load('be'), /could not/);
@@ -99,7 +101,7 @@ test('equal-best homonym owners are separate groups, without changing their acce
   const source = resources();
   // Discover an existing equal-best ambiguity within the registered A search shard.
   const {gunzipSync} = await import('node:zlib');
-  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-13-s4s6-all1676-v1/search/d.json.gz'))));
+  const shard = JSON.parse(gunzipSync(readFileSync(join(root, 'data/releases/2026-11-15-general-as-all1677-v1/search/d.json.gz'))));
   const query = Object.keys(shard).find(key => shard[key][1]?.length > 1);
   assert.ok(query);
   const expected = (await source.api.request('/search?q='+query)).owners.filter(owner => !owner.blocked);

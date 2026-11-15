@@ -1,15 +1,15 @@
 {
-  "dataVersion": "2026-11-13-s4s6-all1676-v1",
+  "dataVersion": "2026-11-15-general-as-all1677-v1",
   "wordOriginsVersion": "2026-11-05-word-origins-v1",
-  "workbookVersion": "2026-11-13-s4s6-all1676-v1-all",
-  "filename": "HK_ELE_Full_Database_S4_S6_20261113.xlsx",
-  "assetPath": "assets/downloads/2026-11-13-s4s6-all1676-v1-all/HK_ELE_Full_Database_S4_S6_20261113.xlsx",
-  "byteSize": 12067772,
-  "sha256": "2ef82cfd8cb3e90dba863533d40cb676264f91da25815b8cf4d1b575079faa88",
+  "workbookVersion": "2026-11-15-general-as-all1677-v1-all",
+  "filename": "HK_ELE_Full_Database_20261115.xlsx",
+  "assetPath": "assets/downloads/2026-11-15-general-as-all1677-v1-all/HK_ELE_Full_Database_20261115.xlsx",
+  "byteSize": 12067904,
+  "sha256": "116da78bf75d446d028f85a4744637ef9d80a7e12b1990ebbb23d3a68a41d6fd",
   "counts": {
     "wordForms": 329202,
     "fullFamilies": 167780,
-    "wordListFamilies": 1676,
+    "wordListFamilies": 1677,
     "worksheets": 1
   }
 }

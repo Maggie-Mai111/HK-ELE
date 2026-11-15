@@ -1,6 +1,6 @@
 (function(root) {
   "use strict";
-  const lists = {get "90"(){return {label:"90% list",families:root.HKELE_WORD_VIEW?.counts()["90"]??1676};},get "95"(){return {label:"95% list",families:root.HKELE_WORD_VIEW?.counts()["95"]??2910};}};
+  const lists = {get "90"(){return {label:"90% list",families:root.HKELE_WORD_VIEW?.counts()["90"]??1677};},get "95"(){return {label:"95% list",families:root.HKELE_WORD_VIEW?.counts()["95"]??2910};}};
   function inFamily(family,target="90") {
     if(!family)return false;
     if(target==="90")return family.candidate_member===true||family.candidate_member===1;

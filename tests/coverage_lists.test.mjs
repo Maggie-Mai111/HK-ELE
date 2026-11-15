@@ -23,8 +23,8 @@ test('actual 8-word passage yields 8 list occurrences, including the and and',as
 });
 
 test('95% AI execution includes actual families beyond the 90% boundary before applying limits',async()=>{
- const c=setup(),filters={scope:'full',overallRankMin:1677,sort:'overall',limit:3};
+ const c=setup(),filters={scope:'full',overallRankMin:1678,sort:'overall',limit:3};
  const r=await c.HKELE_STATIC_API.request('/families?scope=core95&page=1&page_size=25&ai_filters='+encodeURIComponent(JSON.stringify(filters)));
- assert.equal(r.families.length,3);assert.equal(r.families[0].overall_frequency_order,1677);assert.ok(r.families.every(f=>f.overall_frequency_order<=2910&&!f.candidate_member));
+ assert.equal(r.families.length,3);assert.equal(r.families[0].overall_frequency_order,1678);assert.ok(r.families.every(f=>f.overall_frequency_order<=2910&&!f.candidate_member));
  const none=await c.HKELE_STATIC_API.request('/families?scope=core95&ai_filters='+encodeURIComponent(JSON.stringify({...filters,overallRankMin:2911})));assert.equal(none.families.length,0);
 });

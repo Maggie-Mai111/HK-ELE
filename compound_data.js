@@ -5,7 +5,7 @@
   const normalize=word=>String(word||'').normalize('NFKC').trim().toLowerCase();
   function createLoader(release,options={}){
     const base=`data/compounds/${release.expressionVersion}/`;
-    const read=options.read|| (async path=>{const response=await fetch(base+path,{cache:'force-cache'});if(!response.ok)throw new Error('Compound words need downloading.');return new Uint8Array(await response.arrayBuffer());});
+    const read=options.read|| (async path=>{const response=await fetch(base+path+'?v='+release.manifestSha256.slice(0,16),{cache:'force-cache'});if(!response.ok)throw new Error('Compound words need downloading.');return new Uint8Array(await response.arrayBuffer());});
     const hash=options.hash|| (async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join(''));
     const inflate=options.inflate|| (async bytes=>new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
     let manifestPromise;const shards=new Map();

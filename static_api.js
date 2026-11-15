@@ -28,7 +28,7 @@ function teacherUseResult(result,ctx){
  return {...result,owners,alternatives:[...result.alternatives.filter(o=>!o.match_classes.includes(mark)),...moved],best_owner_count:allowed.length,status:allowed.length>1?"AMBIGUOUS":allowed.length?"RESOLVED":"BLOCKED"};
 }
 
-  const DATA_ROOT = "data/releases/2026-11-13-s4s6-all1676-v1/";
+  const DATA_ROOT = "data/releases/2026-11-15-general-as-all1677-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -62,13 +62,13 @@ function teacherUseResult(result,ctx){
   let integrityPromise;
   const hash = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2,"0")).join("");
   async function integrity() {
-    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=7781f89365a4e7cc", {cache:"force-cache"}).then(async response => {
+    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=6dc62d899aba8283", {cache:"force-cache"}).then(async response => {
       if (!response.ok) throw new Error("Please reload to open the word data.");
       const bytes = await response.arrayBuffer();
       const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
       // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
       const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
-      if (await hash(normalized) !== "7781f89365a4e7cc1bd6414ad25d1e840daa116a17a1697ae865b6652c8e0afd") throw new Error("Please reload to open the word data.");
+      if (await hash(normalized) !== "6dc62d899aba8283e66b5e8775f754d426cb592780370c8f1d616253d51f778d") throw new Error("Please reload to open the word data.");
       return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
@@ -102,7 +102,7 @@ function teacherUseResult(result,ctx){
   async function aiFormEvidence() {
     const release=window.HKELE_AI_FORM_RELEASE;
     formEvidencePromise??=(async()=>{
-      const response=await fetch(release.path,{cache:"force-cache"});if(!response.ok)throw new Error("Word filters need downloading.");
+      const response=await fetch(release.path+"?v="+release.sha256.slice(0,16),{cache:"force-cache"});if(!response.ok)throw new Error("Word filters need downloading.");
       const bytes=await response.arrayBuffer();if(await hash(bytes)!==release.sha256)throw new Error("Word filter evidence changed.");
       const document=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).json();
       if(document.schemaVersion!=="HK_ELE_AI_FORM_EVIDENCE_V1"||document.dataVersion!==release.dataVersion||document.sourceManifestSha256!==release.sourceManifestSha256||document.familyCount!==release.familyCount||document.formCount!==release.formCount)throw new Error("Incompatible word filter evidence.");
