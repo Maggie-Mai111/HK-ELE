@@ -28,7 +28,7 @@ function teacherUseResult(result,ctx){
  return {...result,owners,alternatives:[...result.alternatives.filter(o=>!o.match_classes.includes(mark)),...moved],best_owner_count:allowed.length,status:allowed.length>1?"AMBIGUOUS":allowed.length?"RESOLVED":"BLOCKED"};
 }
 
-  const DATA_ROOT = "data/releases/2026-11-10-all-members1663-v1/";
+  const DATA_ROOT = "data/releases/2026-11-13-s4s6-all1676-v1/";
   const cache = new Map();
 
   const norm = value => String(value || "").normalize("NFKC").trim().toLocaleLowerCase();
@@ -62,13 +62,13 @@ function teacherUseResult(result,ctx){
   let integrityPromise;
   const hash = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2,"0")).join("");
   async function integrity() {
-    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=d2ef37aab9c85ced", {cache:"force-cache"}).then(async response => {
+    integrityPromise ??= fetch(DATA_ROOT + "integrity.json?v=7781f89365a4e7cc", {cache:"force-cache"}).then(async response => {
       if (!response.ok) throw new Error("Please reload to open the word data.");
       const bytes = await response.arrayBuffer();
       const text = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
       // Git normalizes text line endings; pin the LF text while binary data hashes stay exact.
       const normalized = new TextEncoder().encode(text.replace(/\r\n/g, "\n"));
-      if (await hash(normalized) !== "20ab2d4a718c0cae02ae59ae930b8793a0ffe00a1643ba0ffbf2ff24123ffdb6") throw new Error("Please reload to open the word data.");
+      if (await hash(normalized) !== "7781f89365a4e7cc1bd6414ad25d1e840daa116a17a1697ae865b6652c8e0afd") throw new Error("Please reload to open the word data.");
       return JSON.parse(text);
     }).catch(error => {integrityPromise = null; throw error;});
     return integrityPromise;
@@ -143,9 +143,9 @@ function teacherUseResult(result,ctx){
       const release=window.HKELE_COVERAGE_RELEASE;
       if(config.metadata.data_version!==release.dataVersion)throw new Error("Please reload the word data.");
       const rows=await loadGzipJson(`data/coverage-lists/${release.version}/${sort}.json.gz`);
-      if(rows.length!==2907)throw new Error("Please reload the word data.");
+      if(rows.length!==2910)throw new Error("Please reload the word data.");
       const start=(page-1)*pageSize;
-      return {api_version:config.api_version,scope,sort,page,page_size:pageSize,total_items:2907,available_items:2907,families:rows.slice(start,start+pageSize).map(row=>inflate(config.browse_fields,row))};
+      return {api_version:config.api_version,scope,sort,page,page_size:pageSize,total_items:2910,available_items:2910,families:rows.slice(start,start+pageSize).map(row=>inflate(config.browse_fields,row))};
     }
     const info = config.browse?.[scope]?.[sort];
     if (!info) throw new Error("Unsupported Browse selection");

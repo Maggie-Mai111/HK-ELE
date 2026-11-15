@@ -68,7 +68,7 @@ test('passage matching preserves source offsets and counts each occurrence once,
  assert.equal(overlap.status,'RESOLVED');assert.ok(overlap.expression);
  assert.ok(overlap.owners.some(owner=>owner.baseword_key==='coinsure'));
  const manifest=await p.HKELE_STATIC_API.manifest();
- assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1663);
+ assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1676);
 });
 test('a corrupt compound shard cannot produce a match and can be retried without losing ordinary lookup',async()=>{
  const p=product({corrupt:true});
@@ -78,7 +78,7 @@ test('a corrupt compound shard cannot produce a match and can be retried without
 });
 test('compound lesson identities survive serialization and refresh without acquiring a family rank',()=>{
  const expression=compound('classroom');
- const item={...teaching.createItem(expression,3,'2026-11-10-all-members1663-v1','Check a text'),notes:'Target classroom sense',connections:'My lesson example',teaching_focus:'focus'};
+ const item={...teaching.createItem(expression,3,'2026-11-13-s4s6-all1676-v1','Check a text'),notes:'Target classroom sense',connections:'My lesson example',teaching_focus:'focus'};
  const reopened=JSON.parse(JSON.stringify(item));const updated=teaching.refresh(reopened,expression);
  assert.equal(updated.baseword_key,'expression:'+expression.expressionId);assert.equal(updated.order,3);assert.equal(updated.notes,item.notes);
  assert.equal(updated.overall_frequency_order,null);assert.equal(updated.hk_corpus_frequency_rank,null);

@@ -1,125 +1,155 @@
 globalThis.HKELE_TEACHER_HELP_CONTENT = {
-  "steps": [
+  "tasks": [
     {
-      "title": "1. Check your lesson text",
-      "body": "Open Check a text, paste your passage and choose Check text. In the App, you can also scan a photo and review the recognised text first."
+      "title": "Check a lesson text",
+      "steps": [
+        "Paste your passage in Check a Text, then choose Check text.",
+        "Click a word in the passage to see its details.",
+        "Mark May need explaining to keep that use in Words to explain."
+      ],
+      "view": "check",
+      "action": "Open Check a Text"
     },
     {
-      "title": "2. Explore a word",
-      "body": "Select a word in the passage to view its information. Find words also lets you search a word and explore its word family."
-    },
-    {
-      "title": "3. Choose what to teach",
-      "body": "Tap words in the text and mark May need explaining to keep them in Words to explain. You can browse by textbook or word-list records too; these help you choose and do not tell you what students know."
-    },
-    {
-      "title": "4. Copy into your materials",
-      "body": "After adding a word, open Selected words to copy your choices. Add a short note if useful. Words saved in an older list remain under Previously saved words."
+      "title": "Look up a word",
+      "steps": [
+        "Enter a word in Find words, then choose Search.",
+        "Your word comes first, followed by related forms in its family.",
+        "Choose View for details or Add to keep a word."
+      ],
+      "view": "browse",
+      "action": "Open Find words"
     }
   ],
+  "keep": {
+    "title": "Keep and copy words",
+    "body": "Choose Add beside a word. Open Selected words to add a note and copy your choices into your materials.",
+    "note": "Saved on this browser; use Copy to take your words to another device."
+  },
   "example": {
     "sentence": "Some students felt stressed before the test.",
-    "body": "Select stressed and explore stress, stressful and unstressed in its family. Keep stressed and stressful, then add a note such as: feel stressed / a stressful situation."
+    "body": "Click stressed to explore stress, stressful and other forms. Save the ones you want and add a note: feel stressed / a stressful situation."
   },
-  "columns": [
-    [
-      "Word / word form",
-      "The particular spelling, such as stressed. Word-form records apply to that spelling."
-    ],
-    [
-      "Word family",
-      "Related forms grouped together, such as stress, stressed and stressful. Check the meaning of each form in your passage."
-    ],
-    [
-      "All words / Familiar words",
-      "All words searches the full database. Familiar words uses general English familiarity estimates of 3.5 or above to select a smaller set of word forms. Your Known / May need explaining marks describe individual uses in your passage."
-    ],
-    [
-      "90% / 95% lists",
-      "These lists were selected to reach those coverage targets in each of the four Hong Kong text collections in the study. The 95% list includes the 90% list. The percentage for your passage counts included word forms each time they occur."
-    ],
-    [
-      "Overall family rank",
-      "Combines British and American English with the four Hong Kong collections described below. Each available component contributes equally. Rank 1 is highest; it is not a school grade."
-    ],
-    [
-      "HK family rank / band",
-      "Ranks word families using Hong Kong school materials, speech and writing (ICE-HK), web texts (GloWbE-HK) and news (NOW-HK). Each collection contributes equally when a score is available. Rank 1 is highest. Bands group ranks 1–1,000, 1,001–2,000, 2,001–3,000, 3,001–5,000, 5,001–10,000 and 10,001+."
-    ],
-    [
-      "First seen in HK textbooks",
-      "Earliest recorded appearance of this spelling in the sampled textbooks. P1–P6 are primary stages; S1–S3 are secondary stages. This does not show when students know it."
-    ],
-    [
-      "US grade reference",
-      "A US school-stage reference for the displayed spelling, separate from Hong Kong textbook stages. It is not your class level."
-    ],
-    [
-      "Academic Word List (AWL)",
-      "Shows whether the displayed form has an Academic Word List record."
-    ],
-    [
-      "Middle School Vocabulary List (MSVL)",
-      "Subject-list records for the displayed form, such as Science or Health."
-    ],
-    [
-      "Greek/Latin root / Root meaning",
-      "Recorded classical roots and their meanings. A root meaning is not a complete definition of the word."
-    ],
-    [
-      "Prefix / Suffix",
-      "Recorded parts at the beginning or end of a word."
-    ],
-    [
-      "Sort related words",
-      "Most frequent forms and Least frequent forms use counts for each spelling in ICE-HK and GloWbE-HK. Family ranks use the broader collections described above. Your searched word always stays first."
-    ],
-    [
-      "View / Add",
-      "View opens the word’s information. Add keeps that word form in Selected words."
-    ],
-    [
-      "— / 0",
-      "A dash means no recorded value or list entry; 0 is a recorded zero."
-    ]
+  "columnGroups": [
+    {
+      "title": "Words and lists",
+      "hint": "Word forms, families and the two views",
+      "items": [
+        [
+          "Word / word form",
+          "One spelling, such as stressed. Its textbook, grade and word-part records apply to that spelling."
+        ],
+        [
+          "Word family",
+          "Related forms grouped together, such as stress, stressed and stressful. Their meanings can differ."
+        ],
+        [
+          "All words / Familiar words",
+          "All words searches the full database. Familiar words shows a smaller set with general English familiarity estimates of 3.5 or above. Your class may know different words."
+        ],
+        [
+          "90% / 95% lists",
+          "These lists covered at least 90% or 95% of counted words in each of the four Hong Kong text collections in the study. The 95% list includes the 90% list. Your passage may differ."
+        ]
+      ]
+    },
+    {
+      "title": "Frequency and ranks",
+      "hint": "What the ranks and sorting tell you",
+      "items": [
+        [
+          "Overall family rank",
+          "Combines British and American English with four Hong Kong collections. Each available component contributes equally. Rank 1 is highest."
+        ],
+        [
+          "HK family rank / band",
+          "Uses Hong Kong school materials, speech and writing (ICE-HK), web texts (GloWbE-HK) and news (NOW-HK). Each available collection contributes equally. Rank 1 is highest. Bands group similar ranks, such as 1–1,000."
+        ],
+        [
+          "Sort related words",
+          "Most frequent forms and Least frequent forms use counts for each spelling in ICE-HK and GloWbE-HK. These differ from family ranks. Your searched word stays first."
+        ]
+      ]
+    },
+    {
+      "title": "Textbooks, grades and subject lists",
+      "hint": "Records for the displayed spelling",
+      "items": [
+        [
+          "First seen in HK textbooks",
+          "The earliest appearance of this spelling in the sampled textbooks. P1–P6 are primary stages; S1–S6 are secondary stages. This does not tell you when students know it."
+        ],
+        [
+          "US grade reference",
+          "A US school-grade reference for this spelling. It is separate from Hong Kong textbook stages and your class level."
+        ],
+        [
+          "Academic Word List (AWL)",
+          "Shows whether this spelling has an Academic Word List record."
+        ],
+        [
+          "Middle School Vocabulary List (MSVL)",
+          "Shows recorded subjects for this spelling, such as Science or Health."
+        ]
+      ]
+    },
+    {
+      "title": "Word parts and table actions",
+      "hint": "Roots, affixes, buttons and symbols",
+      "items": [
+        [
+          "Greek/Latin root / Root meaning",
+          "A recorded classical root and its meaning. The root meaning is not a full definition of the word."
+        ],
+        [
+          "Prefix / Suffix",
+          "Recorded parts at the beginning or end of the word."
+        ],
+        [
+          "View / Add",
+          "View opens the word’s details. Add saves that spelling in Selected words."
+        ],
+        [
+          "— / 0",
+          "A dash means no recorded value or list entry. A zero is a recorded count of zero."
+        ]
+      ]
+    }
   ],
   "features": [
     [
       "Find words with AI",
-      "Describe the words you need, review the proposed search, then confirm it. AI search needs an internet connection."
+      "Describe the words you need. Review the suggested search, then choose Show matching words. An internet connection is needed."
     ],
     [
       "Highlight words",
-      "In Your text, choose Highlight words to mark sight words or HK family frequency bands. CPB100 marks a fixed sight-word list; it does not hide words or choose teaching words."
+      "In Your text, open Highlight words. CPB100 underlines 100 sight words; HK family frequency adds colour by rank. Both can appear on the same word."
     ],
     [
-      "More text tools",
-      "All word results lets you choose a word and see every occurrence in your passage. Extra selection tools are here too; the App also offers a word familiarity check and readability estimates."
+      "Words to explain",
+      "Click a word in your passage and mark May need explaining. Your marks appear here. Use Browse words by records to explore other words."
     ],
     [
-      "Word familiarity (App)",
-      "Tap a word in your passage and mark Known or May need explaining for that occurrence. More text tools → Check word familiarity shows a few examples together. Other uses are marked separately."
+      "All word results",
+      "Open More text tools → All word results to filter the matches or find every use of a word in your passage."
     ],
     [
-      "Readability estimates (App)",
-      "More text tools includes English word and sentence counts and reading estimates based on sentence length and estimated syllables."
+      "Download Excel",
+      "Use the Excel button in Find words to download your current All words or Familiar words view. The file includes more than the selected 90% or 95% list."
     ],
     [
-      "Offline use (App)",
-      "Use Menu → Offline use to download the full package while connected. Once ready, saved word data and text checking work offline; AI still needs the internet."
-    ],
-    [
-      "Excel downloads and feedback",
-      "On the website, use Find words to download the database as Excel for your computer. In the App, Menu → Offline use saves the wordlist for use without internet. Rate this word and Report a problem open feedback forms."
+      "Give feedback",
+      "Choose Rate this word on a word’s details, or Report a problem. A short feedback form opens with the word or page already filled in."
     ]
   ],
   "viewHelp": {
-    "allHint": "Search every word form in the database.",
-    "familiarHint": "Show word forms estimated to be familiar in general English.",
-    "title": "Which view should I use?",
+    "allHint": "Search the full wordlist.",
+    "familiarHint": "A smaller list of generally familiar words.",
+    "title": "All or Familiar?",
     "paragraphs": [
-      "Start with All words to explore the full database. Familiar words narrows it to word forms with general English familiarity estimates of 3.5 or above.",
-      "Your class may know different words. In your passage, mark Known or May need explaining to record your own judgement."
+      "All words: search the full database.",
+      "Familiar words: show words estimated to be familiar in general English.",
+      "Your class may know different words."
     ]
   }
 };

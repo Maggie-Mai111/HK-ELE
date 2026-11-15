@@ -554,7 +554,7 @@
           <div id="form-filter-academic">${multiFilterMarkup("academic", "AWL / MSVL / subject", formFilterOptions.academic, state.formFilters.academic)}</div>
         </div>
         </details><div class="form-tiers">${tierTables}</div>
-        <details class="level-note"><summary>How to read the word information</summary><p>Textbook levels show the earliest appearance of each form in the sampled Hong Kong textbooks. The family level is the earliest observation across its word forms. US grade references use the US school grading system. AWL and MSVL labels follow the selected word form where a record is available. A dash means no recorded value.</p></details>
+        <details class="level-note"><summary>How to read the word information</summary><p>Hong Kong textbook stages show when each spelling first appeared in the sampled books.</p><p>US grade references and AWL / MSVL records apply to the selected spelling.</p><p>A dash means no recorded value. See About these columns for more detail.</p></details>
       </section>`;
     void globalThis.HKELE_LEXICAL_USES?.mount($("[data-lexical-uses]"), selected?.normalized_form || state.selectedForm, family.baseword_key);
     void window.HKELE_WORD_ORIGINS?.mount($("[data-word-origins]"), family.baseword_key, selected?.form || state.selectedForm, family.data_version, selected?.normalized_form);
@@ -749,7 +749,7 @@
     const normalizedTextCounts = globalThis.HKELE_TEXT_NORMALIZATION.normalizedCounts(state.textAudit);
     $("#text-summary").classList.remove("hidden");
     $("#text-summary").innerHTML = `<div class="text-summary-heading"><div><h3>Vocabulary summary</h3></div><p>All word occurrences remain in the counts.</p></div><div class="text-summary-grid">${textSummaryCard(`${state.coverageTarget}% list`, summary.core, "summary-candidate")}${textSummaryCard("Other database words", summary.other, "summary-other")}${summary.compound.words ? textSummaryCard("Compounds",summary.compound,"summary-other") : ""}${textSummaryCard("Language notes", languageNotes, "summary-notes")}</div>`;
-    if(state.textAudit.some(item=>item.normalizedAnalysis?.applied)) $("#text-summary").insertAdjacentHTML("beforeend",`<p class="hint">Original text: ${state.textAudit.length} words. With short forms and spelling variants expanded: ${normalizedTextCounts.tokens} English words, ${normalizedTextCounts.families} matched families; ${normalizedTextCounts.wordList} words in the HK-ELE Word List.</p>`);
+    if(state.textAudit.some(item=>item.normalizedAnalysis?.applied)) $("#text-summary").insertAdjacentHTML("beforeend",`<details><summary>Short forms and spelling variants</summary><p class="hint">Original text: ${state.textAudit.length} words.</p><p class="hint">With short forms and spelling variants expanded: ${normalizedTextCounts.tokens} English words; ${normalizedTextCounts.families} matched families; ${normalizedTextCounts.wordList} words in the 90% list.</p><p class="hint">These extra counts do not change the percentage shown for your original text.</p></details>`);
     let shownUnique = 0;
     const html = definitions.map(([key, label, normallyOpen]) => {
       const all = state.textItems.filter(item => itemGroup(item) === key);

@@ -9,19 +9,20 @@ const contract=createRequire(import.meta.url)('../ai_filter_contract.js');
 function repository(corruptOnce=false){
   const ctx=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},HKELE_AI_FILTER_CONTRACT:contract,location:{href:'https://fixture.invalid/'},URL,crypto:globalThis.crypto,TextDecoder,TextEncoder,Blob,Response,DecompressionStream,
     fetch:async path=>{const raw=new Uint8Array(read(path));if(corruptOnce&&path.includes('ai-form-evidence')){raw[raw.length-1]^=1;corruptOnce=false;}return new Response(raw);}});
+  ctx.HKELE_EDUCATION_FILTERS=globalThis.HKELE_EDUCATION_FILTERS;
   for(const file of ['cpb100.js','ai_form_release.js','ai_form_filter.js'])vm.runInContext(read(file).toString(),ctx);
   ctx.window.HKELE_CPB100=ctx.HKELE_CPB100;ctx.window.HKELE_AI_FORM_RELEASE=ctx.HKELE_AI_FORM_RELEASE;ctx.window.HKELE_AI_WORD_FILTER=ctx.HKELE_AI_WORD_FILTER;
   vm.runInContext(read('static_api.js').toString(),ctx);
   return ctx.window.HKELE_STATIC_API;
 }
 test('actual word evidence rejects corrupt AI projection, retries, and retains agency under its canonical age owner',async()=>{
-  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:788,overallRankMax:788,sort:'overall',limit:100};
+  const repo=repository(true),filters={scope:'full',root:'act',overallRankMin:682,overallRankMax:682,sort:'overall',limit:100};
   const query='/families?ai_filters='+encodeURIComponent(JSON.stringify(filters));
   await assert.rejects(repo.request(query),/integrity|changed|hash/i);
   const result=await repo.request(query);
   const agency=result.families.find(row=>row.ai_match_form==='agency');
   assert.ok(agency);assert.equal(agency.baseword_key,'agent');assert.equal(agency.ai_source_family.baseword_key,'agent');
-  assert.equal(agency.textbook_first_seen_level,null);
+  assert.equal(agency.textbook_first_seen_level,"S4");
   assert.ok(!result.families.some(row=>['age','aged','ageing'].includes(row.ai_match_form)));
 });
 test('real AI result handlers open and add the matched spelling, preserving canonical family information',()=>{

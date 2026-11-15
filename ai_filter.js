@@ -82,8 +82,8 @@
     editButton.hidden = true;
   }
 
-  function displayConditions(filters) {
-    return contract.describeConditions(filters).map(text => text
+  function displayConditions(filters, scope) {
+    return contract.describeConditions(filters, scope).map(text => text
       .replace(/^Scope: /, "Search in: ")
       .replace(/ or lower priority$/, " or greater")
       .replace(/^Sort: overall$/, "Sort: Overall family rank")
@@ -96,11 +96,11 @@
   }
 
   function renderInterpretation(result) {
-    result = contract.teacherResult(result, contract.teacherScope(input.value, document.querySelector(".scope.active")?.dataset.scope || "full"));
+    result = contract.teacherResult(result, contract.teacherScope(input.value, document.querySelector(".scope.active")?.dataset.scope || "full", result));
     interpretation = result;
     summary.textContent = result.status === "ready" ? result.summary : result.status === "needs_clarification" ? "Which words would you like to find?" : "Try a different search.";
     conditions.innerHTML = result.filters
-      ? displayConditions(result.filters).map(item => `<li>${esc(item)}</li>`).join("")
+      ? displayConditions(result.filters, result.teacherScope).map(item => `<li>${esc(item)}</li>`).join("")
       : "";
     const notes = [result.clarifyingQuestion, ...result.warnings].filter(Boolean)
       .filter(text => !/^No filters? (?:was|were) applied\.?$/i.test(text))

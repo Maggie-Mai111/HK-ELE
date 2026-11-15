@@ -25,7 +25,7 @@
     return {before:(left ? "…" : "") + text.slice(left, start), word:text.slice(start,end), after:text.slice(end,right) + (right < text.length ? "…" : "")};
   }
   const flag = value => value === true || value === 1;
-  const levels = {P1:1,P2:2,P3:3,P4:4,P5:5,P6:6,S1:7,S2:8,S3:9};
+  const levels = {P1:1,P2:2,P3:3,P4:4,P5:5,P6:6,S1:7,S2:8,S3:9,S4:10,S5:11,S6:12};
   function suggestions(occurrences, _common, classLevel = null, options = {}) {
     const filter=options.filter || "marked", judgements=options.judgements || {}, groups=new Map();
     for (const item of occurrences) {
@@ -172,7 +172,7 @@
           return `<div class="preteach-form"><div><button class="family-link" data-preteach-view="${index}">${esc(entry.form)}</button>${group.forms.length===1 && entry.form.toLocaleLowerCase()!==entry.family.display_family.toLocaleLowerCase() ? `<small>Family: ${esc(entry.family.display_family)}</small>` : ""}<p class="hint">${contextMarkup(entry.occurrence)}</p>${evidence.primary ? `<div class="preteach-reasons"><span>${esc(evidence.primary)}</span></div>` : ""}<small>In this text: ${entry.count} ${entry.count===1 ? "time" : "times"}</small>${evidence.extra.length ? `<details><summary>Word records</summary><p class="hint">${evidence.extra.map(esc).join(" · ")}</p></details>` : ""}</div><button data-preteach-add="${index}" ${added ? "disabled" : ""}>${added ? "Added" : "Add"}</button></div>`;
         }).join("");
         return `<article class="preteach-word">${group.forms.length>1 ? `<p class="preteach-family">Family: ${esc(group.family)} · ${group.forms.length} forms in your text</p>` : ""}${rows}</article>`;
-      }).join("") || `<p class="hint">${reviewFilter==="marked" ? "No words marked yet. You can start by tapping a word in the text." : "No words match this filter. You can still choose words from the text."}</p>`;
+      }).join("") || `<p class="hint">${reviewFilter==="marked" ? "No marks yet. Click a word in your text to get started." : "No words match this filter. You can still choose words from the text."}</p>`;
       $("#preteach-items").querySelectorAll("[data-review-other]").forEach(button=>button.addEventListener("click",()=>openOccurrence(otherMarked[Number(button.dataset.reviewOther)])));
       $("#preteach-items").querySelectorAll("[data-preteach-view]").forEach(button=>button.addEventListener("click",()=>{
         const entry=entries[Number(button.dataset.preteachView)]; openOccurrence(entry.occurrence);

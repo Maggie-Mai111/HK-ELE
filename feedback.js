@@ -20,12 +20,12 @@
     const link = dialog.querySelector(".feedback-open");
     link.removeAttribute("href"); link.hidden = true;
     const status = dialog.querySelector(".feedback-status");
-    status.textContent = "Opening form…";
+    status.textContent = "Getting your form ready…";
     dialog.showModal();
     try {
       if (!config) { const response = await fetch("./feedback_forms.json?v=20261109-v64"); if (!response.ok) throw new Error(); config = await response.json(); }
       const url = window.HkeleFeedbackContract.buildFeedbackUrl(kind, context, config);
-      if (url) { link.href = url; link.hidden = false; status.textContent = ""; }
+      if (url) { link.href = url; link.hidden = false; status.textContent = `${context.word ? "The word" : "The page"} is already filled in. Complete and submit the form to send your feedback.`; }
       else status.textContent = "Please try this form again later.";
     } catch { status.textContent = "Couldn’t open the form. Close this window and try again."; }
   };

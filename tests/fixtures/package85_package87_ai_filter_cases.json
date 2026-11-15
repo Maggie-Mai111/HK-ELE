@@ -42,7 +42,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 447
+      "expectedMatchCount": 498
     },
     {
       "id": "hk_top_1k",
@@ -78,7 +78,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 591
+      "expectedMatchCount": 604
     },
     {
       "id": "suffix",
@@ -95,7 +95,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 442
+      "expectedMatchCount": 448
     },
     {
       "id": "awl",
@@ -112,7 +112,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 141
+      "expectedMatchCount": 142
     },
     {
       "id": "msvl",
@@ -129,7 +129,7 @@
         "clarifyingQuestion": null,
         "warnings": []
       },
-      "expectedMatchCount": 164
+      "expectedMatchCount": 167
     },
     {
       "id": "cpb100",
@@ -179,6 +179,6 @@
       }
     }
   ],
-  "dataVersion": "2026-11-10-all-members1663-v1",
+  "dataVersion": "2026-11-13-s4s6-all1676-v1",
   "sourceEntrySha256": "b9da2faf2277fd0588b42a2c89a4905793c3ff13d24b355fb510ea34a1104012"
 }

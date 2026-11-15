@@ -6,8 +6,8 @@
   const flag=v=>v===true||v===1;
   const registered=v=>v!=null&&v!==""&&v!==0&&v!==false;
   const range=(v,min,max)=>min===undefined&&max===undefined||v!==null&&Number.isFinite(v)&&(min===undefined||v>=min)&&(max===undefined||v<=max);
-  const grades=["P1","P2","P3","P4","P5","P6","S1","S2","S3"];
-  const hasWordConditions=f=>[f.root,f.prefix,f.suffix,f.earliestObservedFrom,f.earliestObservedTo,f.awl,f.msvl,f.msvlSubjects,f.externalLevels,f.cpb100].some(v=>v!==undefined);
+  const grades=["P1","P2","P3","P4","P5","P6","S1","S2","S3","S4","S5","S6"];
+  const hasWordConditions=f=>[f.root,f.prefix,f.suffix,f.earliestObservedFrom,f.earliestObservedTo,f.awl,f.msvl,f.msvlSubjects,f.externalLevels,f.cpb100].some(v=>v!==undefined)||root.HKELE_EDUCATION_FILTERS.hasUsReferenceConditions(f);
   const label=v=>typeof v==="string"&&v.trim()&&!/^[\d.\s,;|+\-–—eE]+$/.test(v)?v.trim():null;
   function formsFor(document,key){
     return (document.families[key]||[]).map(row=>{
@@ -27,7 +27,7 @@
     if(f.awl!==undefined&&(form.awl===null||flag(form.awl)!==f.awl))return false;
     if(f.msvl!==undefined&&(form.msvl===null||registered(form.msvl)!==f.msvl))return false;
     if(f.msvlSubjects&&!f.msvlSubjects.some(x=>includes(form.msvl,x)))return false;
-    if(f.externalLevels&&!f.externalLevels.some(x=>includes(form.external_level_reference,x)))return false;
+    if(!root.HKELE_EDUCATION_FILTERS.matchesUsReference(form.external_level_reference,f))return false;
     if(f.cpb100!==undefined&&common.has(norm(form.form).replace(/[’‘ʼ＇]/g,"'"))!==f.cpb100)return false;
     return true;
   }

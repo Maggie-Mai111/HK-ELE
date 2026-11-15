@@ -1,21 +1,21 @@
 {
-  "status": "LOCAL_REVIEWED_PUBLIC_PENDING",
-  "iteration": "v68",
-  "dataVersion": "2026-11-10-all-members1663-v1",
+  "status": "LOCAL_VALIDATED_PUBLIC_PENDING",
+  "iteration": "v74",
+  "dataVersion": "2026-11-13-s4s6-all1676-v1",
   "expressionDataVersion": "2026-11-05-closed-compounds-v1",
   "wordOriginsVersion": "2026-11-05-word-origins-v1",
   "dataCounts": {
-    "candidate": 1663,
-    "inclusiveReference": 1663,
+    "candidate": 1676,
+    "inclusiveReference": 1676,
     "referenceOnly": 0,
     "totalFamilies": 167780,
     "forms": 329202,
-    "ranked": 138729,
-    "unranked": 29051,
+    "ranked": 138717,
+    "unranked": 29063,
     "teachingScopeExcluded": 0
   },
   "uiRedesigned": false,
-  "approvedUiPredecessor": "Web v67 / App v65",
+  "approvedUiPredecessor": "Web v73 / App v72",
   "registeredWorkerEnvironment": "production",
   "workerEnvironmentChanged": false,
   "feedbackFormsConnected": true,
@@ -26,17 +26,17 @@
   "publicUpdated": false,
   "provenance": "README.md",
   "fullDatabaseWorkbook": {
-    "dataVersion": "2026-11-10-all-members1663-v1",
+    "dataVersion": "2026-11-13-s4s6-all1676-v1",
     "wordOriginsVersion": "2026-11-05-word-origins-v1",
-    "workbookVersion": "2026-11-10-teacher-all-members-v1",
-    "filename": "HK_ELE_Full_Database_20261110.xlsx",
-    "assetPath": "assets/downloads/2026-11-10-teacher-all-members-v1/HK_ELE_Full_Database_20261110.xlsx",
-    "byteSize": 12041276,
-    "sha256": "2d789d8b6c4ad8c1686f391581608369bd356d42ce1588d90bfe94066cf95ab6",
+    "workbookVersion": "2026-11-13-s4s6-all1676-v1-all",
+    "filename": "HK_ELE_Full_Database_S4_S6_20261113.xlsx",
+    "assetPath": "assets/downloads/2026-11-13-s4s6-all1676-v1-all/HK_ELE_Full_Database_S4_S6_20261113.xlsx",
+    "byteSize": 12067772,
+    "sha256": "2ef82cfd8cb3e90dba863533d40cb676264f91da25815b8cf4d1b575079faa88",
     "counts": {
       "wordForms": 329202,
       "fullFamilies": 167780,
-      "wordListFamilies": 1663,
+      "wordListFamilies": 1676,
       "worksheets": 1
     }
   },
@@ -54,36 +54,34 @@
     "judgementScope": "occurrence",
     "automaticFrequencyAndAnnotationTriggers": false
   },
-  "productVersion": "v67",
+  "productVersion": "v74",
   "vocabularyViews": {
     "default": "all",
     "all": {
       "full": 167780,
-      "90": 1663,
-      "95": 2907
+      "90": 1676,
+      "95": 2910
     },
     "familiar": {
       "full": 14253,
-      "90": 1764,
-      "95": 3779,
-      "generalEnglishFamiliarityMinimum": 3.5,
-      "registeredMemberPairs": 49305
+      "90": 1750,
+      "95": 3685
     }
   },
   "familiarDatabaseWorkbook": {
-    "dataVersion": "2026-11-10-all-members1663-v1",
+    "dataVersion": "2026-11-13-s4s6-all1676-v1",
     "wordOriginsVersion": "2026-11-05-word-origins-v1",
-    "workbookVersion": "2026-11-10-familiar-words-v1",
-    "filename": "HK_ELE_Familiar_Words_20261110.xlsx",
-    "assetPath": "assets/downloads/2026-11-10-familiar-words-v1/HK_ELE_Familiar_Words_20261110.xlsx",
-    "byteSize": 2265494,
-    "sha256": "8aed1204786554ce9548336510ebeb0d8d9a98ae4f0e5612e28b42b5cfc8eb51",
+    "workbookVersion": "2026-11-13-s4s6-all1676-v1-familiar",
+    "filename": "HK_ELE_Familiar_Words_S4_S6_20261113.xlsx",
+    "assetPath": "assets/downloads/2026-11-13-s4s6-all1676-v1-familiar/HK_ELE_Familiar_Words_S4_S6_20261113.xlsx",
+    "byteSize": 2290826,
+    "sha256": "1f35eb069c237c069dbaa67f98afb330a04419e1deba2aa118e40fa710a64c67",
     "counts": {
       "wordForms": 49305,
       "fullFamilies": 14253,
-      "wordListFamilies": 1764,
+      "wordListFamilies": 1750,
       "worksheets": 1
     }
   },
-  "reviewFixes": "Vocabulary view guidance; App Excel download entry removed; existing behaviour protected."
+  "reviewFixes": "Real teacher-language evaluation; preserve explicit model scope; exact rank bounds; safe display/default normalization and out-of-range result-count clarification. No data/UI redesign."
 }
