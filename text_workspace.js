@@ -156,9 +156,13 @@
     }
     function refreshSuggestions() {
       if (state.checkedText === null) return;
-      root.HKELE_SELECTED_WORDS?.mount($("#preteach-copy-actions"),()=>state.selected);
       const entries = suggestions(state.textAudit, state.cpbTokens, classLevel, {judgements,filter:reviewFilter});
       const otherMarked=reviewFilter==="marked" ? markedOtherOccurrences(state.textAudit,judgements) : [];
+      const copyChoices = [
+        ...entries.map(entry => ({familyKey:entry.key, form:entry.form})),
+        ...otherMarked.filter(item=>item.expression).map(item=>({familyKey:"expression:"+item.expression.expressionId,form:item.surface})),
+      ];
+      root.HKELE_SELECTED_WORDS?.mount($("#preteach-copy-actions"),()=>root.HKELE_SELECTED_WORDS.reviewSelections(state.selected,copyChoices));
       $("#preteach-level-control").hidden=reviewFilter!=="later";
       const families = groupSuggestions(entries);
       const cards=[...families.map(group=>({...group,other:null})),...otherMarked.map(item=>({key:item.occurrence_id,forms:[],other:item}))];

@@ -1,3 +1,4 @@
+import { CURRENT_RELEASE_VERSION } from "./current-release.mjs";
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -11,7 +12,7 @@ const contract=require(join(root,'ai_filter_contract.js'));
 function api(failFullIndexOnce = false) {
   const context=vm.createContext({window:{HKELE_AI_FILTER_CONTRACT:contract},location:{href:'https://fixture.invalid/'},URL,crypto:globalThis.crypto,TextDecoder,TextEncoder,Blob,Response,DecompressionStream,fetch:async path=>{
       path=String(path).split("?")[0];
-    if (failFullIndexOnce && path === 'data/releases/2026-11-15-general-as-all1677-v1/ai_full_projection.json.gz') { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
+    if (failFullIndexOnce && path === `data/releases/${CURRENT_RELEASE_VERSION}/ai_full_projection.json.gz`) { failFullIndexOnce=false;return new Response('unavailable',{status:503}); }
     return new Response(new Uint8Array(readFileSync(join(root,path))));
   }});
   context.HKELE_AI_FILTER_CONTRACT=contract;

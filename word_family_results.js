@@ -1,9 +1,9 @@
 (function (root) {
   "use strict";
-  const DATA_VERSION = "2026-11-15-general-as-all1677-v1";
+  const DATA_VERSION = "2026-11-17-current-rules-final-v2";
   const VERSION = "spelling-frequency-20261105-v1";
   const DATA_ROOT = `data/word-forms/${VERSION}/`;
-  const MANIFEST_HASH = "48412c0897a16ea0c2832d1f297c0b9de28029fb727f4f79e6fe599fb65b041a";
+  const MANIFEST_HASH = "fc7e2fd2230e4121cf01c75afbdb99fddb1f6747173fc43f40e83f9e975a821f";
   const normalize = value => String(value ?? "").normalize("NFKC").trim().toLowerCase().replace(/[’‘ʼ＇]/g, "'");
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : null;
   function frequency(record) {

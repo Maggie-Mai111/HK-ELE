@@ -17,3 +17,12 @@ test('copying is available on the selected-word page and passage selection witho
  const html=read('index.html');assert.match(html,/id="list-title">Selected words/);assert.match(html,/id="list-copy-actions"/);assert.match(html,/id="preteach-copy-actions"/);assert.match(html,/id="export-xlsx">Download Excel/);assert.doesNotMatch(html,/id="export-csv"|id="export-md"|More formats/);
  assert.match(read('selected_words.js'),/data-copy-text/);assert.match(read('lesson_workspace.js'),/data-picker-copy/);
 });
+
+
+test('passage copy excludes saved words outside the current review and keeps original forms and notes',()=>{
+ const helper=api(),saved=[{baseword_key:'stress',selected_forms:['stress','stressed'],notes:'Keep note'},{baseword_key:'solar',selected_forms:['solar'],notes:'Earlier text'}];
+ const before=JSON.stringify(saved);
+ assert.equal(helper.selectedWordsText(helper.reviewSelections(saved,[{familyKey:'stress',form:'Stressed'}]),true).text,'stressed\nNote: Keep note');
+ assert.equal(helper.reviewSelections(saved,[]).length,0);
+ assert.equal(JSON.stringify(saved),before);
+});

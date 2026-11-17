@@ -871,9 +871,10 @@
     try {
       if (!window.HKELE_XLSX) throw new Error("Excel export is not available.");
       const rows = lessonExportRows();
-      const keep = rows[0].map((label,index) => index > 0 && (index < 12 || label === "Saved selection status") ? index : -1).filter(index => index >= 0);
+      const teacherColumns = new Set(["Order", "Selected word", "Teaching notes", "Word family", "Word list", "Overall family rank", "HK family rank", "HK family frequency band"]);
+      if (state.selected.some(item => item.connections?.trim())) teacherColumns.add("Related words or example");
+      const keep = rows[0].map((label,index) => teacherColumns.has(label) ? index : -1).filter(index => index >= 0);
       const teacherRows = rows.map(row => keep.map(index => row[index]));
-      teacherRows[0] = teacherRows[0].map(label => label === "Saved selection status" ? "Selection note" : label);
       window.HKELE_XLSX.download(teacherRows, "HK-ELE_Teaching_List.xlsx");
     } catch { toast("We couldn't export your list. Please try again."); }
   }

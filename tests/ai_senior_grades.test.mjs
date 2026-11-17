@@ -33,7 +33,7 @@ test('Web AI accepts and displays P1–S6 ranges in chronological order',()=>{
 
 test('Web AI uses the actual spelling’s S4–S6 textbook record, not another family member’s stage',()=>{
   const evidence=JSON.parse(gunzipSync(readFileSync(new URL('../ai-form-evidence/20261103-wordlist1764-v1.json.gz',import.meta.url))).toString());
-  for(const [family,word,grade] of [['able','ability','S4'],['able','disability','S5'],['abuse','abusing','S6']]){
+  for(const [family,word,grade] of [['cover','coverage','S4'],['cover','uncover','S5'],['suit','suitability','S6']]){
     const forms=formFilter.formsFor(evidence,family);
     const selected=forms.find(form=>form.form===word);
     assert.equal(selected.first_seen_hk_textbooks,grade);
@@ -53,5 +53,5 @@ test('Web AI retains navigation-only flags from actual source records',()=>{
       assert.equal(formFilter.matches(form,filters,new Set()),false);checked++;
     }
   }
-  assert.equal(checked,19);
+  assert.equal(checked,21);
 });

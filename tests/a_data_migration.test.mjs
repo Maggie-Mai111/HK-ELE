@@ -1,3 +1,4 @@
+import { CURRENT_RELEASE_VERSION } from "./current-release.mjs";
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -5,7 +6,7 @@ import vm from 'node:vm';
 import test from 'node:test';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const load=path=>JSON.parse(gunzipSync(readFileSync(root+'data/releases/2026-11-15-general-as-all1677-v1/'+path)));
+const load=path=>JSON.parse(gunzipSync(readFileSync(root+`data/releases/${CURRENT_RELEASE_VERSION}/`+path)));
 const manifest=load('manifest.json.gz');
 function detail(key) {
   let hash=2166136261;
@@ -20,7 +21,7 @@ test('Web refresh keeps concrete forms, teacher work and a recoverable pre-updat
   const old={baseword_key:'use',display_family:'use',selected_forms:['reusable'],notes:'My lesson note',connections:'target meaning',order:4,depth:'Practise',teaching_focus:'focus',overall_frequency_order:15};
   const next=refresh(old,detail('use'));
   for(const key of ['selected_forms','notes','connections','order','depth','teaching_focus'])assert.deepEqual(next[key],old[key]);
-  assert.equal(next.data_version,'2026-11-15-general-as-all1677-v1');assert.equal(next.overall_frequency_order,detail('use').family.overall_frequency_order);
+  assert.equal(next.data_version,CURRENT_RELEASE_VERSION);assert.equal(next.overall_frequency_order,detail('use').family.overall_frequency_order);
   assert.deepEqual(next.previous_evidence,old);
 });
 test('Web retains a changed-owner selection under its original identity for review',()=>{

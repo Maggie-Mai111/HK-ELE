@@ -22,7 +22,7 @@ test('actual word evidence rejects corrupt AI projection, retries, and retains a
   const result=await repo.request(query);
   const agency=result.families.find(row=>row.ai_match_form==='agency');
   assert.ok(agency);assert.equal(agency.baseword_key,'agent');assert.equal(agency.ai_source_family.baseword_key,'agent');
-  assert.equal(agency.textbook_first_seen_level,"S4");
+  assert.equal(agency.textbook_first_seen_level,"S2");
   assert.ok(!result.families.some(row=>['age','aged','ageing'].includes(row.ai_match_form)));
 });
 test('real AI result handlers open and add the matched spelling, preserving canonical family information',()=>{

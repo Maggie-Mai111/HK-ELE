@@ -1,3 +1,4 @@
+import { CURRENT_RELEASE_VERSION } from "./current-release.mjs";
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
@@ -78,7 +79,7 @@ test('a corrupt compound shard cannot produce a match and can be retried without
 });
 test('compound lesson identities survive serialization and refresh without acquiring a family rank',()=>{
  const expression=compound('classroom');
- const item={...teaching.createItem(expression,3,'2026-11-15-general-as-all1677-v1','Check a text'),notes:'Target classroom sense',connections:'My lesson example',teaching_focus:'focus'};
+ const item={...teaching.createItem(expression,3,CURRENT_RELEASE_VERSION,'Check a text'),notes:'Target classroom sense',connections:'My lesson example',teaching_focus:'focus'};
  const reopened=JSON.parse(JSON.stringify(item));const updated=teaching.refresh(reopened,expression);
  assert.equal(updated.baseword_key,'expression:'+expression.expressionId);assert.equal(updated.order,3);assert.equal(updated.notes,item.notes);
  assert.equal(updated.overall_frequency_order,null);assert.equal(updated.hk_corpus_frequency_rank,null);

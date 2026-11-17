@@ -1,3 +1,4 @@
+import { CURRENT_RELEASE_VERSION } from "./current-release.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -22,14 +23,14 @@ async function gzipJson(...parts) {
 }
 
 async function context(scope = "broader", sort = "overall") {
-  const manifest = await gzipJson(package87, "data", "releases", "2026-11-15-general-as-all1677-v1", "manifest.json.gz");
+  const manifest = await gzipJson(package87, "data", "releases", CURRENT_RELEASE_VERSION, "manifest.json.gz");
   const info = manifest.browse[scope][sort];
   const rows = [];
   for (let index = 0; index < info.chunk_count; index += 1) {
-    const packed = await gzipJson(package87, "data", "releases", "2026-11-15-general-as-all1677-v1", "browse", scope, sort, `${String(index).padStart(4, "0")}.json.gz`);
+    const packed = await gzipJson(package87, "data", "releases", CURRENT_RELEASE_VERSION, "browse", scope, sort, `${String(index).padStart(4, "0")}.json.gz`);
     rows.push(...packed.map(row => Object.fromEntries(manifest.browse_fields.map((field, fieldIndex) => [field, row[fieldIndex] ?? null]))));
   }
-  return {manifest, rows, index:await gzipJson(package87, "data", "releases", "2026-11-15-general-as-all1677-v1", "ai_filter_index.json.gz")};
+  return {manifest, rows, index:await gzipJson(package87, "data", "releases", CURRENT_RELEASE_VERSION, "ai_filter_index.json.gz")};
 }
 
 test("principal populations and unchanged static baseline metadata", async () => {

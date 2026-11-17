@@ -28,3 +28,12 @@ test('true ordinary ambiguity and normal variants/abbreviations keep their exist
  const api=resources();for(const word of ['saw','does','in'])assert.equal((await api.request('/search?q='+word)).status,'AMBIGUOUS',word);
  for(const word of ['cell','programme','theatre','media']){const r=await api.request('/search?q='+word);assert.ok(r.owners.length);assert.ok(!r.alternatives.some(o=>o.match_classes.includes('SECONDARY_RECORDED_READING')),word);}
 });
+
+
+test('ordinary they and They use the accepted teacher family, retaining recorded alternatives',async()=>{
+ const api=resources(),rows=await resolve(api,'They read the text. Later they play.');
+ const pronouns=rows.filter(row=>row.surface.toLowerCase()==='they');
+ assert.equal(pronouns.length,2);
+ for(const row of pronouns){assert.equal(row.status,'RESOLVED');assert.deepEqual(keys(row),['they']);assert.equal(row.normalizedAnalysis.tokens[0].familyKey,'they');assert.ok(row.alternatives.some(owner=>owner.baseword_key==='it'));}
+ assert.deepEqual(keys(await api.request('/search?q=they')),['they']);
+});

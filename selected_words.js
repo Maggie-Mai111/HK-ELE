@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.selectedWordsText = selectedWordsText;
 exports.copyPlainText = copyPlainText;
+exports.reviewSelections = reviewSelections;
 function selectedWordsText(items, withNotes = false) {
     let count = 0, skipped = 0;
     const blocks = [];
@@ -45,7 +46,15 @@ async function copyPlainText(text, writer) {
         return false;
     }
 }
-
+/** A copy view only; the complete saved list and its notes stay in storage. */
+function reviewSelections(items, choices) {
+    const normalized = (value) => value.normalize("NFKC").toLocaleLowerCase();
+    const keys = new Set(choices.map(choice => JSON.stringify([choice.familyKey, normalized(choice.form)])));
+    return items.map(item => ({
+        ...item,
+        selectedForms: (item.selectedForms ?? item.selected_forms ?? []).filter(form => keys.has(JSON.stringify([item.basewordKey ?? item.baseword_key, normalized(form)]))),
+    })).filter(item => item.selectedForms.length > 0);
+}
 })(globalThis.HKELE_SELECTED_WORDS={});
 (function(root){
   const api=root.HKELE_SELECTED_WORDS,tokens=new WeakMap();
