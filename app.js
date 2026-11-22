@@ -214,7 +214,7 @@
         add: `<td class="action-cell"><button class="primary" data-add-family="${esc(row.baseword_key)}" data-browse-row="${rowIndex}" ${browseRowAdded(row) ? "disabled" : ""}>${browseRowAdded(row) ? "Added ✓" : "Add"}</button></td>`,
       };
       return `<tr>${visible.map(([key]) => cells[key]).join("")}</tr>`;
-    }).join("") : `<tr><td class="browse-empty" colspan="${visible.length}">${esc(globalThis.HKELE_LESSON_LIBRARY.emptyMessage(Boolean(state.aiFilters), state.scope === "core"))}<button data-empty-reset type="button">${state.aiFilters ? "Clear filters" : state.scope === "core" ? "Search Full database" : "Reload words"}</button></td></tr>`;
+    }).join("") : `<tr><td class="browse-empty" colspan="${visible.length}">${esc(globalThis.HKELE_LESSON_LIBRARY.emptyMessage(Boolean(state.aiFilters), state.scope === "core"))}<button data-empty-reset type="button">${state.aiFilters ? "Clear filters" : state.scope === "core" ? "Search All entries" : "Reload words"}</button></td></tr>`;
     $('[data-empty-reset]')?.addEventListener("click", () => {
       clearAiForManualBrowseChange(); state.scope="full"; state.page=1; syncBrowseControls(); loadFamilies();
     });
@@ -239,7 +239,11 @@
   }
 
   function syncBrowseControls() {
-    $$(".scope").forEach(node => node.classList.toggle("active", node.dataset.scope === state.scope));
+    $$(".scope").forEach(node => {
+      const active = node.dataset.scope === state.scope;
+      node.classList.toggle("active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
     const search = state.familySearch;
     $("#sort-select").innerHTML = search
       ? '<option value="frequency-desc">Most frequent forms</option><option value="frequency-asc">Least frequent forms</option><option value="az">A–Z</option><option value="za">Z–A</option>'
@@ -249,7 +253,6 @@
   }
 
   function clearAiForManualBrowseChange() {
-    if (!state.aiFilters) return;
     state.aiFilters = null;
     state.aiRestore = null;
     window.dispatchEvent(new CustomEvent("hkele:manual-browse-change"));
@@ -279,8 +282,8 @@
     if (!search) { host.innerHTML = ""; return; }
     const wordCount = search.groups.reduce((total, group) => total + group.forms.length, 0);
     const queryIsForm = search.groups.some(group => familyResults.sortedForms(group.forms, search.query).some(row => row.isSearch));
-    host.innerHTML = `<div class="family-search-toolbar"><div><h2 tabindex="-1" id="family-search-title">Results for “${esc(search.query)}”</h2><p>${search.loading ? "Finding related words…" : search.groups.length ? `${wordCount.toLocaleString()} word forms · ${search.groups.length} word ${search.groups.length === 1 ? "family" : "families"}` : ""}</p></div><button type="button" id="clear-word-search">Back to all words</button></div>
-      ${search.message ? `<p class="search-feedback">${esc(search.message)}${search.outsideCore ? ' <button type="button" id="search-full-database">View in Full database</button>' : ""}</p>` : ""}
+    host.innerHTML = `<div class="family-search-toolbar"><div><h2 tabindex="-1" id="family-search-title">Results for “${esc(search.query)}”</h2><p>${search.loading ? "Finding related words…" : search.groups.length ? `${wordCount.toLocaleString()} word forms · ${search.groups.length} word ${search.groups.length === 1 ? "family" : "families"}` : ""}</p></div><button type="button" id="clear-word-search">Back to word list</button></div>
+      ${search.message ? `<p class="search-feedback">${esc(search.message)}${search.outsideCore ? ' <button type="button" id="search-full-database">View in All entries</button>' : ""}</p>` : ""}
       <div data-search-uses></div>
       ${search.expression ? compoundUi.html(search.expression,"Find words") : ""}${search.expressionLayerStatus === "UNAVAILABLE" ? '<p class="hint">Connect or update the wordlist to check compound words.</p>' : ""}
       ${search.groups.length ? `<p class="family-search-note">${queryIsForm ? 'Your search is shown first; the other forms follow your chosen sort.' : 'These are the recorded forms in the matched family.'}</p><p class="family-search-note">Ranks compare whole word families; 1 is the highest.</p>` : ""}
@@ -326,7 +329,7 @@
       const owners = allOwners.filter(owner => scope === "full" || globalThis.HKELE_COVERAGE_LISTS.inFamily(owner,scope==="core95"?"95":"90"));
       if (!owners.length) {
         const outsideCore = allOwners.length > 0 && scope !== "full";
-        Object.assign(state.familySearch, {loading:false, outsideCore, message:outsideCore ? "This word is outside the selected list. Try the full view." : result.expression ? "" : identityNote(result) || (globalThis.HKELE_WORD_VIEW.get()==="familiar" ? "No match in Familiar words. Try All words." : "No automatic match. Try another spelling or word form.")});
+        Object.assign(state.familySearch, {loading:false, outsideCore, message:outsideCore ? "This word is outside the selected list. Try All entries." : result.expression ? "" : identityNote(result) || (globalThis.HKELE_WORD_VIEW.get()==="familiar" ? "No match in Generally familiar forms. Try All word forms." : "No automatic match. Try another spelling or word form.")});
       } else {
         const groups = await Promise.all(owners.map(async owner => {
           const [detail, frequency] = await Promise.all([json(`/families/${encodeURIComponent(owner.baseword_key)}`), familyFrequency.load(owner.baseword_key).then(value => ({value}), () => ({error:true, value:{}}))]);
@@ -496,14 +499,17 @@
       external: [...distinct(detail.forms.map(form => form.external_level_reference)), ...(detail.forms.some(form => blank(form.external_level_reference)) ? ["No record"] : [])],
       academic: ["AWL", "MSVL", ...MSVL_ORDER, "No record"],
     };
+    const fromPassage = state.wordReturn?.view === "check";
+    const actions = `<div class="word-card-actions"><div class="word-action-buttons"><button class="primary selected-add" data-add-selected>Add to selected words</button><div class="feedback-word-actions"><button type="button" data-feedback-kind="rating" data-feedback-word="true">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true">Report a problem</button></div></div></div>`;
     $("#word-workspace").innerHTML = `
       <article class="selected-word-card">
         <header class="word-card-head">
           <div class="word-card-identity"><div class="word-title-line"><h1 id="word-view-title">${shown(selected?.form || state.selectedForm)}</h1><span class="set-pill ${statusClass(family.set_membership)}">${statusLabel(family.set_membership,family)}</span></div><p class="identity-line">Word family: <strong>${esc(family.display_family)}</strong></p></div>
-          <div class="word-card-actions"><div class="word-action-buttons"><button class="primary selected-add" data-add-selected>+ Selected words</button><div class="feedback-word-actions"><button type="button" data-feedback-kind="rating" data-feedback-word="true">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true">Report a problem</button></div></div></div>
+          ${fromPassage ? "" : actions}
         </header>
+        ${fromPassage ? '<div class="word-passage-actions">' + actions + '</div>' : ""}
         <div class="word-card-evidence">
-          <section class="word-evidence-group" aria-labelledby="word-teaching-title"><h2 id="word-teaching-title">Teaching records</h2><div class="evidence-grid">
+          <section class="word-evidence-group" aria-labelledby="word-teaching-title"><h2 id="word-teaching-title">Teaching records</h2><p class="hint">The textbook stage is the earliest record of this spelling in the sampled Hong Kong textbooks.</p><div class="evidence-grid">
             ${evidenceItem("First seen in HK textbooks", selected?.first_seen_hk_textbooks)}
             ${evidenceItem("US grade reference", selected?.external_level_reference)}
             ${evidenceItem("Academic Word List (AWL)", selectedEvidence.awl ? "Yes" : null)}
@@ -565,7 +571,7 @@
       $(".word-card-actions").insertAdjacentHTML("beforeend", '<button type="button" data-word-occurrences>View all occurrences</button>');
       $("[data-word-occurrences]").addEventListener("click", () => textWorkspace.openOccurrences(checkedForm));
     }
-    textWorkspace.mountReviewTools?.($(".word-card-actions"), checkedForm);
+    if (sourceLabel === "Check a text") textWorkspace.mountReviewTools?.($(".word-card-actions"), checkedForm, state.reviewOccurrence, true);
     $("[data-add-selected]").addEventListener("click", () => addToList(family, selected?.form || state.selectedForm, sourceLabel));
     $$('[data-select-form]').forEach(button => button.addEventListener("click", () => { state.selectedForm = detail.forms.find(form => form.form_key === button.dataset.selectForm)?.form || state.selectedForm; renderWord(); }));
     $$('[data-add-form]').forEach(button => button.addEventListener("click", () => addToList(family, detail.forms.find(form => form.form_key === button.dataset.addForm)?.form || family.display_family, sourceLabel)));
@@ -727,7 +733,7 @@
     const owner = itemOwner(item), evidence = exactEvidence(item);
     if (!owner || item.status !== "RESOLVED") {
       const unsupported = item.status === "UNSUPPORTED" || item.token_status === "UNSUPPORTED_TOKEN";
-      const note = unsupported ? "Kept in your text. No English-word match." : identityNote(item) || (item.status === "UNMATCHED" ? "" : "Check the reading in this sentence before choosing a family.");
+      const note = unsupported ? "Kept in your text. No English-word match." : identityNote(item) || (item.status === "UNMATCHED" ? "No automatic match in this text." : "Check the reading in this sentence before choosing a family.");
       return `<article class="text-result"><div><span class="observed-word">${esc(item.display_word)}</span><span class="occurrence-count">${item.count} occurrence${item.count === 1 ? "" : "s"}</span>${context}</div><div class="review-note">${esc(note)}</div><div></div></article>`;
     }
     return `<article class="text-result"><div class="result-token"><span class="observed-word">${esc(item.display_word)}</span><span class="occurrence-count">${item.count} occurrence${item.count === 1 ? "" : "s"}</span>${context}</div><div><div class="result-family-line"><span>Word family</span><strong>${esc(owner.display_family)}</strong></div><div class="result-evidence">${resultEvidence(owner, evidence, item)}</div></div><div class="result-actions"><button data-result-view="${esc(owner.baseword_key)}" data-result-form="${esc(evidence?.form || item.display_word)}">View</button><button class="primary" data-result-add="${esc(owner.baseword_key)}" data-result-form="${esc(evidence?.form || item.display_word)}">Add</button></div></article>`;
@@ -739,11 +745,14 @@
       ["contractions", "Contractions and expressions", false], ["unmatched", "Words without a match", false], ["review", "Words that need a context check", false], ["common", "Common words", $("#filter-common").checked],
     ];
     const activeFilters = Object.values(state.textFilters).reduce((count, values) => count + values.size, 0) + ($("#filter-word-set").value !== "all" ? 1 : 0) + ($("#filter-common").checked ? 1 : 0);
-    $("#active-filter-count").textContent = activeFilters ? `${activeFilters} active` : "All words";
+    $("#active-filter-count").textContent = activeFilters ? `${activeFilters} active` : "All results";
     const counts=globalThis.HKELE_COVERAGE_LISTS.summarize(state.textAudit,state.coverageTarget);
-    $("#passage-coverage-value").textContent=`${counts.percent===null?"—":Number(counts.percent.toFixed(1))+"%"} · ${counts.included} of ${counts.total} word occurrences · this text`;
-    $("#coverage-outside").hidden=counts.outside===0;
-    $("#coverage-outside").textContent=`View words outside this list (${counts.outside})`;
+    $("#passage-coverage-value").textContent = counts.percent === null
+      ? "No words to count."
+      : `${counts.included} of ${counts.total} ${counts.total === 1 ? "word is" : "words are"} on the ${state.coverageTarget}% list (${Number(counts.percent.toFixed(1))}%).`;
+    $("#coverage-outside").hidden = counts.outside === 0;
+    $("#coverage-outside").textContent = "Review words outside the list";
+    const reviewingOutside = state.coverageOutside || $("#filter-word-set").value === "outside";
     const summary = summarizeTextItems(state.textItems);
     const languageNotes = {words:summary.contractions.words + summary.review.words, occurrences:summary.contractions.occurrences + summary.review.occurrences};
     const normalizedTextCounts = globalThis.HKELE_TEXT_NORMALIZATION.normalizedCounts(state.textAudit);
@@ -754,9 +763,9 @@
     const html = definitions.map(([key, label, normallyOpen]) => {
       const all = state.textItems.filter(item => itemGroup(item) === key);
       const filtered = sortItems(all.filter(passesFilters)); shownUnique += filtered.length;
-      if (!all.length || ((state.coverageOutside || $("#filter-word-set").value === "outside") && !filtered.length)) return "";
+      if (!all.length || (reviewingOutside && !filtered.length)) return "";
       const occurrences = filtered.reduce((sum, item) => sum + item.count, 0);
-      const open = key === "common" ? $("#filter-common").checked : normallyOpen;
+      const open = key === "common" ? $("#filter-common").checked : normallyOpen || (reviewingOutside && key === "unmatched");
       return `<details class="result-group group-${key}" ${open ? "open" : ""}><summary>${label} <span>${filtered.length} of ${all.length} grouped words · ${occurrences} occurrence${occurrences === 1 ? "" : "s"}</span></summary><div class="result-group-content">${key === "unmatched" ? '<p class="hint">These words were not matched in this text.</p>' : ""}${filtered.length ? filtered.map(resultCard).join("") : '<p class="hint">No words in this group match the current filters.</p>'}</div></details>`;
     }).join("");
     $("#text-results").className = "result-groups"; $("#text-results").innerHTML = html;
@@ -875,7 +884,7 @@
       if (state.selected.some(item => item.connections?.trim())) teacherColumns.add("Related words or example");
       const keep = rows[0].map((label,index) => teacherColumns.has(label) ? index : -1).filter(index => index >= 0);
       const teacherRows = rows.map(row => keep.map(index => row[index]));
-      window.HKELE_XLSX.download(teacherRows, "HK-ELE_Teaching_List.xlsx");
+      window.HKELE_XLSX.download(teacherRows, "HK-ELE-Selected-Words.xlsx");
     } catch { toast("We couldn't export your list. Please try again."); }
   }
 
@@ -885,11 +894,10 @@
       globalThis.HKELE_WORD_VIEW.set(button.dataset.wordView);
       const familiar=globalThis.HKELE_WORD_VIEW.get()==="familiar",n=globalThis.HKELE_WORD_VIEW.counts();
       $$('[data-word-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wordView===globalThis.HKELE_WORD_VIEW.get())));
-      $$('[data-familiar-note]').forEach(p=>{p.hidden=false;p.textContent=globalThis.HKELE_TEACHER_HELP_CONTENT.viewHelp[familiar?'familiarHint':'allHint'];});
-      const label=scope=>scope==='full'?`${familiar?'Familiar words':'Full database'} <span>${n.full.toLocaleString()} families</span>`:`${scope==='core95'?'95%':'90%'} list <span>${n[scope==='core95'?'95':'90'].toLocaleString()} families</span>`;
+      const label=scope=>scope==='full'?`<strong>All entries</strong><span>${n.full.toLocaleString()} families</span>`:`<strong>${scope==='core95'?'95%':'90%'} list</strong><span>${n[scope==='core95'?'95':'90'].toLocaleString()} families</span>`;
       $$('.scope').forEach(b=>{b.innerHTML=label(b.dataset.scope);});
       $$('#coverage-target option').forEach(o=>{o.textContent=`${o.value}% list · ${n[o.value].toLocaleString()} families`;});
-      $('#download-full-database').textContent=familiar?'Download familiar words (.xlsx)':'Download full database (.xlsx)';
+      $('#download-full-database').textContent=familiar?'Download familiar forms (.xlsx)':'Download full database (.xlsx)';
       state.textAudit=state.textAudit.map(globalThis.HKELE_WORD_VIEW.item);state.textItems=state.textItems.map(globalThis.HKELE_WORD_VIEW.item);
       if(state.textItems.length){renderTextResults();textWorkspace.render({reset:false});}state.page=1;clearAiForManualBrowseChange();loadFamilies();if($('#browse-search').value.trim())searchWordFamily();
     }));

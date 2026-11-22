@@ -178,3 +178,13 @@ button:disabled{cursor:default;opacity:.6}
 @media(max-width:700px){.lesson-context{margin:12px 16px 0;padding:12px}.lesson-context-controls{width:100%}.lesson-context select{flex:1;width:100%;min-width:0}.lesson-context-controls label{width:100%}}
 
 .lesson-context.home-context:not(.has-save-error){display:none}
+
+/* Keep complete navigation labels visible when saved words adds an item. */
+.site-header{flex-wrap:wrap;column-gap:16px;row-gap:8px}
+.site-header>nav{flex-shrink:0;flex-wrap:wrap;overflow:visible;max-width:100%}
+.site-header>.teacher-help-link{flex:0 0 auto;white-space:nowrap}
+.site-header>.feedback-global{flex-shrink:0;max-width:100%}
+.site-header>.feedback-global button{white-space:nowrap}
+@media(max-width:1360px){
+  .site-header>nav{flex:0 0 100%;order:3;width:100%}
+}

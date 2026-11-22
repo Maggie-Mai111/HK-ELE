@@ -89,7 +89,7 @@ test("damaged saved or legacy data is never silently replaced with an empty less
 });
 test("empty browse guidance distinguishes reviewed filters from Core and ordinary browsing",()=>{
   assert.match(api.emptyMessage(true,false),/filters/);
-  assert.match(api.emptyMessage(false,true),/Full database/);
+  assert.match(api.emptyMessage(false,true),/All entries/);
   assert.doesNotMatch(api.emptyMessage(false,false),/AI|controlled|filters/);
 });
 

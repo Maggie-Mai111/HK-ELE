@@ -37,10 +37,10 @@ test("principal populations and unchanged static baseline metadata", async () =>
   const {manifest} = await context();
   const metadata = manifest.metadata;
   assert.equal(Number(metadata.family_count), 167780);
-  assert.equal(Number(metadata.ranked_family_count), 138719);
-  assert.equal(Number(metadata.unranked_family_count), 29061);
-  assert.equal(manifest.browse.core.overall.available_items, 1677);
-  assert.equal(manifest.browse.broader.overall.available_items, 1677);
+  assert.equal(Number(metadata.ranked_family_count), 138518);
+  assert.equal(Number(metadata.unranked_family_count), 29262);
+  assert.equal(manifest.browse.core.overall.available_items, 1669);
+  assert.equal(manifest.browse.broader.overall.available_items, 1669);
   assert.equal(manifest.browse.broader.overall.available_items - manifest.browse.core.overall.available_items, 0);
   for (const name of ["tokenizer.js", "contractions.js", "xlsx_export.js"]) {
     let source = await readFile(path.join(package87,name));
@@ -50,6 +50,11 @@ test("principal populations and unchanged static baseline metadata", async () =>
         .replace(/\n  const TEACHER_TEXT_TOKENIZER_ID[\s\S]*?\n(?=  globalThis.HKELE_TOKENIZER)/, "\n")
         .replace(", TEACHER_TEXT_TOKENIZER_ID, scanTeacherText, tokenizeTeacherText", "");
       source = Buffer.from(legacy, "utf8");
+    }
+    if (name === "xlsx_export.js") {
+      const workbook = source.toString("utf8");
+      assert.match(workbook, /sheet name="Selected words"/);
+      source = Buffer.from(workbook.replace('sheet name="Selected words"', 'sheet name="Teaching List"'), "utf8");
     }
     assert.equal(createHash("sha256").update(source).digest("hex"),captured.baselineHelperSha256[name], `${name} legacy contract changed from the selected UI baseline`);
   }

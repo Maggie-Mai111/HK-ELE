@@ -587,4 +587,4 @@ button,input,select,textarea{font-size:18px}
 #passage-coverage .coverage-value{font-size:24px;font-weight:750;margin:0;}
 @media(max-width:600px){#passage-coverage select{display:block;margin:8px 0 0;}}
 
-.word-view-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-block:12px}.word-view-controls button[aria-pressed="true"]{background:#12654f;color:white}.word-view-controls p{flex-basis:100%;margin:0;font-size:16px}
+.word-view-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-block:12px}.word-selection-label{margin:12px 0 0;font-weight:700}.word-view-controls button[aria-pressed="true"]{background:#12654f;color:white}.word-view-controls p{flex-basis:100%;margin:0;font-size:16px}

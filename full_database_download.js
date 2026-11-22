@@ -6,7 +6,7 @@
     try{
       if((await globalThis.HKELE_STATIC_API.manifest()).metadata.data_version!==release.dataVersion)throw new Error('Generation mismatch');
       const a=document.createElement('a');a.href=release.assetPath+'?v='+release.sha256.slice(0,16);a.download=release.filename;a.click();
-      button.textContent=globalThis.HKELE_WORD_VIEW?.get()==='familiar'?'Download familiar words (.xlsx)':'Download full database (.xlsx)';
+      button.textContent=globalThis.HKELE_WORD_VIEW?.get()==='familiar'?'Download familiar forms (.xlsx)':'Download full database (.xlsx)';
     }catch{button.textContent='Download failed · Try again';}finally{button.disabled=false;}
   });
 })();

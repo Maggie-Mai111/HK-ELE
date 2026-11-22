@@ -11,6 +11,21 @@ function resources(){
  return ctx.window.HKELE_STATIC_API;
 }
 const keys=r=>Array.from(r.owners,o=>o.baseword_key).sort();
+
+test('ordinary at prefers the preposition but currency and quoted readings stay available',async()=>{
+ const api=resources();
+ const ordinary=await resolve(api,'At school they read. They work at home.');
+ for(const row of ordinary.filter(r=>r.surface.toLowerCase()==='at')){
+  assert.equal(row.status,'RESOLVED');assert.deepEqual(keys(row),['at']);
+  assert.equal(row.normalizedAnalysis.tokens[0].familyKey,'at');
+  assert.ok(row.alternatives.some(o=>o.baseword_key==='att'));
+ }
+ for(const text of ['It costs 100 at.','The Lao currency is at.','"at" is quoted.']){
+  const row=(await resolve(api,text)).find(r=>r.surface==='at');assert.deepEqual(keys(row),['at','att']);
+ }
+ assert.deepEqual(keys(await api.request('/search?q=at')),['at']);
+ assert.ok((await api.request('/families/att')).forms.some(f=>f.normalized_form==='at'));
+});
 async function resolve(api,text){const occurrences=[...text.matchAll(/[A-Za-z]+/g)].map((m,i)=>({occurrence_id:String(i),surface:m[0],normalized_token:m[0].toLowerCase(),start_offset:m.index,end_offset:m.index+m[0].length,occurrence_order:i,token_status:'SUPPORTED_TOKEN',failure_reason:null}));return (await api.request('/occurrences/resolve',{body:JSON.stringify({source:text,occurrences})})).occurrences;}
 
 test('ordinary classroom has/a/wall resolve while original alternative readings and family forms remain',async()=>{

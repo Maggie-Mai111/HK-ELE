@@ -1,25 +1,17 @@
 (function (root) {
-  function values(context, config) {
+  function values(context) {
     const result = {
-      product: context.product,
+      product: context.product === "App/PWA" ? "App" : context.product,
       page: String(context.page || "").slice(0, 80),
       word: String(context.word || "").slice(0, 160),
       family: String(context.family || "").slice(0, 160),
-      familyKey: String(context.familyKey || "").slice(0, 160),
-      productVersion: String(config.productVersion || "").slice(0, 100),
-      dataVersion: String(config.dataVersion || "").slice(0, 100),
     };
     const reference = [
-      context.expressionId && "Record type: Compound",
-      context.expressionId && `Expression ID: ${String(context.expressionId).slice(0,160)}`,
-      context.expressionVersion && `Compound data version: ${String(context.expressionVersion).slice(0,100)}`,
+      context.expressionId && "Compound word",
       result.word && `Word: ${result.word}`,
       result.family && `Family: ${result.family}`,
-      result.familyKey && `Family key: ${result.familyKey}`,
       `Product: ${result.product}`,
       `Page: ${result.page}`,
-      `Product version: ${result.productVersion}`,
-      `Data version: ${result.dataVersion}`,
     ].filter(Boolean).join(" | ");
     return { ...result, reference };
   }
@@ -33,7 +25,7 @@
       if (url.protocol !== "https:" || url.username || url.password || url.port) return null;
       if (url.hostname !== "docs.google.com" || !/^\/forms\/d\/(?:e\/)?[A-Za-z0-9_-]+\/viewform$/.test(url.pathname)) return null;
       url.search = ""; url.hash = ""; url.searchParams.set("usp", "pp_url");
-      Object.entries(values(context, config)).forEach(([key, value]) => {
+      Object.entries(values(context)).forEach(([key, value]) => {
         const entry = target.fields[key];
         if (value && entry && /^entry\.\d+$/.test(entry)) url.searchParams.set(entry, value);
       });

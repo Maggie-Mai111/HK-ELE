@@ -61,7 +61,7 @@
   }
   function emptyMessage(hasAi, core) {
     return hasAi ? "No words match these filters. Change or clear the filters to try again." : core ?
-      "No words found in the HK-ELE Word List. Try the Full database." : "No words found. Try another word or check the spelling.";
+      "No words found in the selected list. Try All entries." : "No words found. Try another word or check the spelling.";
   }
   root.HKELE_LESSON_LIBRARY = {KEY, create, withCurrent, add, emptyMessage};
 })(globalThis);

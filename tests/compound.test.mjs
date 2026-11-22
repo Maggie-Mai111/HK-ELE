@@ -69,7 +69,7 @@ test('passage matching preserves source offsets and counts each occurrence once,
  assert.equal(overlap.status,'RESOLVED');assert.ok(overlap.expression);
  assert.ok(overlap.owners.some(owner=>owner.baseword_key==='coinsure'));
  const manifest=await p.HKELE_STATIC_API.manifest();
- assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1677);
+ assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1669);
 });
 test('a corrupt compound shard cannot produce a match and can be retried without losing ordinary lookup',async()=>{
  const p=product({corrupt:true});
@@ -85,11 +85,11 @@ test('compound lesson identities survive serialization and refresh without acqui
  assert.equal(updated.overall_frequency_order,null);assert.equal(updated.hk_corpus_frequency_rank,null);
  const retained=teaching.refresh(updated,null);assert.equal(retained.notes,item.notes);assert.equal(retained.expression.expressionId,expression.expressionId);assert.match(retained.data_review_status,/kept/);
 });
-test('compound feedback prefill carries an expression identity and does not invent a family',()=>{
+test('compound feedback prefill shows its spelling without internal identifiers',()=>{
  const feedback=require('../feedback_contract.js'),expression=compound('classroom');
  const cfg=JSON.parse(read('feedback_forms.json'));
  const ctx={product:'Web',page:'Check a text',word:expression.displayExpression,expressionId:expression.expressionId,expressionVersion:expression.sourceVersion};
  const url=feedback.buildFeedbackUrl('rating',ctx,cfg);assert.ok(url);
- const reference=feedback.feedbackValues(ctx,cfg).reference;
- assert.match(reference,/Record type: Compound/);assert.match(reference,/Expression ID:/);assert.ok(!reference.includes('Family key:'));
+ const reference=new URL(url).searchParams.get(cfg.rating.fields.reference);
+ assert.match(reference,/Compound word/);assert.match(reference,/Word: classroom/);assert.doesNotMatch(reference,/Expression ID|Family key|version/i);
 });

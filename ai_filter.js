@@ -48,6 +48,8 @@
   let busy = false;
   let fixturePromise = null;
   let pendingRequest = null;
+  const selectedScope = () => document.querySelector(".scope.active")?.dataset.scope || "full";
+  const selectedView = () => window.HKELE_WORD_VIEW?.get() || "all";
 
   function setExpanded(expanded) {
     toggle.setAttribute("aria-expanded", String(expanded));
@@ -77,13 +79,16 @@
     interpretation = null;
     preview.hidden = true;
     summary.textContent = "";
+    summary.hidden = true;
     conditions.innerHTML = "";
+    conditions.hidden = true;
     confirmButton.hidden = true;
     editButton.hidden = true;
   }
 
   function displayConditions(filters, scope) {
     return contract.describeConditions(filters, scope).map(text => text
+      .replace(/^Scope: Full database$/, "Search in: All entries")
       .replace(/^Scope: /, "Search in: ")
       .replace(/ or lower priority$/, " or greater")
       .replace(/^Sort: overall$/, "Sort: Overall family rank")
@@ -96,22 +101,24 @@
   }
 
   function renderInterpretation(result) {
-    result = contract.teacherResult(result, contract.teacherScope(input.value, document.querySelector(".scope.active")?.dataset.scope || "full", result));
+    result = contract.teacherResult(result, contract.teacherScope(input.value, selectedScope(), result));
     interpretation = result;
-    summary.textContent = result.status === "ready" ? result.summary : result.status === "needs_clarification" ? "Which words would you like to find?" : "Try a different search.";
-    conditions.innerHTML = result.filters
-      ? displayConditions(result.filters, result.teacherScope).map(item => `<li>${esc(item)}</li>`).join("")
-      : "";
-    const notes = [result.clarifyingQuestion, ...result.warnings].filter(Boolean)
+    const ready = result.status === "ready" && Boolean(result.filters);
+    const items = ready ? displayConditions(result.filters, result.teacherScope) : [];
+    if (ready) items.splice(1, 0, `Vocabulary set: ${selectedView() === "familiar" ? "Generally familiar forms" : "All word forms"}`);
+    conditions.innerHTML = items.map(item => `<li>${esc(item)}</li>`).join("");
+    conditions.hidden = items.length === 0;
+    const notes = result.warnings
       .filter(text => !/^No filters? (?:was|were) applied\.?$/i.test(text))
       .map(text => text.replace(/\bregistered\s+/gi, ""));
-    if (notes.length) conditions.insertAdjacentHTML("beforeend", notes.map(item => `<li class="ai-warning">${esc(item)}</li>`).join(""));
-    confirmButton.hidden = result.status !== "ready";
+    if (result.status === "needs_clarification") notes.unshift(result.clarifyingQuestion || "Which words would you like to find?");
+    if (result.status === "unsupported") notes.unshift("Try a simpler request or one of the examples.");
+    summary.textContent = notes.join(" ");
+    summary.hidden = notes.length === 0;
+    confirmButton.hidden = !ready;
     editButton.hidden = false;
     preview.hidden = false;
-    if (result.status === "unsupported") setMessage("Try a simpler request or one of the examples.", "error");
-    else if (result.status === "needs_clarification") setMessage("Add a little more detail to your request.", "warning");
-    else setMessage("");
+    setMessage("");
   }
 
   function uuidV4() {
@@ -225,6 +232,9 @@
   async function previewRequest() {
     const query = input.value.trim();
     if (!query || query.length > 300 || busy) return;
+    const scopeAtRequest = selectedScope();
+    const viewAtRequest = selectedView();
+    const isCurrent = () => input.value.trim() === query && selectedScope() === scopeAtRequest && selectedView() === viewAtRequest;
     if (!isOnline()) { updateNetworkState(); return; }
     if (!config.fixtureMode && (!config.configured || !turnstileToken)) {
       setMessage("Please complete the verification and try again.", "error");
@@ -235,10 +245,10 @@
     clearPreview();
     try {
       const raw = config.fixtureMode ? await fixtureResult(query) : await workerResult(query);
-      if (!isOnline()) return;
+      if (!isOnline() || !isCurrent()) return;
       renderInterpretation(contract.validateResult(raw));
     } catch (error) {
-      if (!isOnline()) { setMessage(""); return; }
+      if (!isOnline() || !isCurrent()) return;
       setMessage(error instanceof Error && error.message === "AI search is busy. Try again later."
         ? "Search is busy. Try again shortly or use the word search."
         : "We couldn't complete the search. Try again or use the word search.", "error");
@@ -251,9 +261,11 @@
     if (!interpretation?.filters || busy || !window.HKELE_BROWSE_ADAPTER) return;
     setBusy(true);
     try {
-      const result = await window.HKELE_BROWSE_ADAPTER.apply(interpretation.filters,interpretation.teacherScope);
+      const reviewed = interpretation;
+      const result = await window.HKELE_BROWSE_ADAPTER.apply(reviewed.filters, reviewed.teacherScope);
+      if (reviewed !== interpretation) return;
       activeTitle.textContent = `${result.matchedBeforeLimit.toLocaleString("en")} matches · showing first ${result.availableItems.toLocaleString("en")}`;
-      activeConditions.textContent = displayConditions(interpretation.filters).join(" · ");
+      activeConditions.textContent = displayConditions(reviewed.filters, reviewed.teacherScope).join(" · ");
       active.hidden = false;
       setExpanded(false);
       setMessage("");
@@ -298,12 +310,18 @@
   activeEdit.addEventListener("click", () => void clearApplied({edit: true}));
   activeClear.addEventListener("click", () => void clearApplied());
   panel.querySelectorAll("[data-ai-example]").forEach(button => button.addEventListener("click", () => {
+    if (busy) return;
     input.value = button.dataset.aiExample;
     clearPreview();
     setMessage("");
     setBusy(false);
   }));
-  window.addEventListener("hkele:manual-browse-change", () => { active.hidden = true; clearPreview(); });
+  window.addEventListener("hkele:manual-browse-change", () => {
+    active.hidden = true;
+    pendingRequest?.abort();
+    clearPreview();
+    setMessage("");
+  });
   window.addEventListener("offline", updateNetworkState);
   window.addEventListener("online", updateNetworkState);
   setExpanded(false);

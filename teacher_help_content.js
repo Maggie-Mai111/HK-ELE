@@ -4,8 +4,7 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "title": "Check a lesson text",
       "steps": [
         "Paste your passage in Check a Text, then choose Check text.",
-        "Click a word in the passage to see its details.",
-        "Mark May need explaining to keep that use in Words to explain."
+        "Click a word to see its details."
       ],
       "view": "check",
       "action": "Open Check a Text"
@@ -14,8 +13,7 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "title": "Look up a word",
       "steps": [
         "Enter a word in Find words, then choose Search.",
-        "Your word comes first, followed by related forms in its family.",
-        "Choose View for details or Add to keep a word."
+        "Your word appears first, with related forms below."
       ],
       "view": "browse",
       "action": "Open Find words"
@@ -23,12 +21,12 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
   ],
   "keep": {
     "title": "Keep and copy words",
-    "body": "Choose Add beside a word. Open Selected words to add a note and copy your choices into your materials.",
-    "note": "Saved on this browser; use Copy to take your words to another device."
+    "body": "Choose Add to save a word. In Selected words, add notes or copy your list.",
+    "note": "Saved in this browser only."
   },
   "example": {
     "sentence": "Some students felt stressed before the test.",
-    "body": "Click stressed to explore stress, stressful and other forms. Save the ones you want and add a note: feel stressed / a stressful situation."
+    "body": "Paste this in Check a Text, then click stressed in the results. Add any forms you want to keep."
   },
   "columnGroups": [
     {
@@ -44,12 +42,12 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
           "Related forms grouped together, such as stress, stressed and stressful. Their meanings can differ."
         ],
         [
-          "All words / Familiar words",
-          "All words searches the full database. Familiar words shows a smaller set with general English familiarity estimates of 3.5 or above. Your class may know different words."
+          "All word forms / Generally familiar forms",
+          "Choose All word forms for every spelling in HK-ELE. The smaller set keeps spellings rated as familiar in general English. Your class may know different words."
         ],
         [
           "90% / 95% lists",
-          "These lists covered at least 90% or 95% of counted words in each of the four Hong Kong text collections in the study. The 95% list includes the 90% list. Your passage may differ."
+          "In each of the study’s four Hong Kong text collections, the lists matched at least 90% or 95% of the words, counting repeats. The 95% list includes the 90% list. Your text may have a different percentage."
         ]
       ]
     },
@@ -59,15 +57,15 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "items": [
         [
           "Overall family rank",
-          "Combines British and American English with four Hong Kong collections. Each available component contributes equally. Rank 1 is highest."
+          "Compares how common word families are in British, American and Hong Kong English. Rank 1 is highest."
         ],
         [
           "HK family rank / band",
-          "Uses Hong Kong school materials, speech and writing (ICE-HK), web texts (GloWbE-HK) and news (NOW-HK). Each available collection contributes equally. Rank 1 is highest. Bands group similar ranks, such as 1–1,000."
+          "Compares word families using Hong Kong school materials, speech and writing (ICE-HK), web texts (GloWbE-HK) and news (NOW-HK). A band is a range of ranks, such as 1–1,000."
         ],
         [
           "Sort related words",
-          "Most frequent forms and Least frequent forms use counts for each spelling in ICE-HK and GloWbE-HK. These differ from family ranks. Your searched word stays first."
+          "Sorts by how often each spelling appears in Hong Kong speech, writing and web texts (ICE-HK and GloWbE-HK). The word you searched for stays first."
         ]
       ]
     },
@@ -77,11 +75,11 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "items": [
         [
           "First seen in HK textbooks",
-          "The earliest appearance of this spelling in the sampled textbooks. P1–P6 are primary stages; S1–S6 are secondary stages. This does not tell you when students know it."
+          "The earliest level where this spelling appears in the textbooks we checked. P means Primary and S means Secondary. Students may learn it at a different level."
         ],
         [
           "US grade reference",
-          "A US school-grade reference for this spelling. It is separate from Hong Kong textbook stages and your class level."
+          "A US grade reference. Choose what suits your class."
         ],
         [
           "Academic Word List (AWL)",
@@ -99,7 +97,7 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "items": [
         [
           "Greek/Latin root / Root meaning",
-          "A recorded classical root and its meaning. The root meaning is not a full definition of the word."
+          "A Greek or Latin part of a word and what that part means."
         ],
         [
           "Prefix / Suffix",
@@ -111,7 +109,7 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
         ],
         [
           "— / 0",
-          "A dash means no recorded value or list entry. A zero is a recorded count of zero."
+          "A dash means no information is shown for that field. A zero means none were counted."
         ]
       ]
     }
@@ -123,33 +121,23 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
     ],
     [
       "Highlight words",
-      "In Your text, open Highlight words. CPB100 underlines 100 sight words; HK family frequency adds colour by rank. Both can appear on the same word."
+      "In Your text, open Highlight words. The sight-word list (CPB100) adds an underline. HK family rank adds colour. A word can have both marks."
     ],
     [
       "Words to explain",
-      "Click a word in your passage and mark May need explaining. Your marks appear here. Use Browse words by records to explore other words."
+      "Words marked May need explaining in this passage."
     ],
     [
       "All word results",
-      "Open More text tools → All word results to filter the matches or find every use of a word in your passage."
+      "Find words and their sentences under More text tools → All word results."
     ],
     [
-      "Download Excel",
-      "Use the Excel button in Find words to download your current All words or Familiar words view. The file includes more than the selected 90% or 95% list."
+      "Download the database",
+      "In Find words, choose Download full database or Download familiar forms."
     ],
     [
       "Give feedback",
       "Choose Rate this word on a word’s details, or Report a problem. A short feedback form opens with the word or page already filled in."
     ]
-  ],
-  "viewHelp": {
-    "allHint": "Search the full wordlist.",
-    "familiarHint": "A smaller list of generally familiar words.",
-    "title": "All or Familiar?",
-    "paragraphs": [
-      "All words: search the full database.",
-      "Familiar words: show words estimated to be familiar in general English.",
-      "Your class may know different words."
-    ]
-  }
+  ]
 };

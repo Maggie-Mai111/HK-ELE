@@ -17,7 +17,7 @@
       }));
       host.querySelectorAll('[data-compound-feedback]').forEach(button=>button.addEventListener('click',()=>{
         const expression=records.get(button.dataset.compoundFeedback);if(!expression)return;
-        window.dispatchEvent(new CustomEvent('hkele-word-feedback-context',{detail:{word:expression.displayExpression,expressionId:expression.expressionId,expressionVersion:expression.sourceVersion,page:button.dataset.compoundSource}}));
+        window.dispatchEvent(new CustomEvent('hkele-word-feedback-context',{detail:{word:expression.displayExpression,expressionId:expression.expressionId,page:button.dataset.compoundSource}}));
       }));
     }
     function open(expression,source='Selected words'){

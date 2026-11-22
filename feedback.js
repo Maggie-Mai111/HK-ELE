@@ -10,7 +10,7 @@
   window.addEventListener("hkele-word-feedback-context", (event) => { wordContext = event.detail; });
   const currentContext = (useWord) => {
     const onWordPage = document.querySelector("#view-word")?.classList.contains("active");
-    return { product: "Web", page: useWord || onWordPage ? "Word detail" : ({ "#home": "Home", "#browse": "Browse", "#check": "Check a Text", "#list": "Selected words" })[location.hash] || "Home", ...((useWord || onWordPage) && wordContext ? wordContext : {}) };
+    return { product: "Web", page: useWord || onWordPage ? "Word detail" : ({ "#home": "Home", "#browse": "Find words", "#check": "Check a Text", "#list": "Selected words" })[location.hash] || "Home", ...((useWord || onWordPage) && wordContext ? wordContext : {}) };
   };
   const showFeedback = async (kind, useWord) => {
     dialog.querySelector("h2").textContent = kind === "rating" ? "Rate this word" : "Report a problem";
@@ -23,7 +23,7 @@
     status.textContent = "Getting your form ready…";
     dialog.showModal();
     try {
-      if (!config) { const response = await fetch("./feedback_forms.json?v=20261109-v64"); if (!response.ok) throw new Error(); config = await response.json(); }
+      if (!config) { const response = await fetch("./feedback_forms.json?v=2026-11-20-feedback-context"); if (!response.ok) throw new Error(); config = await response.json(); }
       const url = window.HkeleFeedbackContract.buildFeedbackUrl(kind, context, config);
       if (url) { link.href = url; link.hidden = false; status.textContent = `${context.word ? "The word" : "The page"} is already filled in. Complete and submit the form to send your feedback.`; }
       else status.textContent = "Please try this form again later.";

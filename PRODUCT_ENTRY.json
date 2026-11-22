@@ -1,7 +1,9 @@
 {
-  "version": 81,
-  "dataVersion": "2026-11-17-current-rules-final-v2",
-  "status": "LOCAL_V81_TEACHER_CLOSEOUT",
+  "version": 92,
+  "date": "2026-11-23",
+  "dataVersion": "2026-11-23-author-closeout-v1",
+  "status": "LOCAL_GUIDE_STEP_CORRECTED_NOT_DEPLOYED",
   "publicDeploymentPerformed": false,
-  "dataChanged": false
+  "dataChanged": false,
+  "masterEntry": "../PRODUCT_ENTRY.json"
 }

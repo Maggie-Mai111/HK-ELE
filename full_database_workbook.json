@@ -1,15 +1,15 @@
 {
-  "dataVersion": "2026-11-17-current-rules-final-v2",
+  "dataVersion": "2026-11-23-author-closeout-v1",
   "wordOriginsVersion": "2026-11-05-word-origins-v1",
-  "workbookVersion": "2026-11-17-education-all",
-  "filename": "HK_ELE_Full_Database_20261115.xlsx",
-  "assetPath": "assets/downloads/2026-11-17-current-rules-final-v2-all/HK_ELE_Full_Database_20261115.xlsx",
-  "byteSize": 12916810,
-  "sha256": "8d3a34b9bfecce1f71685e9d930951987c4caf18c3c6a8dd1edede3075f6bee3",
+  "workbookVersion": "2026-11-23-all",
+  "filename": "HK_ELE_Full_Database_Nov23.xlsx",
+  "assetPath": "assets/downloads/2026-11-23-author-closeout-v1-all/HK_ELE_Full_Database_Nov23.xlsx",
+  "byteSize": 20640892,
+  "sha256": "071604c2c776f5859bc8d8408c7af4252b502185e933ef2ea53f4f8f87c691c5",
   "counts": {
     "wordForms": 329202,
     "fullFamilies": 167780,
-    "wordListFamilies": 1677,
+    "wordListFamilies": 1669,
     "worksheets": 1
   }
 }

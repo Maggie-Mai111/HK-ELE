@@ -29,7 +29,7 @@ function api(failFullIndexOnce = false) {
 test('default Full and Core scopes retain exact populations and the former Reference-only word fabric',async()=>{
   const repository=api();
   assert.equal((await repository.request('/families')).available_items,167780);
-  assert.equal((await repository.request('/families?scope=core')).available_items,1677);
+  assert.equal((await repository.request('/families?scope=core')).available_items,1669);
   const result=await repository.request('/search?q=fabric');
   assert.equal(result.status,'RESOLVED');
   assert.equal(Number(result.owners[0].candidate_member),0);

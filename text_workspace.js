@@ -105,7 +105,7 @@
         const owner = owners[Number(button.dataset.readerOwner)]; dialog.close();
         void openFamily(owner.baseword_key, owner.matched_form_evidence?.form || item.surface, item);
       }));
-      if (/[A-Za-z]/.test(item.surface)) mountReviewTools(dialog.querySelector("[data-reader-close]"), item.surface, item, true);
+      if (/[A-Za-z]/.test(item.surface)) mountReviewTools(dialog.querySelector("#text-word-title"), item.surface, item);
       dialog.querySelector("[data-reader-close]").addEventListener("click", () => dialog.close()); dialog.showModal();
     }
     function mountReviewTools(host, surface, selectedItem = state.reviewOccurrence, before = false) {
@@ -115,7 +115,7 @@
       const excerpt=occurrenceExcerpt(state.checkedText||"",selectedItem);
       const render=()=>{
         const answer=judgements[selectedItem.occurrence_id];
-        box.innerHTML=`<h3>Do students know this use?</h3><p>${esc(excerpt.before)}<mark>${esc(excerpt.word)}</mark>${esc(excerpt.after)}</p><div class="row"><button type="button" data-judge="known" aria-pressed="${answer===true}">Known</button><button type="button" data-judge="explain" aria-pressed="${answer===false}">May need explaining</button>${answer!==undefined?'<button type="button" data-judge="clear">Clear mark</button>':""}</div><p class="hint" role="status">${answer===true?"Marked Known in this sentence.":answer===false?"Kept in Words to explain.":"This mark applies only here. Check other uses separately."}</p>`;
+        box.innerHTML=`<h3>In your text</h3><p>${esc(excerpt.before)}<mark>${esc(excerpt.word)}</mark>${esc(excerpt.after)}</p><p><strong>Do students know this use?</strong></p><div class="row"><button type="button" data-judge="known" aria-pressed="${answer===true}">Known</button><button type="button" data-judge="explain" aria-pressed="${answer===false}">May need explaining</button>${answer!==undefined?'<button type="button" data-judge="clear">Clear mark</button>':""}</div><p class="hint" role="status">${answer===true?"Marked Known in this sentence.":answer===false?"Kept in Words to explain.":"This mark applies only here. Check other uses separately."}</p>`;
         box.querySelectorAll("[data-judge]").forEach(button=>button.addEventListener("click",()=>{
           const action=button.dataset.judge;
           if(action==="clear")delete judgements[selectedItem.occurrence_id];else judgements[selectedItem.occurrence_id]=action==="known";
@@ -167,7 +167,7 @@
       const families = groupSuggestions(entries);
       const cards=[...families.map(group=>({...group,other:null})),...otherMarked.map(item=>({key:item.occurrence_id,forms:[],other:item}))];
       if(reviewFilter==="marked")cards.sort((a,b)=>(a.other?.occurrence_order ?? a.forms[0].entry.firstOrder)-(b.other?.occurrence_order ?? b.forms[0].entry.firstOrder));
-      $("#preteach-summary").textContent = reviewFilter==="marked" ? `${entries.length+otherMarked.length} ${entries.length+otherMarked.length===1 ? "word" : "words"} marked for explanation` : reviewFilter==="later" && !classLevel ? "Choose a class level to compare first recorded textbook stages." : `${entries.length} word ${entries.length===1 ? "form" : "forms"} · records from this text, most repeated first`;
+      $("#preteach-summary").textContent = reviewFilter==="marked" ? `${entries.length+otherMarked.length} ${entries.length+otherMarked.length===1 ? "word" : "words"} marked for explanation` : reviewFilter==="later" && !classLevel ? "Choose your class level to find words first seen in later textbooks." : `${entries.length} word ${entries.length===1 ? "form" : "forms"} · records from this text, most repeated first`;
       $("#preteach-items").innerHTML = cards.slice(0,limit).map(group => {
         if(group.other)return `<article class="preteach-word"><button class="family-link" data-review-other="${otherMarked.indexOf(group.other)}">${esc(group.other.surface)}</button><p>${contextMarkup(group.other)}</p><p class="hint">You marked this use May need explaining</p><button data-review-other="${otherMarked.indexOf(group.other)}">View</button></article>`;
         const rows=group.forms.map(({entry,index}) => {
@@ -176,7 +176,7 @@
           return `<div class="preteach-form"><div><button class="family-link" data-preteach-view="${index}">${esc(entry.form)}</button>${group.forms.length===1 && entry.form.toLocaleLowerCase()!==entry.family.display_family.toLocaleLowerCase() ? `<small>Family: ${esc(entry.family.display_family)}</small>` : ""}<p class="hint">${contextMarkup(entry.occurrence)}</p>${evidence.primary ? `<div class="preteach-reasons"><span>${esc(evidence.primary)}</span></div>` : ""}<small>In this text: ${entry.count} ${entry.count===1 ? "time" : "times"}</small>${evidence.extra.length ? `<details><summary>Word records</summary><p class="hint">${evidence.extra.map(esc).join(" · ")}</p></details>` : ""}</div><button data-preteach-add="${index}" ${added ? "disabled" : ""}>${added ? "Added" : "Add"}</button></div>`;
         }).join("");
         return `<article class="preteach-word">${group.forms.length>1 ? `<p class="preteach-family">Family: ${esc(group.family)} · ${group.forms.length} forms in your text</p>` : ""}${rows}</article>`;
-      }).join("") || `<p class="hint">${reviewFilter==="marked" ? "No marks yet. Click a word in your text to get started." : "No words match this filter. You can still choose words from the text."}</p>`;
+      }).join("") || (reviewFilter==="later" && !classLevel ? "" : `<p class="hint">${reviewFilter==="marked" ? "No marks yet. Click a word in your text to get started." : "No words match this filter. You can still choose words from the text."}</p>`);
       $("#preteach-items").querySelectorAll("[data-review-other]").forEach(button=>button.addEventListener("click",()=>openOccurrence(otherMarked[Number(button.dataset.reviewOther)])));
       $("#preteach-items").querySelectorAll("[data-preteach-view]").forEach(button=>button.addEventListener("click",()=>{
         const entry=entries[Number(button.dataset.preteachView)]; openOccurrence(entry.occurrence);

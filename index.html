@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>HK-ELE Teacher Database</title>
-  <link rel="stylesheet" href="styles.css?v=coverage63-20261102-readable50-final2">
+  <link rel="stylesheet" href="styles.css?v=2026-11-20-vocabulary-labels">
   <link rel="stylesheet" href="teacher_help.css?v=20261113-web69">
   <link rel="stylesheet" href="feedback.css?v=20261012">
   <link rel="stylesheet" href="home.css?v=20261108-simple62-final">
   <link rel="stylesheet" href="privacy.css?v=20261012-v2">
-  <link rel="stylesheet" href="teacher_view.css?v=20261020-v16">
+  <link rel="stylesheet" href="teacher_view.css?v=20261122-navigation">
   <link rel="stylesheet" href="text_workspace.css?v=20261108-simple62">
   <link rel="stylesheet" href="workspace_readability.css?v=20261020-v20">
   <link rel="stylesheet" href="browse_compact.css?v=20261102-readable50-final2">
   <link rel="stylesheet" href="word_family_results.css?v=20261102-readable50-final2">
   <link rel="stylesheet" href="evidence_tokens.css?v=20261022-tags1">
-  <link rel="stylesheet" href="word_detail.css?v=20261102-readable50-final2">
+  <link rel="stylesheet" href="word_detail.css?v=2026-11-20-evidence-flow">
   <link rel="stylesheet" href="word_origins.css?v=20261029-v1">
   <link rel="stylesheet" href="lesson_list.css?v=20261030-v41">
   <style>html[data-consent-pending] .site-header,html[data-consent-pending] main,html[data-consent-pending] .lesson-context{visibility:hidden}</style>
@@ -63,13 +63,19 @@
         <label>Sort<select id="sort-select"><option value="overall">Overall family rank</option><option value="hk">HK family rank</option><option value="az">A–Z</option></select></label>
       </form>
       <p class="download-actions"><button id="download-full-database" type="button">Download full database (.xlsx)</button></p>
-      <div class="word-view-controls" role="group" aria-label="Vocabulary view"><button type="button" data-word-view="all" aria-pressed="true">All words</button><button type="button" data-word-view="familiar" aria-pressed="false">Familiar words</button><p data-familiar-note>Search the full wordlist.</p></div><details class="workspace-disclosure"><summary>All or Familiar?</summary><p><strong>All words:</strong> search the full database.</p><p><strong>Familiar words:</strong> show words estimated to be familiar in general English.</p><p>Your class may know different words. See About these columns for the selection rule.</p></details>
-<div class="scope-cards" role="group" aria-label="Database scope">
-        <button class="scope" data-scope="core"><strong>90% list</strong><span>1,677 families</span></button><button class="scope" data-scope="core95"><strong>95% list</strong><span>2,910 families</span></button>
-        <button class="scope active" data-scope="full"><strong>Full database</strong><span>All 167,780 families</span></button>
+
+      <div class="word-view-controls" role="group" aria-labelledby="browse-vocabulary-label">
+        <p id="browse-vocabulary-label" class="word-selection-label">Vocabulary set</p>
+        <button type="button" data-word-view="all" aria-pressed="true">All word forms</button>
+        <button type="button" data-word-view="familiar" aria-pressed="false">Generally familiar forms</button>
+        <p>Choose Generally familiar forms to use only spellings rated as familiar in general English. Your class may know different words.</p>
       </div>
-        <p class="hint">90% / 95%: coverage in the study’s Hong Kong texts.</p>
-      <details class="workspace-disclosure"><summary>What do 90% and 95% mean?</summary><p class="hint">These lists covered at least 90% or 95% of counted words in each study collection. The 95% list includes the 90% list. Your passage may differ.</p></details>
+      <p id="browse-list-label" class="word-selection-label">Word list</p>
+      <div class="scope-cards" role="group" aria-labelledby="browse-list-label">
+        <button class="scope active" data-scope="full"><strong>All entries</strong><span>167,780 families</span></button>
+        <button class="scope" data-scope="core"><strong>90% list</strong><span>1,669 families</span></button><button class="scope" data-scope="core95"><strong>95% list</strong><span>2,880 families</span></button>
+      </div>
+      <details class="workspace-disclosure"><summary>What do 90% and 95% mean?</summary><p class="hint">In each of the study’s four Hong Kong text collections, the lists matched at least 90% or 95% of the words, counting repeats. The 95% list includes the 90% list. Your text may have a different percentage.</p></details>
       <section id="ai-filter-panel" class="ai-filter-panel" aria-labelledby="ai-filter-title" hidden>
         <button id="ai-filter-toggle" class="ai-filter-toggle" type="button" aria-expanded="false" aria-controls="ai-filter-body">
           <span><strong id="ai-filter-title">Find words with AI</strong><small>Describe the words you need.</small></span>
@@ -77,13 +83,13 @@
         </button>
       <div id="ai-filter-body" class="ai-filter-body" hidden>
           <p id="ai-network-note" class="hint" role="status" hidden>AI search needs an internet connection. Reconnect and try again.</p>
-          <p>Describe what you want, then review the search before showing results. Only your request is sent to the AI service.</p>
-          <label for="ai-filter-query"><strong>Teaching request</strong></label>
-          <textarea id="ai-filter-query" maxlength="300" rows="3" placeholder="Example: Find words with the root act. Limit 20."></textarea>
+          <label for="ai-filter-query"><strong>What words are you looking for?</strong></label>
+          <textarea id="ai-filter-query" aria-describedby="ai-query-note" maxlength="300" rows="3" placeholder="Example: Find words with the root act. Limit 20."></textarea>
+          <p id="ai-query-note" class="hint">Your request goes to the AI service. Leave out classroom text and student names.</p>
           <div class="ai-examples" aria-label="Example searches">
             <button type="button" data-ai-example="Find words with the root act. Limit 20.">Root: act</button>
-            <button type="button" data-ai-example="Find 10 words first observed by P2 or earlier, sorted by overall rank">Textbooks: by P2</button>
-            <button type="button" data-ai-example="Find 10 words in HK Top 1k, sorted by HK rank">HK ranks 1–1,000</button>
+            <button type="button" data-ai-example="Find 10 words first observed by P2 or earlier, sorted by overall rank">In textbooks by P2</button>
+            <button type="button" data-ai-example="Find 10 words in HK Top 1k, sorted by HK rank">Top 1,000 in HK</button>
           </div>
           <div id="ai-turnstile" aria-label="Search verification"></div>
           <p id="ai-turnstile-message" class="hint"></p>
@@ -95,8 +101,8 @@
 
       <div id="ai-filter-preview" class="ai-filter-preview" hidden>
             <h2>Review your search</h2>
-            <p id="ai-filter-summary"></p>
             <ul id="ai-filter-conditions"></ul>
+            <p id="ai-filter-summary" role="status" hidden></p>
             <button id="ai-filter-confirm-button" class="primary" type="button" hidden>Show matching words</button>
           </div>
         </div>
@@ -116,12 +122,18 @@
     </section>
 
     <section id="view-word" class="view word-view" aria-labelledby="word-view-title">
-      <button id="back-to-browse" class="back-button">← Back to Browse</button>
+        <button id="back-to-browse" class="back-button">← Back to Find words</button>
       <div id="word-workspace" class="word-workspace"><div class="empty-state">Choose a word to see its information.</div></div>
     </section>
 
     <section id="view-check" class="view" aria-labelledby="check-title">
-      <div class="page-heading"><h1 id="check-title">Check a Text</h1></div><div class="word-view-controls" role="group" aria-label="Vocabulary view"><button type="button" data-word-view="all" aria-pressed="true">All words</button><button type="button" data-word-view="familiar" aria-pressed="false">Familiar words</button><p data-familiar-note>Search the full wordlist.</p></div><details class="workspace-disclosure"><summary>All or Familiar?</summary><p><strong>All words:</strong> search the full database.</p><p><strong>Familiar words:</strong> show words estimated to be familiar in general English.</p><p>Your class may know different words. See About these columns for the selection rule.</p></details>
+      <div class="page-heading"><h1 id="check-title">Check a Text</h1></div>
+      <div class="word-view-controls" role="group" aria-labelledby="check-vocabulary-label">
+        <p id="check-vocabulary-label" class="word-selection-label">Vocabulary set</p>
+        <button type="button" data-word-view="all" aria-pressed="true">All word forms</button>
+        <button type="button" data-word-view="familiar" aria-pressed="false">Generally familiar forms</button>
+        <p>Choose Generally familiar forms to use only spellings rated as familiar in general English. Your class may know different words.</p>
+      </div>
       <div id="check-compose" class="check-compose panel">
         <label for="text-input"><strong>Your text</strong></label>
         <p class="hint">Paste your lesson text, then choose Check text.</p>
@@ -132,39 +144,39 @@
       <div id="checked-workspace" hidden>
         <section id="checked-reader" class="checked-reader" tabindex="-1" aria-labelledby="checked-reader-title">
           <div class="reader-heading"><h2 id="checked-reader-title">Your text</h2><span id="reader-word-count"></span></div>
-          <p class="hint">Click a word for details. Mark May need explaining if your class needs help with this use.</p>
-          <div class="reader-actions"><button id="edit-checked-text" type="button">Edit text</button><details><summary>Highlight words</summary><label><input id="reader-common" type="checkbox" aria-label="CPB100 sight words">CPB100 sight words</label><label><input id="reader-hk" type="checkbox" aria-label="HK family frequency">HK family frequency</label><p class="hint">CPB100 underlines 100 sight words. HK family frequency adds colour by rank. A word can have both.</p></details><button id="reader-to-suggestions" type="button" hidden>Words to explain ↓</button></div>
+          <p class="hint">Click a word for details or to mark <strong>May need explaining</strong>.</p>
+          <div class="reader-actions"><button id="edit-checked-text" type="button">Edit text</button><details><summary>Highlight words</summary><label><input id="reader-common" type="checkbox">100 sight words (CPB100)</label><label><input id="reader-hk" type="checkbox">Colour by HK family rank</label><p class="hint">Sight words are underlined. A word can have both marks.</p></details><button id="reader-to-suggestions" type="button" hidden>Words to explain ↓</button></div>
           <div id="passage-words" class="passage-words"></div><div id="reader-legend" class="reader-legend"></div>
         </section>
         <section id="passage-coverage" class="panel" aria-label="Words in this list">
           <h2>Words in this list</h2>
-          <label>Compare this text with<select id="coverage-target" aria-label="List for text comparison"><option value="90">90% list · 1,677 families</option><option value="95">95% list · 2,910 families</option></select></label>
+          <label>Compare this text with<select id="coverage-target" aria-label="List for text comparison"><option value="90">90% list · 1,669 families</option><option value="95">95% list · 2,880 families</option></select></label>
           <p id="passage-coverage-value" class="coverage-value" role="status"></p>
           <button id="coverage-outside" type="button" hidden></button>
-          <details><summary>How is this counted?</summary><p class="hint">Each word counts every time it appears. Compounds and unmatched words stay in the total.</p><p class="hint">Only spellings in your selected list count towards its percentage. Highlighting does not change the count. All word results also shows counts with short forms expanded.</p><p class="hint">The 90% and 95% names refer to the study’s Hong Kong texts. This percentage is for your text, not what students know.</p></details>
+          <details><summary>How is this counted?</summary><p class="hint">Every word counts each time it appears, even if it has no match. Switching between all and familiar forms can change how many match, while the total stays the same.</p><p class="hint">The list names come from the study’s Hong Kong texts. The result above shows how many words on the list appear in your passage.</p></details>
         </section>
         <section id="preteach-panel" class="preteach-panel" tabindex="-1" aria-labelledby="preteach-title">
           <button id="suggestions-to-reader" type="button" hidden>↑ Back to text</button>
           <h2 id="preteach-title">Words to explain</h2>
-          <p class="hint">Words you mark May need explaining appear here.</p>
+          <p class="hint">For this passage only. Use <strong>Add</strong> to save a word in <strong>Selected words</strong>.</p>
           <details><summary>How to choose</summary><p class="hint">Might students need help with this use? Would explaining it help them understand the text or complete the task?</p><p class="hint">Your marked words are grouped by family, in text order. Use the records to help you choose what to teach.</p></details>
           <details><summary>Browse words by records</summary><div class="preteach-controls"><label>Show<select id="preteach-filter" aria-label="Browse words by records"><option value="marked">Marked by you</option><option value="all">All matched words</option><option value="academic">Academic / subject lists</option><option value="repeated">Repeated words</option><option value="later">Later textbook stages</option></select></label>
           <label id="preteach-level-control" hidden>Class level<select id="preteach-level" aria-label="Class level"><option value="">Choose a level</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option><option>P6</option><option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>S5</option><option>S6</option></select></label></div><p class="hint">Explore other words here, or mark a word directly in your text.</p></details><p id="preteach-summary" class="hint" role="status"></p>
           <div id="preteach-items"></div><div class="row"><button id="preteach-more" type="button" hidden>Show more suggestions</button><div id="preteach-copy-actions"></div><button id="preteach-open-list" type="button">Review selected words</button></div>
         </section>
         <details id="text-tools" class="workspace-disclosure"><summary>More text tools</summary>
-        <details id="all-text-details" class="workspace-disclosure"><summary>All word results</summary><p class="hint">See all matches, filter the results or choose a word to find every use in your text.</p>
+        <details id="all-text-details" class="workspace-disclosure"><summary>All word results</summary><p class="hint">Choose a word to see where it appears.</p>
           <details id="lesson-picker-disclosure" class="workspace-disclosure"><summary>Choose several words</summary>
             <div id="lesson-picker" class="lesson-picker hidden" aria-label="Choose words to keep"></div>
           </details>
-      <details class="workspace-disclosure" id="text-filter-disclosure"><summary>Filter results <span id="active-filter-count">All words</span></summary>
+      <details class="workspace-disclosure" id="text-filter-disclosure"><summary>Filter results <span id="active-filter-count">All results</span></summary>
       <div id="text-filters" class="text-filters panel" aria-label="Check a Text filters">
-        <label class="single-filter"><span>Wordlist</span><select id="filter-word-set"><option value="all">Full database</option><option value="core">90% list</option><option value="core95">95% list</option><option value="outside">Outside the selected list</option></select></label>
+        <label class="single-filter"><span>Word list</span><select id="filter-word-set"><option value="all">All results</option><option value="core">90% list</option><option value="core95">95% list</option><option value="outside">Outside the selected list</option></select></label>
         <div id="filter-hk" class="multi-filter-host"></div>
         <div id="filter-first" class="multi-filter-host"></div>
         <div id="filter-external" class="multi-filter-host"></div>
         <div id="filter-academic" class="multi-filter-host"></div>
-        <label class="toggle"><input id="filter-common" type="checkbox"> CPB100 words only</label>
+        <label class="toggle"><input id="filter-common" type="checkbox"> Sight words only (CPB100)</label>
         <button id="reset-filters" type="button">Reset</button>
       </div>
       </details>
@@ -178,7 +190,7 @@
 
     <section id="view-list" class="view" aria-labelledby="list-title">
       <div class="page-heading"><h1 id="list-title">Selected words</h1></div>
-      <p class="hint">Copy your words into your materials. Add a note if useful.</p>
+      <p class="hint">Keep words for your teaching materials. Add a note, then copy or download your list.</p>
       <details class="lesson-context-controls" hidden><summary>Previously saved words</summary><div class="lesson-controls-inner"><label for="active-lesson">Saved words</label><select id="active-lesson"></select></div></details>
       <div id="list-empty" class="empty-state large"><h2>Which words would you like to keep?</h2><p>Check a passage and choose a few words, or add words as you search.</p><div class="lesson-actions"><button class="primary" data-lesson-view="check">Choose words from a text</button><button data-lesson-view="browse">Find a word</button></div></div>
       <div id="list-workspace" class="hidden">
@@ -194,11 +206,11 @@
   <script src="tokenizer.js?v=2de3f5beb5da1fb9"></script><script src="contractions.js?v=61ff67a51f81566b"></script><script src="ai_runtime_config.js?v=929e26ea0e765e99"></script><script src="ai_public_config.js?v=452823c55196247c"></script><script src="ai_filter_contract.js?v=b5497573f289d771"></script><script src="compound_release.js?v=63109f6fa981cd84"></script><script src="compound_data.js?v=f37abf5c8974553b"></script><script src="cpb100.js?v=f02f88c404a3397b"></script>
   <script src="ai_form_release.js?v=3b6f7dc9e0e5355e"></script><script src="ai_form_filter.js?v=5a359782f97a8879"></script><script src="text_normalization.js?v=393bba4c1c7b00a1"></script><script src="coverage_lists_release.js?v=156b82f51bfd40e3"></script><script src="word_views.js?v=9472cb6a9c7b2c04"></script>
 <script src="word_view_controller.js?v=92b9430fd68b389a"></script>
-<script src="coverage_lists.js?v=8e3512e5fb73b551"></script><script src="static_api.js?v=2026-11-17-closeout-v81"></script><script src="xlsx_export.js?v=b4b617073427b9ed"></script><script src="selected_words.js?v=2026-11-17-closeout-v81"></script><script src="lesson_contract.js?v=72c5d7a2d8c2f7e9"></script><script src="lesson_library.js?v=36893a293056eed8"></script><script src="lesson_library_ui.js?v=f681ed1b42d4172f"></script><script src="lesson_workspace.js?v=5655a7c90c590c6d"></script><script src="text_workspace.js?v=2026-11-17-closeout-v81"></script><script src="identity_migration.js?v=01292fa9fc45e57e"></script><script src="lesson_data_refresh.js?v=d25e7a50d83c6cdd"></script><script src="word_family_results.js?v=f0cc4b714d90a5eb"></script><script src="evidence_tokens.js?v=f8249b920417ee0a"></script><script src="compound_teaching.js?v=06139b11bb64a2f7"></script><script src="compound_ui.js?v=3d3c4a4a7beee57b"></script><script src="word_origins_release.js?v=e3985a70017827eb"></script><script src="word_origins.js?v=459b679056a4fe9e"></script><script src="full_database_release.js?v=88ceb71eda0b1ed3"></script><script src="full_database_download.js?v=55357a29eb5ea88e"></script>
+<script src="coverage_lists.js?v=8e3512e5fb73b551"></script><script src="static_api.js?v=2026-11-17-closeout-v81"></script><script src="xlsx_export.js?v=2026-11-20-feedback-selected-words"></script><script src="selected_words.js?v=2026-11-17-closeout-v81"></script><script src="lesson_contract.js?v=72c5d7a2d8c2f7e9"></script><script src="lesson_library.js?v=2026-11-20-vocabulary-labels"></script><script src="lesson_library_ui.js?v=f681ed1b42d4172f"></script><script src="lesson_workspace.js?v=5655a7c90c590c6d"></script><script src="text_workspace.js?v=2026-11-20-evidence-flow"></script><script src="identity_migration.js?v=01292fa9fc45e57e"></script><script src="lesson_data_refresh.js?v=d25e7a50d83c6cdd"></script><script src="word_family_results.js?v=f0cc4b714d90a5eb"></script><script src="evidence_tokens.js?v=f8249b920417ee0a"></script><script src="compound_teaching.js?v=06139b11bb64a2f7"></script><script src="compound_ui.js?v=2026-11-20-feedback-selected-words"></script><script src="word_origins_release.js?v=e3985a70017827eb"></script><script src="word_origins.js?v=459b679056a4fe9e"></script><script src="full_database_release.js?v=88ceb71eda0b1ed3"></script><script src="full_database_download.js?v=2026-11-20-vocabulary-labels"></script>
   <script src="lexical_uses.js?v=1dd00d967607dcf3"></script>
-  <script src="teacher_help_content.js?v=1d6b64a5ed12fe71"></script><script src="teacher_help.js?v=560e9a1d9f2ddb8b"></script>
-  <script src="app.js?v=2026-11-17-closeout-v81"></script><script src="ai_filter.js?v=c19a156d8b510da4"></script>
-  <script src="feedback_contract.js?v=973f5402a9a74613"></script><script src="feedback.js?v=da20fbf4794c0fe2"></script>
+  <script src="teacher_help_content.js?v=2026-11-23-example-step"></script><script src="teacher_help.js?v=560e9a1d9f2ddb8b"></script>
+  <script src="app.js?v=2026-11-20-feedback-selected-words"></script><script src="ai_filter.js?v=2026-11-20-vocabulary-labels"></script>
+  <script src="feedback_contract.js?v=2026-11-20-feedback-selected-words"></script><script src="feedback.js?v=2026-11-20-feedback-selected-words"></script>
   <script src="home.js?v=5cb6e4fe9cfbed47"></script>
   <script src="privacy_contract.js?v=65543dc406e2c362"></script><script src="privacy.js?v=0f1c5614f9a7c18c"></script>
 </body>

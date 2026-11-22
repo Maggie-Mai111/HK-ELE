@@ -10,6 +10,9 @@ main:has(#view-word.active) { width:100%; max-width:none; }
 #view-word .word-card-identity { min-width:0; }
 #view-word .word-card-identity .identity-line { margin:10px 0 0; font-size:20px; color:#455f50; }
 #view-word .word-card-actions { display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-width:100%; }
+#view-word .word-passage-actions { display:grid; gap:14px; margin-top:20px; }
+#view-word .word-passage-actions .word-card-actions { align-items:flex-start; }
+#view-word .word-passage-actions .panel { margin:0; }
 #view-word .word-card-actions .hint { margin:0; font-size:18px; }
 #view-word .word-action-buttons { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 #view-word .word-card-actions :is(button,.selected-add) { margin:0; min-height:48px; font-size:18px; padding:9px 13px; }
