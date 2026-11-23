@@ -1,8 +1,8 @@
 {
-  "version": 92,
-  "date": "2026-11-23",
+  "version": 94,
+  "date": "2026-11-24",
   "dataVersion": "2026-11-23-author-closeout-v1",
-  "status": "LOCAL_GUIDE_STEP_CORRECTED_NOT_DEPLOYED",
+  "status": "LOCAL_WEB_SUPPORTING_TEXT_SIZE_NOT_DEPLOYED",
   "publicDeploymentPerformed": false,
   "dataChanged": false,
   "masterEntry": "../PRODUCT_ENTRY.json"

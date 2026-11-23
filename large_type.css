@@ -1,0 +1,172 @@
+/* Teacher reading size. Keep complete tables inside their horizontal scrollers. */
+:root {
+  --work-copy: clamp(24px, 1.15vw, 30px);
+  --work-note: clamp(21px, 1vw, 26px);
+  --work-word: clamp(28px, 1.35vw, 36px);
+  --work-reading: clamp(26px, 1.3vw, 34px);
+  --work-heading: clamp(36px, 2vw, 50px);
+  --table-copy: clamp(26px, 1.2vw, 30px);
+  --table-note: clamp(22px, 1.05vw, 27px);
+}
+body { font-size: 22px; line-height: 1.55; }
+button, input, select, textarea { font-size: 22px; }
+.site-header .nav-button,
+body:has(.view.active:not(#view-home)) .site-header .nav-button,
+.site-header > .teacher-help-link,
+.site-header .feedback-global button,
+body:has(.view.active:not(#view-home)) .feedback-global button {
+  font-size: 21px; min-height: 48px; line-height: 1.4;
+}
+.site-header .brand strong { font-size: 26px; }
+.site-header .brand small { font-size: 14px; }
+.site-header .count { font-size: 18px; height: auto; min-height: 28px; min-width: 28px; }
+.site-header > .feedback-global { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 1600px) {
+  .site-header > nav { flex: 0 0 100%; order: 3; width: 100%; }
+}
+
+/* Guidance stays the same; smaller supporting labels use the reading scale too. */
+.view:not(#view-home) :is(.word-view-controls, .word-selection-label, .word-view-hint,
+  .search-toolbar label, .family-search-note, .table-scroll-hint, .pagination,
+  .row span, .form-tier .tier-count, .shown-count, .preteach-help, .preteach-empty) {
+  font-size: var(--work-note); line-height: 1.55;
+}
+.view .word-view-controls p, .view .ai-toggle-label {
+  font-size: var(--work-note); line-height: 1.55;
+}
+.view:not(#view-home) :is(.word-view-controls button, .columns-menu > summary,
+  .pagination button, .pagination select, .wordlist-download-row button) {
+  font-size: var(--work-copy); min-height: 50px;
+}
+#view-browse .family-search-toolbar h2 { font-size: 30px; }
+#view-browse .family-search-toolbar p,
+#view-browse .family-search-note { font-size: var(--work-note); }
+#view-browse .family-search-heading h3 { font-size: 30px; }
+#view-browse .family-search-heading p,
+#view-browse .family-search-heading .family-summary span { font-size: var(--work-note); }
+#view-browse .family-search-heading .set-pill { font-size: 23px; }
+
+/* Remove the compact table overrides rather than squeezing larger text into them. */
+#view-browse #family-table,
+#view-browse .family-search-table,
+#view-word .form-detail-table {
+  width: 100%; table-layout: auto; font-size: var(--table-copy);
+}
+#view-browse #family-table { min-width: 3200px; }
+#view-browse .family-search-table { min-width: 2800px; }
+#view-word .form-detail-table { min-width: 2600px; }
+#view-browse #family-table :is(th, td),
+#view-browse .family-search-table :is(th, td),
+#view-word .form-detail-table :is(th, td) {
+  font-size: var(--table-copy) !important; line-height: 1.5; padding: 16px 18px;
+  white-space: normal; overflow-wrap: normal; word-break: normal;
+  min-width: 160px; max-width: none; vertical-align: middle;
+}
+#view-browse #family-table #family-head th,
+#view-browse .family-search-table thead th,
+#view-word .form-detail-table thead th {
+  font-size: var(--table-note) !important; line-height: 1.45; font-weight: 700;
+}
+#view-browse { --work-group-height: 58px; }
+#view-browse #family-table #family-column-groups th {
+  height: var(--work-group-height); padding: 10px 18px;
+  font-size: var(--table-note) !important; line-height: 1.35;
+}
+#view-browse #family-table #family-head th { top: var(--work-group-height); }
+#view-browse #family-column-widths col { width: 210px !important; }
+#view-browse #family-column-widths col[data-col="external"] { width: 310px !important; }
+#view-browse #family-column-widths col[data-col="msvl"] { width: 360px !important; }
+#view-browse #family-table .family-cell,
+#view-browse .family-search-table tbody th,
+#view-word .form-detail-table tbody td:first-child { min-width: 230px; }
+#view-browse #family-table :is(.family-link, .overall-cell, .hk-cell strong),
+#view-browse .family-search-table .form-search-link,
+#view-word .form-detail-table .family-link {
+  font-size: var(--table-copy) !important; line-height: 1.45; font-weight: 750;
+  overflow-wrap: anywhere; min-height: 44px;
+}
+#view-browse #family-table :is(.hint, .set-pill, .band, .evidence-badge),
+#view-browse .family-search-table :is(.your-search, .set-pill),
+#view-word .form-detail-table .selected-marker {
+  font-size: var(--table-note) !important; line-height: 1.45; padding: 4px 8px;
+}
+#view-browse #family-table .evidence-badge strong { font-size: inherit; }
+#view-browse #family-table td strong,
+#view-browse .family-search-table td strong,
+#view-word .form-detail-table td strong { font-size: var(--table-copy) !important; }
+#view-browse #family-table .evidence-token,
+#view-browse .family-search-table .evidence-token,
+#view-word .form-detail-table .evidence-token {
+  font-size: var(--table-copy) !important; line-height: 1.45; padding: 5px 8px;
+}
+#view-browse #family-table .action-cell button,
+#view-browse .family-search-table button:not(.form-search-link),
+#view-word .form-detail-table td:last-child button {
+  font-size: 23px !important; line-height: 1.4; min-height: 52px; padding: 10px 16px;
+  width: 100%; min-width: 110px;
+}
+#view-browse .table-scroll-hint { display: block; }
+
+/* Details, saved words, and dialogs follow the same supporting-text minimum. */
+#view-word { --work-copy: 24px; --work-note: 22px; --work-word: 28px; }
+#view-word .word-card-identity .identity-line,
+#view-word .word-card-actions .hint,
+#view-word .word-card-actions :is(button,.selected-add),
+#view-word .family-summary :is(.evidence-item > span,.evidence-item > strong,.level-note),
+#view-word .form-table-controls :is(label,input,button),
+#view-word .form-tier .tier-count { font-size: 22px; }
+#view-word .word-title-line .set-pill,
+#view-word .evidence-token,
+#view-word .word-evidence-group .evidence-token,
+#view-word .form-tier > summary strong,
+#view-word :is(.word-origin-language,.word-origin-meaning) {
+  font-size: 22px !important; line-height: 1.5;
+}
+.teacher-help-body { font-size: 23px; line-height: 1.6; }
+.teacher-help-dialog h1 { font-size: 32px; }
+.teacher-help-dialog :is(h2,dt), .help-group summary strong { font-size: 25px; }
+.teacher-help-dialog button, .help-keep .help-save-note,
+.help-group summary span { font-size: 21px; line-height: 1.5; }
+.privacy-panel, .feedback-dialog { font-size: 22px; }
+
+/* Supporting screens must not fall back to their older compact type sizes. */
+body:has(#view-home.active) .site-header .nav-button,
+body:has(#view-home.active) .feedback-global button { font-size: 21px; }
+.site-header .brand-mark { font-size: 22px; }
+.site-header .count { font-size: 20px; }
+.site-header .brand small { font-size: 18px; }
+#view-home .home-copy .eyebrow,
+#view-home .home-task small { font-size: 20px; }
+#view-home .home-task span { font-size: clamp(22px, 1.1vw, 30px); }
+
+.privacy-dialog {
+  max-width: 800px; font-size: 22px; line-height: 1.6;
+}
+.privacy-dialog :is(.privacy-brand,.privacy-note,details) {
+  font-size: 20px; line-height: 1.6;
+}
+.privacy-dialog :is(summary,.privacy-choice,button) {
+  font-size: 22px; line-height: 1.5;
+}
+.privacy-dialog button { min-height: 52px; }
+.feedback-dialog :is(button,a) { font-size: 22px; line-height: 1.5; }
+#view-list :is(.lesson-card > details > summary,
+  .lesson-card-editor details > summary,.lesson-more > summary,
+  .lesson-teaching-options > summary) {
+  font-size: 22px; line-height: 1.5;
+}
+#view-list .lesson-teaching-options label { font-size: 21px; }
+
+@media (max-width: 760px) {
+  :root { --work-copy: 22px; --work-note: 20px; --work-heading: 32px; }
+  .site-header :is(.nav-button,.teacher-help-link),
+  body:has(.view.active:not(#view-home)) .site-header .nav-button,
+  .site-header .feedback-global button { font-size: 20px; white-space: normal; }
+  .site-header { padding: 12px 14px; gap: 8px; }
+  .site-header > .feedback-global { flex: 0 0 100%; margin-left: 0; }
+  .site-header > nav { gap: 6px; }
+  .site-header .nav-button { padding: 8px 10px; }
+  .teacher-help-body { font-size: 22px; }
+  .teacher-help-dialog .help-topics button { flex: 1 1 180px; }
+  .help-tasks, .help-definitions { grid-template-columns: 1fr; }
+}
