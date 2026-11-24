@@ -47,7 +47,7 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
         ],
         [
           "90% / 95% lists",
-          "In each of the study’s four Hong Kong text collections, the lists matched at least 90% or 95% of the words, counting repeats. The 95% list includes the 90% list. Your text may have a different percentage."
+          "In the Hong Kong texts used to choose the lists, at least 90 out of every 100 words were on the 90% list, and at least 95 on the 95% list. The 95% list includes more words. For example, if both words in last year are in the selected list, your result is 2 out of 2 (100%). Repeated words count each time; this does not show what students know."
         ]
       ]
     },
