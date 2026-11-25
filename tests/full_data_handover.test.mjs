@@ -18,7 +18,7 @@ test('limited-only readings stay queryable but never become an ordinary passage 
  assert.equal(result.occurrences[0].status,'UNMATCHED');assert.equal(result.occurrences[0].owners.length,0);assert.ok(result.occurrences[0].alternatives.length);
 });
 test('word-list membership and counts use the new generation; exact spelling keeps its own grade',async()=>{
- const repo=api(),m=await repo.manifest();assert.equal(m.metadata.data_version,CURRENT_RELEASE_VERSION);assert.equal(m.browse.core.overall.total_items,1669);assert.equal(m.browse.full.overall.total_items,167780);
+ const repo=api(),m=await repo.manifest();assert.equal(m.metadata.data_version,CURRENT_RELEASE_VERSION);assert.equal(m.browse.core.overall.total_items,1661);assert.equal(m.browse.full.overall.total_items,167780);
  const {forms}=await repo.request('/families/stress');assert.equal(forms.find(f=>f.form==='stressed').external_level_reference,'Grade 6');assert.equal(forms.find(f=>f.form==='stressful').external_level_reference,'Grades 8–9');
 });
 

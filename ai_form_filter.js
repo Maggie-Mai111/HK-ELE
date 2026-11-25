@@ -7,10 +7,11 @@
   const registered=v=>v!=null&&v!==""&&v!==0&&v!==false;
   const range=(v,min,max)=>min===undefined&&max===undefined||v!==null&&Number.isFinite(v)&&(min===undefined||v>=min)&&(max===undefined||v<=max);
   const grades=["P1","P2","P3","P4","P5","P6","S1","S2","S3","S4","S5","S6"];
-  const hasWordConditions=f=>[f.root,f.prefix,f.suffix,f.earliestObservedFrom,f.earliestObservedTo,f.awl,f.msvl,f.msvlSubjects,f.externalLevels,f.cpb100].some(v=>v!==undefined)||root.HKELE_EDUCATION_FILTERS.hasUsReferenceConditions(f);
+  const hasWordConditions=f=>[f.candidateWords,f.root,f.prefix,f.suffix,f.earliestObservedFrom,f.earliestObservedTo,f.awl,f.msvl,f.msvlSubjects,f.externalLevels,f.cpb100].some(v=>v!==undefined)||root.HKELE_EDUCATION_FILTERS.hasUsReferenceConditions(f);
   const label=v=>typeof v==="string"&&v.trim()&&!/^[\d.\s,;|+\-–—eE]+$/.test(v)?v.trim():null;
-  function formsFor(document,key){
-    return (document.families[key]||[]).map(row=>{
+  function formsFor(document,key,candidates=null){
+    const wordIndex=document.fields.indexOf("form");
+    return (document.families[key]||[]).filter(row=>!candidates||candidates.has(norm(row[wordIndex]))).map(row=>{
       const form=Object.fromEntries(document.fields.map((field,i)=>[field,field!=="form"&&typeof row[i]==="number"&&row[i]<0?document.strings[-row[i]-1]:row[i]??null]));
       form.baseword_key=key;form.normalized_form=norm(form.form);
       form.external_level_reference=label(form.external_level_reference_teacher_display)??label(form.external_level_reference);
@@ -19,6 +20,7 @@
   }
   function matches(form,f,common){
     if(form.lookup_only) return false;
+    if(f.candidateWords&&!f.candidateWords.some(word=>norm(word)===norm(form.normalized_form)||norm(word)===norm(form.form)))return false;
     const grade=grades.indexOf(form.first_seen_hk_textbooks);
     if(f.earliestObservedFrom&&(grade<0||grade<grades.indexOf(f.earliestObservedFrom)))return false;
     if(f.earliestObservedTo&&(grade<0||grade>grades.indexOf(f.earliestObservedTo)))return false;
@@ -40,6 +42,7 @@
   }
   function apply(families,proposed,document,common){
     const f=root.HKELE_AI_FILTER_CONTRACT.validateConditions(proposed),hits=[];
+    const candidates=f.candidateWords?new Set(f.candidateWords.map(norm)):null;
     const compareHit=(a,b)=>f.sort==="az"?norm(a.form.form).localeCompare(norm(b.form.form),"en")||a.family.baseword_key.localeCompare(b.family.baseword_key):
       (a.family[f.sort==="hk"?"current_hk_frequency_rank":"overall_frequency_order"]??Number.MAX_SAFE_INTEGER)-(b.family[f.sort==="hk"?"current_hk_frequency_rank":"overall_frequency_order"]??Number.MAX_SAFE_INTEGER)||norm(a.form.form).localeCompare(norm(b.form.form),"en");
     let matchedBeforeLimit=0;
@@ -47,7 +50,7 @@
       if(flag(family.display_blocked)||f.scope==="candidate"&&!flag(family.candidate_member)||f.scope==="inclusive_reference"&&!flag(family.reference_member))continue;
       if(!range(family.overall_frequency_order,f.overallRankMin,f.overallRankMax)||!range(family.current_hk_frequency_rank,f.hkRankMin,f.hkRankMax))continue;
       if(f.hkBands&&!f.hkBands.includes(family.current_hk_frequency_band))continue;
-      for(const form of formsFor(document,family.baseword_key))if(matches(form,f,common)){matchedBeforeLimit++;const hit={family,form};if(hits.length<f.limit||compareHit(hit,hits[hits.length-1])<0){hits.push(hit);hits.sort(compareHit);if(hits.length>f.limit)hits.pop();}}
+      for(const form of formsFor(document,family.baseword_key,candidates))if(matches(form,f,common)){matchedBeforeLimit++;const hit={family,form};if(hits.length<f.limit||compareHit(hit,hits[hits.length-1])<0){hits.push(hit);hits.sort(compareHit);if(hits.length>f.limit)hits.pop();}}
     }
 
     return {filters:f,matchedBeforeLimit,families:hits.slice(0,f.limit).map(x=>project(x.family,x.form)),resultUnit:"word"};

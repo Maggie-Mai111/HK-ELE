@@ -1,0 +1,66 @@
+/* Check a Text only: read, choose words, then inspect the list comparison. */
+#view-check .page-heading { padding-bottom:12px; }
+#view-check:has(#checked-workspace:not([hidden])) > .page-heading > p { display:none; }
+#view-check .check-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:8px 0 18px; }
+#view-check #reader-word-count { margin-right:auto; color:var(--muted); font-size:var(--work-note); }
+#view-check:has(#checked-workspace[hidden]) :is(#reader-word-count,#edit-checked-text) { display:none; }
+#view-check:has(#checked-workspace[hidden]) #check-word-options { margin-left:auto; }
+#view-check #check-word-options { min-width:0; border:0; margin-top:0; }
+#view-check #check-word-options > summary { padding:10px 14px; border:1px solid var(--line); border-radius:8px; background:#fff; display:flex; align-items:center; gap:12px; cursor:pointer; }
+#view-check #check-word-options > summary::after { content:"＋"; color:var(--green); }
+#view-check #check-word-options[open] > summary::after { content:"−"; }
+#view-check #check-word-options:has([data-word-view="all"][aria-pressed="true"]) .check-view-mode { display:none; }
+#view-check .check-view-mode { color:var(--muted); font-size:var(--work-note); }
+#view-check #check-word-options[open] { flex-basis:100%; margin-left:0; }
+#view-check .check-options-content { border:1px solid var(--line); border-radius:12px; background:#fff; margin-top:10px; padding:20px; display:grid; gap:18px; }
+#view-check .check-options-content .word-view-controls { margin:0; padding:0; }
+#view-check .check-options-content h3 { margin:0 0 12px; font-size:var(--work-copy); }
+#view-check .check-options-content p { margin:12px 0 0; }
+#view-check .check-display-options { border:0; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:12px 20px; align-items:center; }
+#view-check .check-display-options legend { padding:0; margin:0 0 10px; font-size:var(--work-copy); font-weight:700; }
+#view-check .check-display-options label { display:inline-flex; gap:8px; align-items:center; }
+#view-check #checked-workspace { display:grid; gap:18px; }
+#view-check :is(#checked-reader,#preteach-panel,#passage-coverage,#text-tools) { margin:0; }
+#view-check :is(#checked-reader,#preteach-panel,#passage-coverage) { padding:22px 24px; }
+#view-check .reader-heading { margin-bottom:8px; }
+#view-check #checked-reader > .hint { margin:0; }
+#view-check .reader-jump-actions:has(> [hidden]) { display:none; }
+#view-check #passage-words { margin:14px 0 0; }
+#view-check #reader-legend { margin:12px 0 0; }
+#view-check .preteach-heading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px 18px; margin-bottom:12px; }
+#view-check #preteach-summary { margin:0; }
+#view-check #preteach-items > .hint { margin:0 0 12px; }
+#view-check #preteach-items .preteach-word:first-child { margin-top:0; }
+#view-check #preteach-browse { margin-top:10px; }
+#view-check #preteach-browse > summary { color:var(--green); cursor:pointer; padding:6px 0; }
+#view-check #preteach-browse .preteach-controls { margin:12px 0 0; }
+#view-check .preteach-footer { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+#view-check .preteach-footer:not(:has(>button:not([hidden]))):not(:has(#preteach-copy-actions button)) { display:none; }
+#view-check #passage-coverage { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px 24px; }
+#view-check #coverage-heading { grid-column:1 / -1; font-size:28px; margin:0 0 6px; }
+#view-check .coverage-result-row { grid-column:1 / -1; display:flex; align-items:center; flex-wrap:wrap; gap:12px 24px; }
+#view-check .coverage-result-row label { min-width:0; }
+#view-check .coverage-result-row select { max-width:100%; font-size:var(--work-copy); padding:10px 12px; }
+#view-check #passage-coverage-value { margin:0; font-size:var(--work-copy); font-weight:700; }
+#view-check #coverage-outside { grid-column:1; grid-row:3; justify-self:start; display:block; width:auto; padding:6px 0; min-height:44px; margin:0; border:0; background:transparent; color:var(--green); text-align:left; font-size:var(--work-copy); }
+#view-check .comparison-help { grid-column:2; grid-row:3; margin:0; }
+#view-check .comparison-help[open] { grid-column:1 / -1; grid-row:4; }
+#view-check .comparison-help > summary { padding:6px 0; color:var(--green); }
+#view-check .comparison-help .list-explanation h3 { font-size:var(--work-copy); margin:18px 0 8px; }
+#view-check .comparison-help .list-explanation p { margin:0 0 12px; }
+#view-check .check-visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+#view-check #text-tools { margin-top:2px; }
+html:not([data-onboarding-example]) #view-check #text-input { height:clamp(220px,30dvh,320px); min-height:220px; }
+@media (max-width:600px) {
+  #view-check :is(#checked-reader,#preteach-panel,#passage-coverage) { padding:18px; }
+  #view-check .check-toolbar { gap:10px; }
+  #view-check #reader-word-count { flex-basis:100%; }
+  #view-check #edit-checked-text { margin-right:auto; }
+  #view-check .check-options-content { padding:16px; }
+  #view-check .coverage-result-row { gap:12px; }
+  #view-check .coverage-result-row label { width:100%; }
+  #view-check .coverage-result-row select { width:100%; }
+  #view-check #passage-coverage { grid-template-columns:minmax(0,1fr); }
+  #view-check .comparison-help { grid-column:1; grid-row:4; }
+  #view-check .check-display-options { align-items:flex-start; flex-direction:column; }
+}

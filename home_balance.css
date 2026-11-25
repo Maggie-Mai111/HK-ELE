@@ -1,0 +1,68 @@
+/* Home only: a balanced illustration and clear starting points at wide sizes. */
+#view-home.home-page {
+  width:100%; max-width:1920px; margin:0 auto;
+  padding:clamp(28px,2.6vw,56px) clamp(24px,3vw,64px) 48px;
+}
+#view-home .home-hero {
+  grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);
+  gap:clamp(32px,3.6vw,72px); align-items:center;
+}
+#view-home .home-copy h1 {
+  font-size:clamp(42px,3vw,72px); line-height:1.12;
+  max-width:20ch; margin:0 0 24px;
+}
+#view-home .home-copy .eyebrow { margin-bottom:18px; }
+#view-home .home-copy > p.home-intro {
+  font-size:clamp(22px,1.35vw,30px); line-height:1.55;
+  max-width:39ch; margin:0;
+}
+#view-home .home-hero img {
+  width:100%; height:auto; max-width:100%; max-height:none;
+  aspect-ratio:3 / 2; object-fit:cover; border-radius:24px;
+}
+#view-home .home-start-title {
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap;
+}
+#view-home .home-tasks { margin-top:32px; gap:24px; }
+#view-home .home-task {
+  grid-template-columns:48px minmax(0,1fr) 28px;
+  grid-template-rows:auto auto; column-gap:20px; row-gap:8px;
+  align-content:center; align-items:center;
+  min-height:156px; padding:28px; border-radius:16px;
+}
+#view-home .home-task-icon { grid-column:1; grid-row:1 / span 2; width:44px; height:44px; color:var(--green); }
+#view-home .home-task strong { grid-column:2; grid-row:1; font-size:clamp(24px,1.4vw,30px); }
+#view-home .home-task > span:not(.home-task-arrow) { grid-column:2; grid-row:2; font-size:clamp(20px,1.1vw,26px); line-height:1.5; }
+#view-home .home-task .home-task-arrow { grid-column:3; grid-row:1 / span 2; font-size:32px; color:var(--green); }
+#view-home .home-task:hover { border-color:var(--green); box-shadow:0 5px 18px rgba(26,56,42,.07); }
+#view-home .first-visit-invitation {
+  background:transparent; border:0; border-top:1px solid var(--line);
+  border-radius:0; padding:18px 0 0; margin:22px 0 0; gap:12px 24px;
+}
+#view-home .first-visit-invitation > div:first-child { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; flex:1 1 auto; }
+#view-home .first-visit-invitation h2 { font-size:22px; line-height:1.5; margin:0; }
+#view-home .first-visit-invitation p { font-size:22px; margin:0; color:var(--muted); }
+#view-home .first-visit-invitation .onboarding-actions { margin:0; }
+#view-home .first-visit-invitation [data-start-onboarding] { background:#fff; color:var(--green); border-color:var(--green); }
+@media (max-width:1100px) {
+  #view-home .home-tasks { grid-template-columns:1fr; gap:16px; }
+  #view-home .home-task { min-height:132px; padding:24px; }
+}
+@media (max-width:760px) {
+  #view-home.home-page { padding:24px 20px 40px; }
+  #view-home.home-page.active { display:grid; grid-template-columns:1fr; gap:24px; }
+  #view-home .home-hero { display:contents; }
+  #view-home .home-copy { grid-row:1; }
+  #view-home .home-tasks { grid-row:2; }
+  #view-home .home-hero img { grid-row:3; }
+  #view-home .first-visit-invitation { grid-row:4; }
+  #view-home .home-copy h1 { font-size:36px; margin-bottom:18px; }
+  #view-home .home-copy > p.home-intro { font-size:22px; }
+  #view-home .home-hero img { width:100%; max-height:none; border-radius:16px; }
+  #view-home .home-task { grid-template-columns:32px minmax(0,1fr) 22px; column-gap:12px; padding:20px; }
+  #view-home .home-task-icon { width:30px; height:30px; }
+  #view-home .home-task .home-task-arrow { font-size:26px; }
+  #view-home .home-tasks { margin-top:0; }
+  #view-home .first-visit-invitation > div:first-child { flex-basis:100%; }
+}

@@ -1,0 +1,30 @@
+{
+  "cases": [
+    {
+      "id": "music-topic",
+      "query": "Find words related to music.",
+      "response": {
+        "status": "ready",
+        "summary": "Music-related word suggestions",
+        "requestedScope": null,
+        "filters": {
+          "scope": "full",
+          "limit": 25,
+          "sort": "overall",
+          "semanticQuery": "Music",
+          "candidateWords": [
+            "music",
+            "rhythm",
+            "melody",
+            "instrument",
+            "note",
+            "orchestra",
+            "hkeleinventedmusicword"
+          ]
+        },
+        "clarifyingQuestion": null,
+        "warnings": []
+      }
+    }
+  ]
+}

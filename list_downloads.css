@@ -1,0 +1,11 @@
+.selected-list-download { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0; }
+.selected-list-download:has(button[hidden]) { display: none; }
+.selected-list-download button[hidden], .selected-list-download p[hidden] { display: none; }
+.selected-list-download p { margin: 0; }
+
+.browse-heading .download-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; max-width: 100%; }
+.browse-heading .download-actions button { white-space: normal; max-width: 100%; }
+.selected-list-download p { max-width: 36ch; }
+@media (max-width: 760px) {
+  .browse-heading .download-actions { justify-content: flex-start; }
+}

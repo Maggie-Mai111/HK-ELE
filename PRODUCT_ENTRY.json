@@ -1,8 +1,8 @@
 {
-  "version": 95,
-  "date": "2026-11-24",
-  "dataVersion": "2026-11-23-author-closeout-v1",
-  "status": "LOCAL_FIRST_USER_FEEDBACK_NOT_DEPLOYED",
+  "version": 104,
+  "date": "2026-11-25",
+  "dataVersion": "2026-11-25-name-abbreviation-v1",
+  "status": "LOCAL_CHECK_TEXT_FLOW_ACCEPTED_NOT_DEPLOYED",
   "publicDeploymentPerformed": false,
   "dataChanged": false,
   "masterEntry": "../PRODUCT_ENTRY.json"

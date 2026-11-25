@@ -37,10 +37,10 @@ test("principal populations and unchanged static baseline metadata", async () =>
   const {manifest} = await context();
   const metadata = manifest.metadata;
   assert.equal(Number(metadata.family_count), 167780);
-  assert.equal(Number(metadata.ranked_family_count), 138518);
-  assert.equal(Number(metadata.unranked_family_count), 29262);
-  assert.equal(manifest.browse.core.overall.available_items, 1669);
-  assert.equal(manifest.browse.broader.overall.available_items, 1669);
+  assert.equal(Number(metadata.ranked_family_count), 138517);
+  assert.equal(Number(metadata.unranked_family_count), 29263);
+  assert.equal(manifest.browse.core.overall.available_items, 1661);
+  assert.equal(manifest.browse.broader.overall.available_items, 1661);
   assert.equal(manifest.browse.broader.overall.available_items - manifest.browse.core.overall.available_items, 0);
   for (const name of ["tokenizer.js", "contractions.js", "xlsx_export.js"]) {
     let source = await readFile(path.join(package87,name));

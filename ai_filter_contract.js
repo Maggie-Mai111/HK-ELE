@@ -191,7 +191,7 @@ root.HKELE_EDUCATION_FILTERS=Object.freeze(exports);})(globalThis);
   const FILTER_KEYS = Object.freeze([
     "scope", "earliestObservedFrom", "earliestObservedTo", "overallRankMin", "overallRankMax",
     "hkRankMin", "hkRankMax", "hkBands", "prefix", "suffix", "root", "awl", "msvl",
-    "msvlSubjects", "externalLevels", "usGradeFrom", "usGradeTo", "usGradeMatch", "usCollege", "cpb100", "limit", "sort",
+    "msvlSubjects", "externalLevels", "usGradeFrom", "usGradeTo", "usGradeMatch", "usCollege", "cpb100", "semanticQuery", "candidateWords", "limit", "sort",
   ]);
   const RESULT_KEYS = new Set(["status", "summary", "filters", "clarifyingQuestion", "warnings", "requestedScope"]);
   const FILTER_KEY_SET = new Set(FILTER_KEYS);
@@ -283,6 +283,14 @@ root.HKELE_EDUCATION_FILTERS=Object.freeze(exports);})(globalThis);
     try { education.validateUsReferenceConditions(result); }
     catch (error) { throw new ValidationError(error.message); }
     assign("cpb100", optionalBoolean(record, "cpb100"));
+    if ((record.semanticQuery === undefined) !== (record.candidateWords === undefined)) throw new ValidationError("Topic searches need both a description and candidate words.");
+    if (record.semanticQuery !== undefined) {
+      assign("semanticQuery", boundedString(record.semanticQuery, "semanticQuery", 100));
+      const words = optionalStringArray(record, "candidateWords", 100, 60);
+      if (words.some(word => !/^[\p{L}][\p{L}\p{M}'’–-]*$/u.test(word))) throw new ValidationError("Candidates must be single word forms.");
+      assign("candidateWords", words);
+    }
+
     if (result.overallRankMin && result.overallRankMax && result.overallRankMin > result.overallRankMax) throw new ValidationError("overall rank range is reversed.");
     if (result.hkRankMin && result.hkRankMax && result.hkRankMin > result.hkRankMax) throw new ValidationError("HK rank range is reversed.");
     const from = result.earliestObservedFrom ? GRADES.indexOf(result.earliestObservedFrom) : -1;
@@ -314,6 +322,7 @@ root.HKELE_EDUCATION_FILTERS=Object.freeze(exports);})(globalThis);
 
   function applyToRows(rows, proposedFilters, index = {}) {
     const filters = validateConditions(proposedFilters);
+    if (filters.candidateWords) throw new ValidationError("Topic searches require exact word-form evidence.");
     const cpbKeys = new Set(index.cpb100_family_keys || []);
     const morphology = index.morphology_by_family || {};
     const from = filters.earliestObservedFrom ? GRADES.indexOf(filters.earliestObservedFrom) : -1;
@@ -358,7 +367,8 @@ root.HKELE_EDUCATION_FILTERS=Object.freeze(exports);})(globalThis);
   }
 
   function describeConditions(filters, scope) {
-    const items = [scope === "core95" ? "Scope: 95% list" : scope === "core" ? "Scope: 90% list" : filters.scope === "full" ? "Scope: Full database" : filters.scope === "candidate" ? "Scope: HK-ELE Word List" : "Scope: saved word data (partial)"];
+    const items = [scope === "core95" ? "Scope: 95% core list" : scope === "core" ? "Scope: 90% core list" : filters.scope === "full" ? "Scope: Full database" : filters.scope === "candidate" ? "Scope: HK-ELE Word List" : "Scope: saved word data (partial)"];
+    if (filters.semanticQuery) items.push(`Looking for: ${filters.semanticQuery}`);
     if (filters.earliestObservedFrom || filters.earliestObservedTo) items.push(filters.earliestObservedFrom && filters.earliestObservedTo ? `First seen in HK textbooks: ${filters.earliestObservedFrom}–${filters.earliestObservedTo}` : filters.earliestObservedFrom ? `First seen in HK textbooks: ${filters.earliestObservedFrom} or later` : `First seen in HK textbooks: ${filters.earliestObservedTo} or earlier`);
     const range = (label, minimum, maximum) => { if (minimum !== undefined || maximum !== undefined) items.push(minimum !== undefined && maximum !== undefined ? `${label}: ${minimum.toLocaleString("en")}–${maximum.toLocaleString("en")}` : minimum !== undefined ? `${label}: ${minimum.toLocaleString("en")} or lower priority` : `${label}: up to ${maximum.toLocaleString("en")}`); };
     range("Overall family rank", filters.overallRankMin, filters.overallRankMax);
@@ -390,7 +400,7 @@ root.HKELE_EDUCATION_FILTERS=Object.freeze(exports);})(globalThis);
   function teacherResult(raw, scope = "full") {
     const result = validateResult(raw);
     const teacherText = text => text.replace(/Candidate\s*(?:and|\+)\s*Reference/gi, "HK-ELE Word List").replace(/Reference[ -]only/gi, "other database").replace(/\bCandidate\b/g, "HK-ELE Word List");
-    return {...result, teacherScope:scope, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core95" ? "95% list" : scope === "core" ? "HK-ELE Word List" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
+    return {...result, teacherScope:scope, filters:result.filters ? {...result.filters, scope:scope === "core" ? "candidate" : "full"} : null, summary:result.filters ? `${scope === "core95" ? "95% core list" : scope === "core" ? "HK-ELE Word List" : "Full database"} words matching these filters.` : teacherText(result.summary), clarifyingQuestion:result.clarifyingQuestion ? teacherText(result.clarifyingQuestion) : null, warnings:result.warnings.map(teacherText)};
   }
   return Object.freeze({GRADES, HK_BANDS, MSVL_SUBJECTS, FILTER_KEYS, ValidationError, validateConditions, validateResult, applyToRows, describeConditions, teacherScope, interpreterQuery, teacherResult});
 });

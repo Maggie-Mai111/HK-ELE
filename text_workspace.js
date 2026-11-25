@@ -78,34 +78,58 @@
       extra:reasons.filter(reason=>reason!==primary && !reason.startsWith("Appears ")).map(label)};
   }
 
+  function comparisonDisplay(counts) {
+    return {
+      value:counts.percent === null ? "No words to count."
+        : `${counts.included} of ${counts.total} ${counts.total === 1 ? "word" : "words"} · ${Number(counts.percent.toFixed(1))}%`,
+      outsideHidden:counts.outside === 0,
+      outsideLabel:`${counts.outside} ${counts.outside === 1 ? "word" : "words"} outside this list →`,
+    };
+  }
+  const highlightKey = "hkele.web.reader-display.v1";
+  function readHighlights(storage) {
+    try {
+      const value = JSON.parse(storage?.getItem(highlightKey) || "null");
+      if (typeof value?.common === "boolean" && typeof value?.hk === "boolean")
+        return {common:value.common, hk:value.hk};
+    } catch (_) { /* Display remains usable when storage is unavailable. */ }
+    return {common:false, hk:true};
+  }
+  function rememberHighlights(storage, common, hk) {
+    try { storage?.setItem(highlightKey, JSON.stringify({common:!!common,hk:!!hk})); } catch (_) {}
+  }
   function create({state, $, esc, openFamily, addToList, contractionDescription, showView, compoundUi}) {
-    let classLevel = null, limit = 4, commonOn = false, hkOn = false, reviewFilter = "marked";
+    let displayStorage;
+    try { displayStorage = root.localStorage; } catch (_) {}
+    const display = readHighlights(displayStorage);
+    let classLevel = null, limit = 4, commonOn = display.common, hkOn = display.hk, reviewFilter = "marked";
     let judgements = {};
     const dialog = document.createElement("dialog");
     dialog.className = "text-word-dialog"; dialog.setAttribute("aria-labelledby", "text-word-title");
     document.body.appendChild(dialog);
     function reveal(id) {
       const node = $(id), headerHeight = $(".site-header")?.getBoundingClientRect().height || 0;
-      window.scrollTo({top:Math.max(0,window.scrollY+node.getBoundingClientRect().top-headerHeight-16),behavior:"smooth"});
+      const anchor=id==="#checked-reader" ? $("#view-check") : node;
+      window.scrollTo({top:Math.max(0,window.scrollY+anchor.getBoundingClientRect().top-headerHeight-16),behavior:"smooth"});
       node.focus({preventScroll:true});
     }
     function openOccurrence(item) {
-      if(item.status === "REGISTERED_EXPRESSION" && item.expression && compoundUi) {const host=compoundUi.open(item.expression,"Check a text");if(host)mountReviewTools(host.querySelector("[data-compound-close]"),item.surface,item,true);return;}
+      if(item.status === "REGISTERED_EXPRESSION" && item.expression && compoundUi) {const host=compoundUi.open(item.expression,"Check a text");if(host)mountReviewTools(host.querySelector("[data-compound-context]"),item.surface,item);return;}
       const owners = (item.owners || []).filter(owner => !owner.blocked && !owner.display_blocked);
       const expansion = contractionDescription(item);
       if (!expansion && item.status === "RESOLVED" && item.owners.length === 1 && owners.length === 1) {
         void openFamily(owners[0].baseword_key, owners[0].matched_form_evidence?.form || item.surface, item); return;
       }
-      dialog.innerHTML = `<h2 id="text-word-title">${esc(item.surface)}</h2>${expansion
+      dialog.innerHTML = `<header class="word-dialog-heading"><h2 id="text-word-title">${esc(item.surface)}</h2><button type="button" data-reader-close>Close</button></header><div class="word-dialog-body"><div data-reader-context></div>${expansion
         ? `<p>Full form: ${esc(expansion)}</p>`
         : item.status === "AMBIGUOUS" && owners.length
-          ? `<p>Choose the family that fits this sentence.</p>${owners.map((owner,index)=>`<button data-reader-owner="${index}">${esc(owner.display_family)}</button>`).join("")}`
-        : `<p>${item.status === "UNSUPPORTED" ? "No word entry for this part. You can still explore the other words in your text." : item.status === "BLOCKED" ? "Check the spelling or use in this sentence." : "No automatic match in this text."}</p>`}<button data-reader-close>Close</button>`;
+          ? `<p>Choose the family that fits this sentence.</p><div class="reader-owner-choices">${owners.map((owner,index)=>`<button type="button" data-reader-owner="${index}">${esc(owner.display_family)}</button>`).join("")}</div>`
+        : `<p>${item.status === "UNSUPPORTED" ? "No word entry for this part. You can still explore the other words in your text." : item.status === "BLOCKED" ? "Check the spelling or use in this sentence." : "No automatic match in this text."}</p>`}</div>`;
       dialog.querySelectorAll("[data-reader-owner]").forEach(button => button.addEventListener("click", () => {
         const owner = owners[Number(button.dataset.readerOwner)]; dialog.close();
         void openFamily(owner.baseword_key, owner.matched_form_evidence?.form || item.surface, item);
       }));
-      if (/[A-Za-z]/.test(item.surface)) mountReviewTools(dialog.querySelector("#text-word-title"), item.surface, item);
+      if (/[A-Za-z]/.test(item.surface)) mountReviewTools(dialog.querySelector("[data-reader-context]"), item.surface, item);
       dialog.querySelector("[data-reader-close]").addEventListener("click", () => dialog.close()); dialog.showModal();
     }
     function mountReviewTools(host, surface, selectedItem = state.reviewOccurrence, before = false) {
@@ -129,7 +153,7 @@
     }
     function openOccurrences(surface) {
       const occurrences = wordOccurrences(state.textAudit, surface);
-      dialog.innerHTML = `<header class="occurrences-heading"><h2 id="text-word-title">“${esc(surface)}” in your text</h2><button data-reader-close>Close occurrences</button></header><p>${occurrences.length} ${occurrences.length === 1 ? "occurrence" : "occurrences"}</p><div class="occurrences-list">${occurrences.map((item,index) => {const excerpt=occurrenceExcerpt(state.checkedText || "",item);return `<article><p class="hint">Occurrence ${index + 1}</p><p>${esc(excerpt.before)}<mark>${esc(excerpt.word)}</mark>${esc(excerpt.after)}</p><button data-occurrence-open="${index}">View ${esc(item.surface)}</button></article>`;}).join("")}</div>`;
+      dialog.innerHTML = `<header class="word-dialog-heading"><h2 id="text-word-title">“${esc(surface)}” in your text</h2><button type="button" data-reader-close aria-label="Close occurrences">Close</button></header><div class="word-dialog-body"><p>${occurrences.length} ${occurrences.length === 1 ? "occurrence" : "occurrences"}</p><div class="occurrences-list">${occurrences.map((item,index) => {const excerpt=occurrenceExcerpt(state.checkedText || "",item);return `<article><p class="hint">Occurrence ${index + 1}</p><p>${esc(excerpt.before)}<mark>${esc(excerpt.word)}</mark>${esc(excerpt.after)}</p><button data-occurrence-open="${index}">View ${esc(item.surface)}</button></article>`;}).join("")}</div></div>`;
       dialog.querySelector("[data-reader-close]").addEventListener("click", () => dialog.close());
       dialog.querySelectorAll("[data-occurrence-open]").forEach(button => button.addEventListener("click", () => {
         const item = occurrences[Number(button.dataset.occurrenceOpen)]; dialog.close(); openOccurrence(item);
@@ -148,7 +172,7 @@
       $("#passage-words").querySelectorAll("[data-reader-word]").forEach(button => button.addEventListener("click", () => {
         const item = state.textAudit.find(row => row.occurrence_id === button.dataset.readerWord); if (item) openOccurrence(item);
       }));
-      $("#reader-legend").innerHTML = `${commonOn ? '<span class="is-common">CPB100 sight words · underline</span>' : ""}${hkOn ? '<span class="hk-top">HK family ranks 1–1,000</span><span class="hk-next">HK family ranks 1,001–2,000</span><span class="hk-later">HK family ranks 2,001+</span>' : ""}`;
+      $("#reader-legend").innerHTML = `${commonOn ? '<span class="is-common">100 sight words · underline</span>' : ""}${hkOn ? '<span>HK family rank:</span><span class="hk-top">1–1,000</span><span class="hk-next">1,001–2,000</span><span class="hk-later">2,001+</span>' : ""}`;
     }
     function contextMarkup(item) {
       const excerpt=occurrenceExcerpt(state.checkedText||"",item);
@@ -167,16 +191,20 @@
       const families = groupSuggestions(entries);
       const cards=[...families.map(group=>({...group,other:null})),...otherMarked.map(item=>({key:item.occurrence_id,forms:[],other:item}))];
       if(reviewFilter==="marked")cards.sort((a,b)=>(a.other?.occurrence_order ?? a.forms[0].entry.firstOrder)-(b.other?.occurrence_order ?? b.forms[0].entry.firstOrder));
-      $("#preteach-summary").textContent = reviewFilter==="marked" ? `${entries.length+otherMarked.length} ${entries.length+otherMarked.length===1 ? "word" : "words"} marked for explanation` : reviewFilter==="later" && !classLevel ? "Choose your class level to find words first seen in later textbooks." : `${entries.length} word ${entries.length===1 ? "form" : "forms"} · records from this text, most repeated first`;
+      const markedCount=entries.length+otherMarked.length;
+      $("#preteach-title").textContent=reviewFilter==="marked" ? "Words to explain" : "Words in this text";
+      $("#preteach-summary").hidden=reviewFilter==="marked" && markedCount===0;
+      $("#preteach-summary").textContent = reviewFilter==="marked" ? `${markedCount} ${markedCount===1 ? "word" : "words"} marked` : reviewFilter==="later" && !classLevel ? "Choose your class level to find words first seen in later textbooks." : `${entries.length} word ${entries.length===1 ? "form" : "forms"} · most repeated first`;
       $("#preteach-items").innerHTML = cards.slice(0,limit).map(group => {
         if(group.other)return `<article class="preteach-word"><button class="family-link" data-review-other="${otherMarked.indexOf(group.other)}">${esc(group.other.surface)}</button><p>${contextMarkup(group.other)}</p><p class="hint">You marked this use May need explaining</p><button data-review-other="${otherMarked.indexOf(group.other)}">View</button></article>`;
         const rows=group.forms.map(({entry,index}) => {
           const added=state.selected.some(item=>item.baseword_key===entry.key && item.selected_forms.some(form=>form.toLocaleLowerCase()===entry.form.toLocaleLowerCase()));
           const evidence=suggestionEvidence(entry);
+          if(reviewFilter==="marked")evidence.primary=null;
           return `<div class="preteach-form"><div><button class="family-link" data-preteach-view="${index}">${esc(entry.form)}</button>${group.forms.length===1 && entry.form.toLocaleLowerCase()!==entry.family.display_family.toLocaleLowerCase() ? `<small>Family: ${esc(entry.family.display_family)}</small>` : ""}<p class="hint">${contextMarkup(entry.occurrence)}</p>${evidence.primary ? `<div class="preteach-reasons"><span>${esc(evidence.primary)}</span></div>` : ""}<small>In this text: ${entry.count} ${entry.count===1 ? "time" : "times"}</small>${evidence.extra.length ? `<details><summary>Word records</summary><p class="hint">${evidence.extra.map(esc).join(" · ")}</p></details>` : ""}</div><button data-preteach-add="${index}" ${added ? "disabled" : ""}>${added ? "Added" : "Add"}</button></div>`;
         }).join("");
         return `<article class="preteach-word">${group.forms.length>1 ? `<p class="preteach-family">Family: ${esc(group.family)} · ${group.forms.length} forms in your text</p>` : ""}${rows}</article>`;
-      }).join("") || (reviewFilter==="later" && !classLevel ? "" : `<p class="hint">${reviewFilter==="marked" ? "No marks yet. Click a word in your text to get started." : "No words match this filter. You can still choose words from the text."}</p>`);
+      }).join("") || (reviewFilter==="later" && !classLevel ? "" : `<p class="hint">${reviewFilter==="marked" ? "Click a word above and mark May need explaining." : "No words match this filter. You can still choose words from the text."}</p>`);
       $("#preteach-items").querySelectorAll("[data-review-other]").forEach(button=>button.addEventListener("click",()=>openOccurrence(otherMarked[Number(button.dataset.reviewOther)])));
       $("#preteach-items").querySelectorAll("[data-preteach-view]").forEach(button=>button.addEventListener("click",()=>{
         const entry=entries[Number(button.dataset.preteachView)]; openOccurrence(entry.occurrence);
@@ -211,8 +239,11 @@
       });
       $("#reader-to-suggestions").addEventListener("click",()=>reveal("#preteach-panel"));
       $("#suggestions-to-reader").addEventListener("click",()=>reveal("#checked-reader"));
-      $("#reader-common").addEventListener("change",event=>{commonOn=event.target.checked;renderReader();});
-      $("#reader-hk").addEventListener("change",event=>{hkOn=event.target.checked;renderReader();});
+      $("#reader-common").checked=commonOn; $("#reader-hk").checked=hkOn;
+      const saveDisplay=()=>rememberHighlights(displayStorage,commonOn,hkOn);
+      $("#reader-common").addEventListener("change",event=>{commonOn=event.target.checked;saveDisplay();renderReader();});
+      $("#reader-hk").addEventListener("change",event=>{hkOn=event.target.checked;saveDisplay();renderReader();});
+      $("#reader-plain").addEventListener("click",()=>{commonOn=false;hkOn=false;$("#reader-common").checked=false;$("#reader-hk").checked=false;saveDisplay();renderReader();});
       $("#preteach-filter").addEventListener("change",event=>{reviewFilter=event.target.value;limit=4;refreshSuggestions();});
       $("#preteach-level").addEventListener("change",event=>{classLevel=event.target.value || null;limit=4;refreshSuggestions();});
       $("#preteach-more").addEventListener("click",()=>{limit+=20;refreshSuggestions();});
@@ -225,5 +256,5 @@
     }
     return {bind, render, hideResults, refreshSuggestions, reveal, resetLessonContext, openOccurrences, mountReviewTools, openResult};
   }
-  root.HKELE_TEXT_WORKSPACE = Object.freeze({segments, wordOccurrences, occurrenceExcerpt, suggestions, markedOtherOccurrences, groupSuggestions, suggestionEvidence, create});
+  root.HKELE_TEXT_WORKSPACE = Object.freeze({segments, wordOccurrences, occurrenceExcerpt, suggestions, markedOtherOccurrences, groupSuggestions, suggestionEvidence, comparisonDisplay, readHighlights, rememberHighlights, create});
 })(globalThis);

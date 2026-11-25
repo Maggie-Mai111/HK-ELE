@@ -96,7 +96,7 @@ test('Web loads the same pinned database after Git converts CRLF text to LF', as
   for (const lineEndings of ['lf', 'crlf']) {
     const {api} = webApi({lineEndings});
     assert.equal((await api.request('/families?scope=full')).available_items, 167780);
-    assert.equal((await api.request('/families?scope=core')).available_items, 1669);
+    assert.equal((await api.request('/families?scope=core')).available_items, 1661);
     assert.equal((await api.request('/search?q=reusable')).owners[0].baseword_key, 'use');
   }
 });

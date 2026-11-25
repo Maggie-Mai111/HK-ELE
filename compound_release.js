@@ -1,1 +1,1 @@
-globalThis.HKELE_COMPOUND_RELEASE = {"dataVersion":"2026-11-23-author-closeout-v1","expressionVersion":"2026-11-05-closed-compounds-v1","records":57881,"manifestSha256":"b555ddd412664b7ea4e7193535dd6caaaf64bc9c7e6146469df6a375da6e77d0"};
+globalThis.HKELE_COMPOUND_RELEASE = {"dataVersion":"2026-11-25-name-abbreviation-v1","expressionVersion":"2026-11-05-closed-compounds-v1","records":57881,"manifestSha256":"f75003facddea353bd4149c7309e7224a66e407be5e5a6cb7711c2e64b59f10e"};

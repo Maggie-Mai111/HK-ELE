@@ -1,11 +1,11 @@
 (function(root){
   function create({state,esc,openFamily,onChanged}){
     const records=new Map();let dialog;
-    function html(expression,source='Find words'){
+    function html(expression,source='Find words',inDialog=false){
       records.set(expression.expressionId,expression);
       const added=state.selected.some(item=>item.baseword_key===root.HKELE_COMPOUND_TEACHING.key(expression));
       const parts=(expression.parts||[]).map(part=>part.familyKey?`<button type="button" data-compound-family="${esc(part.familyKey)}" data-compound-form="${esc(part.form)}">${esc(part.form)}</button>`:`<span>${esc(part.form)}</span>`).join('');
-      return `<section class="compound-card" aria-label="${esc(expression.displayExpression)} compound"><div class="compound-title"><h3>${esc(expression.displayExpression)}</h3><span class="set-pill other">Compound</span></div>${parts?`<div class="compound-parts"><span>Word parts</span>${parts}</div>`:''}<div class="compound-actions"><button type="button" class="primary" data-compound-add="${expression.expressionId}" data-compound-source="${esc(source)}" ${added?'disabled':''}>${added?'Added ✓':'Add to Selected words'}</button><button type="button" data-feedback-kind="rating" data-feedback-word="true" data-compound-feedback="${expression.expressionId}" data-compound-source="${esc(source)}">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true" data-compound-feedback="${expression.expressionId}" data-compound-source="${esc(source)}">Report a problem</button></div></section>`;
+      return `<section class="compound-card" aria-label="${esc(expression.displayExpression)} compound"><div class="compound-title">${inDialog?'':`<h3>${esc(expression.displayExpression)}</h3>`}<span class="set-pill other">Compound</span></div>${parts?`<div class="compound-parts"><span>Word parts</span>${parts}</div>`:''}<div class="compound-actions"><button type="button" class="primary" data-compound-add="${expression.expressionId}" data-compound-source="${esc(source)}" ${added?'disabled':''}>${added?'Added ✓':'Add to Selected words'}</button><button type="button" data-feedback-kind="rating" data-feedback-word="true" data-compound-feedback="${expression.expressionId}" data-compound-source="${esc(source)}">Rate this word</button><button type="button" data-feedback-kind="report" data-feedback-word="true" data-compound-feedback="${expression.expressionId}" data-compound-source="${esc(source)}">Report a problem</button></div></section>`;
     }
     function bind(host){
       host.querySelectorAll('[data-compound-family]').forEach(button=>button.addEventListener('click',()=>{if(dialog?.open)dialog.close();void openFamily(button.dataset.compoundFamily,button.dataset.compoundForm);}));
@@ -22,9 +22,9 @@
     }
     function open(expression,source='Selected words'){
       if(!expression)return;
-      if(!dialog){dialog=document.createElement('dialog');dialog.className='feedback-dialog';document.body.appendChild(dialog);}
+      if(!dialog){dialog=document.createElement('dialog');dialog.className='feedback-dialog compound-dialog';document.body.appendChild(dialog);}
       dialog.setAttribute('aria-label',expression.displayExpression+' compound');
-      dialog.innerHTML=html(expression,source)+'<button type="button" data-compound-close>Close</button>';bind(dialog);
+      dialog.innerHTML=`<header class="word-dialog-heading"><h2>${esc(expression.displayExpression)}</h2><button type="button" data-compound-close>Close</button></header><div class="word-dialog-body"><div data-compound-context></div>${html(expression,source,true)}</div>`;bind(dialog);
       dialog.querySelector('[data-compound-close]').addEventListener('click',()=>dialog.close());if(!dialog.open)dialog.showModal();return dialog;
     }
     return {html,bind,open};

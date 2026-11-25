@@ -1,9 +1,9 @@
 (function (root) {
   "use strict";
-  const DATA_VERSION = "2026-11-23-author-closeout-v1";
+  const DATA_VERSION = "2026-11-25-name-abbreviation-v1";
   const VERSION = "spelling-frequency-20261105-v1";
   const DATA_ROOT = `data/word-forms/${VERSION}/`;
-  const MANIFEST_HASH = "c0c02da638820399153ab2bf7890f7103220525ef2b1ca8ec4b466dbbd202e09";
+  const MANIFEST_HASH = "fb559def9c2e6887dc87f66f909bb0bde5dcd69a873d5116351c97c7415d5328";
   const normalize = value => String(value ?? "").normalize("NFKC").trim().toLowerCase().replace(/[’‘ʼ＇]/g, "'");
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : null;
   function frequency(record) {
@@ -21,6 +21,11 @@
       } else if (a.frequency !== b.frequency) return (sort === "frequency-asc" ? 1 : -1) * (a.frequency - b.frequency);
       return normalize(a.form.form).localeCompare(normalize(b.form.form), "en");
     });
+  }
+  function previewForms(rows, key, showAll = false) {
+    if (showAll || !root.HKELE_WORD_VIEW?.familiarForm) return rows;
+    const preferred = rows.filter(row => row.isSearch || root.HKELE_WORD_VIEW.familiarForm(key, row.form.normalized_form || row.form.form));
+    return preferred.length ? preferred : rows.slice(0, 1);
   }
   function bucket(key) {
     let h = 2166136261;
@@ -65,5 +70,5 @@
     let ticket = 0;
     return {next:() => ++ticket, cancel:() => ++ticket, current:value => value === ticket};
   }
-  root.HKELE_WORD_FAMILY_RESULTS = Object.freeze({normalize, frequency, sortedForms, bucket, createReader, createRequestGate});
+  root.HKELE_WORD_FAMILY_RESULTS = Object.freeze({normalize, frequency, sortedForms, previewForms, bucket, createReader, createRequestGate});
 })(globalThis);

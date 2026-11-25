@@ -69,7 +69,7 @@ test('passage matching preserves source offsets and counts each occurrence once,
  assert.equal(overlap.status,'RESOLVED');assert.ok(overlap.expression);
  assert.ok(overlap.owners.some(owner=>owner.baseword_key==='coinsure'));
  const manifest=await p.HKELE_STATIC_API.manifest();
- assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1669);
+ assert.equal(manifest.browse.full.overall.available_items,167780);assert.equal(manifest.browse.core.overall.available_items,1661);
 });
 test('a corrupt compound shard cannot produce a match and can be retried without losing ordinary lookup',async()=>{
  const p=product({corrupt:true});

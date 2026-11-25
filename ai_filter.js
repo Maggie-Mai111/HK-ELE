@@ -111,6 +111,7 @@
     const notes = result.warnings
       .filter(text => !/^No filters? (?:was|were) applied\.?$/i.test(text))
       .map(text => text.replace(/\bregistered\s+/gi, ""));
+    if (ready && result.filters.semanticQuery) notes.unshift("AI suggests possible matches. HK-ELE will check the word records.");
     if (result.status === "needs_clarification") notes.unshift(result.clarifyingQuestion || "Which words would you like to find?");
     if (result.status === "unsupported") notes.unshift("Try a simpler request or one of the examples.");
     summary.textContent = notes.join(" ");
@@ -194,7 +195,9 @@
       if (!response.ok) throw new Error("Fixture unavailable");
       return response.json();
     });
-    const document = await fixturePromise;
+    const base = await fixturePromise;
+    const extra = await fetch("tests/fixtures/topic_search_cases.json", {cache:"no-store"}).then(response=>response.json());
+    const document = {cases:[...base.cases,...extra.cases]};
     const queryKey = value => value.normalize("NFKC").trim().toLocaleLowerCase().replace(/candidate\s*(?:and|\+)\s*reference|candidate|core list/gi, "").replace(/\s+/g," ");
     const target = queryKey(query);
     const item = document.cases.find(candidate => queryKey(candidate.query) === target);
@@ -207,18 +210,21 @@
     pendingRequest = controller;
     const timer = setTimeout(() => controller.abort(), config.requestTimeoutMs);
     try {
-      const response = await fetch(config.endpoint, {
+      const requestBody = {
+        query: contract.interpreterQuery(query), locale: /[\u3400-\u9fff]/u.test(query) ? "zh-HK" : "en-HK",
+        surface: "browse", semanticSearch: true, turnstileToken, anonymousSessionId: anonymousSessionId(),
+      };
+      let response = await fetch(config.endpoint, {
         method: "POST",
         headers: {"content-type": "application/json"},
-        body: JSON.stringify({
-          query: contract.interpreterQuery(query),
-          locale: /[\u3400-\u9fff]/u.test(query) ? "zh-HK" : "en-HK",
-          surface: "browse",
-          turnstileToken,
-          anonymousSessionId: anonymousSessionId(),
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
+      if (response.status === 400 && (await response.clone().json().catch(() => null))?.error?.code === "INVALID_REQUEST") {
+        const {semanticSearch, ...legacyBody} = requestBody;
+        void semanticSearch;
+        response = await fetch(config.endpoint, {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(legacyBody),signal:controller.signal});
+      }
       if (!response.ok) throw new Error(response.status === 429 ? "AI search is busy. Try again later." : "AI search is unavailable.");
       return response.json();
     } finally {
@@ -264,11 +270,13 @@
       const reviewed = interpretation;
       const result = await window.HKELE_BROWSE_ADAPTER.apply(reviewed.filters, reviewed.teacherScope);
       if (reviewed !== interpretation) return;
-      activeTitle.textContent = `${result.matchedBeforeLimit.toLocaleString("en")} matches · showing first ${result.availableItems.toLocaleString("en")}`;
+      activeTitle.textContent = `${result.matchedBeforeLimit.toLocaleString("en")} ${reviewed.filters.semanticQuery ? "HK-ELE suggestions" : "matches"} · showing first ${result.availableItems.toLocaleString("en")}`;
       activeConditions.textContent = displayConditions(reviewed.filters, reviewed.teacherScope).join(" · ");
+      const topicNote = document.querySelector("#ai-semantic-note");
+      topicNote.hidden = !reviewed.filters.semanticQuery;
       active.hidden = false;
       setExpanded(false);
-      setMessage("");
+      setMessage(reviewed.filters.semanticQuery ? "AI suggests which words fit your request. HK-ELE provides the word information. Check meanings for your lesson." : "");
       document.querySelector("#family-table")?.scrollIntoView({block: "start", behavior: "smooth"});
     } catch {
       setMessage("We couldn't show these results. Try again or adjust the word search.", "error");

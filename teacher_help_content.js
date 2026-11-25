@@ -46,8 +46,8 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
           "Choose All word forms for every spelling in HK-ELE. The smaller set keeps spellings rated as familiar in general English. Your class may know different words."
         ],
         [
-          "90% / 95% lists",
-          "In the Hong Kong texts used to choose the lists, at least 90 out of every 100 words were on the 90% list, and at least 95 on the 95% list. The 95% list includes more words. For example, if both words in last year are in the selected list, your result is 2 out of 2 (100%). Repeated words count each time; this does not show what students know."
+          "90% / 95% core lists",
+          "The 90% core list matched at least 90 in every 100 words in each group of Hong Kong texts we studied. The 95% core list adds more words to reach at least 95. Repeated words count each time; your text may differ. Knowing around 95% of the words in a text is a research-based starting target for basic reading comprehension with some support. Use these core lists to help choose words to teach. Check which words your class still needs help with."
         ]
       ]
     },
@@ -120,12 +120,12 @@ globalThis.HKELE_TEACHER_HELP_CONTENT = {
       "Describe the words you need. Review the suggested search, then choose Show matching words. An internet connection is needed."
     ],
     [
-      "Highlight words",
-      "In Your text, open Highlight words. The sight-word list (CPB100) adds an underline. HK family rank adds colour. A word can have both marks."
+      "Highlights",
+      "In Check a Text, open Options → Highlights to change the colours, add sight-word underlines (CPB100), or choose Plain text. A word can have both marks."
     ],
     [
       "Words to explain",
-      "Words marked May need explaining in this passage."
+      "Click a word and mark May need explaining. Your choices appear below the text. Choose Add to keep a word in Selected words."
     ],
     [
       "All word results",

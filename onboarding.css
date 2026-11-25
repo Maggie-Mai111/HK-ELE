@@ -1,0 +1,33 @@
+/* A single optional guide, in the page flow; no overlay or smaller type. */
+.first-visit-invitation[hidden], .onboarding-coach[hidden], .onboarding-coach [hidden] { display:none !important; }
+.first-visit-invitation, .onboarding-coach {
+  border:1px solid var(--line); border-left:5px solid var(--green);
+  background:var(--mint); color:var(--ink); padding:22px 26px; border-radius:10px;
+  font-size:var(--work-copy,24px); line-height:1.5;
+}
+.first-visit-invitation { display:flex; flex-wrap:wrap; align-items:center; gap:20px; margin:24px 0; }
+.first-visit-invitation > div:first-child { flex:1 1 420px; }
+.first-visit-invitation h2, .onboarding-coach h2 { margin:0; font:700 26px/1.4 Inter,Segoe UI,Arial,sans-serif; }
+.first-visit-invitation p, .onboarding-coach p { margin:8px 0 0; }
+.onboarding-actions, .onboarding-coach-heading { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.onboarding-coach-heading { justify-content:space-between; }
+.onboarding-coach-heading button { flex:0 0 auto; }
+.first-visit-invitation button, .onboarding-coach button, .help-example-start button { font-size:22px; min-height:48px; white-space:normal; }
+.onboarding-coach { margin:18px 0; scroll-margin-top:200px; }
+.onboarding-coach .onboarding-actions:not(:has([data-guide-list]:not([hidden]))) { display:none; }
+.onboarding-actions { margin-top:14px; }
+.onboarding-target { outline:2px solid var(--green); outline-offset:4px; }
+.onboarding-target:focus-visible { outline-width:3px; }
+.help-example-start { margin:14px 0 22px; }
+html[data-onboarding-step="check"][data-onboarding-example] #text-input { height:168px; min-height:168px; }
+html[data-onboarding-step="check"] #check-compose > .hint,
+html[data-onboarding-step="explore"] #checked-reader > .hint,
+html[data-onboarding-step="saved"] #view-list > .hint { display:none; }
+html[data-consent-pending] .first-visit-invitation, html[data-privacy-open] .first-visit-invitation,
+html[data-consent-pending] .onboarding-coach, html[data-privacy-open] .onboarding-coach { display:none; }
+@media(max-width:760px) {
+  .first-visit-invitation, .onboarding-coach { padding:18px; }
+  .first-visit-invitation > div:first-child { flex-basis:100%; }
+  .onboarding-coach-heading { align-items:flex-start; }
+  .onboarding-coach-heading h2 { flex:1 1 220px; }
+}

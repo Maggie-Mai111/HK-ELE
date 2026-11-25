@@ -50,3 +50,5 @@
 .related-form-shortcuts > div { display:flex; gap:10px; flex-wrap:wrap; }
 .related-form-shortcuts button { color:var(--green-dark); font-size:var(--work-copy); min-height:46px; }
 #view-browse .family-search-note { margin:10px 0; }
+
+.family-form-preview { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px 24px; }
